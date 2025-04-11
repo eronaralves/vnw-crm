@@ -1,0 +1,39 @@
+import axios from 'axios'
+import { env } from '@/env'
+import { getServerSession } from 'next-auth'
+import { cookies } from 'next/headers'
+
+// Utils
+import { authOptions } from '@/utils/auth-options'
+
+export const api = axios.create({
+  baseURL: env.BASE_URL,
+})
+
+api.interceptors.request.use(async (config) => {
+  const session = await getServerSession(authOptions)
+
+  if (session?.accessToken) {
+    config.headers.Authorization = `Bearer ${session.accessToken}`
+  }
+
+  return config
+})
+
+api.interceptors.response.use(
+  (response) => {
+    return response
+  },
+  async (error) => {
+    const originalRequest = error.config
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+
+      const cookie = await cookies()
+      cookie.delete('next-auth.session-token')
+    }
+
+    return Promise.reject(error)
+  },
+)
