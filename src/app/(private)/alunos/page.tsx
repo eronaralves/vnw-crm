@@ -1,7 +1,6 @@
 // Components
-import { getStudents } from '@/http/students/get-students'
-import { FormSearch } from '../../../components/form-search'
 import { ListStudent } from './list-students'
+import { FormSearch } from '../../../components/form-search'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default async function Alunos() {
