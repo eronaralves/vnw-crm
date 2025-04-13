@@ -89,7 +89,7 @@ const filtersTableLeads = [
   },
   {
     id: 'course_options',
-    name: 'Curso',
+    name: 'Curso Interessado',
     options: [],
     value: 'interested_course_in',
   },

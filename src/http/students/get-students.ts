@@ -70,7 +70,7 @@ export type Student = {
 
 export async function getStudents({
   offset = 0,
-  limit = 10,
+  limit = 7,
   filters,
 }: GetStudentsRequest) {
   try {

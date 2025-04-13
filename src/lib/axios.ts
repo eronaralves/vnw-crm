@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 
 // Utils
 import { authOptions } from '@/utils/auth-options'
+import { AppError } from '@/utils/app-error'
 
 export const api = axios.create({
   baseURL: env.BASE_URL,
@@ -21,9 +22,7 @@ api.interceptors.request.use(async (config) => {
 })
 
 api.interceptors.response.use(
-  (response) => {
-    return response
-  },
+  (response) => response,
   async (error) => {
     const originalRequest = error.config
 
@@ -32,6 +31,10 @@ api.interceptors.response.use(
 
       const cookie = await cookies()
       cookie.delete('next-auth.session-token')
+
+      return Promise.reject(
+        new AppError('Token expirado ou inválido. Faça login novamente.'),
+      )
     }
 
     return Promise.reject(error)

@@ -44,7 +44,7 @@ import {
   Transition,
 } from '@headlessui/react'
 import { Button } from '@/components/button'
-import { Pagination } from '@/components/pagination'
+import { LIMIT_PER_PAGE, Pagination } from '@/components/pagination'
 import {
   Dialog,
   DialogContent,
@@ -100,7 +100,11 @@ export function ListLeads() {
     }
   })
 
-  const { data: dataLeads, isLoading } = useQuery({
+  const {
+    data: dataLeads,
+    isLoading,
+    isFetching,
+  } = useQuery({
     queryKey: [
       'get-leads',
       page,
@@ -118,7 +122,7 @@ export function ListLeads() {
     ],
     queryFn: async () =>
       await getLeads({
-        offset: (Number(page) - 1) * 10,
+        offset: (Number(page) - 1) * LIMIT_PER_PAGE,
         filters: {
           city_in: cityIn,
           state_in: stateIn,
@@ -132,10 +136,16 @@ export function ListLeads() {
           skin_color_in: skinColorIn,
           search,
         },
+      }).then((res) => {
+        if (res.message) {
+          toast.error(res.message, { duration: 3000, position: 'top-center' })
+        }
+
+        return res
       }),
     refetchOnWindowFocus: true,
     staleTime: 1000 * 60 * 2,
-    // placeholderData: (data) => data,
+    placeholderData: (data) => data,
   })
 
   useQuery({
@@ -278,7 +288,7 @@ export function ListLeads() {
                   key={filter.name}
                   className="px-5 pb-5 text-left whitespace-nowrap  min-w-[250px]"
                 >
-                  <div className="flex flex-col gap-2 z-50">
+                  <div className="relative flex flex-col gap-2 z-50">
                     <label className="text-black font-bold">
                       {filter.name}
                     </label>
@@ -361,7 +371,10 @@ export function ListLeads() {
           <TableBody>
             {dataLeads?.leads?.length !== 0
               ? dataLeads?.leads?.map((lead) => (
-                  <TableRow key={lead.id}>
+                  <TableRow
+                    key={lead.id}
+                    className={`${isFetching ? 'opacity-40' : ''}`}
+                  >
                     <TableCell className="p-5 pl-[60px] whitespace-nowrap">
                       <div className="flex flex-col gap-2">
                         <strong className="text-sm font-bold text-[#1c1d21]">
@@ -414,26 +427,27 @@ export function ListLeads() {
 
                     <TableCell className="p-5 whitespace-nowrap">
                       <span className="text-xs text-[#1c1d21] ">
-                        {lead.student_socioeconomic_data.income_range ??
+                        {lead.student_socioeconomic_data?.income_range ??
                           'Não informado'}
                       </span>
                     </TableCell>
 
                     <TableCell className="p-5 whitespace-nowrap">
                       <span className="text-xs text-[#1c1d21] ">
-                        {lead.student_address.community ?? 'Não informado'}
+                        {lead.student_address?.community ?? 'Não informado'}
                       </span>
                     </TableCell>
 
                     <TableCell className="p-5 whitespace-nowrap">
                       <span className="text-xs text-[#1c1d21] ">
-                        {lead.student_address.address.city ?? 'Não informado'}
+                        {lead.student_address?.address?.city ?? 'Não informado'}
                       </span>
                     </TableCell>
 
                     <TableCell className="p-5 whitespace-nowrap">
                       <span className="text-xs text-[#1c1d21] ">
-                        {lead.student_address.address.state ?? 'Não informado'}
+                        {lead.student_address?.address?.state ??
+                          'Não informado'}
                       </span>
                     </TableCell>
                   </TableRow>
@@ -462,7 +476,6 @@ export function ListLeads() {
           <Pagination
             className="mt-4"
             pageIndex={Number(page)}
-            perPage={10}
             totalCount={dataLeads?.count}
             isLoading={isLoading}
           />

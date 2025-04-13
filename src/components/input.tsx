@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils'
 import { LucideIcon } from 'lucide-react'
 import type { InputHTMLAttributes } from 'react'
 
@@ -11,22 +12,26 @@ export function Input({
   icon: Icon,
   error = false,
   handleIcon,
+  className,
   ...rest
 }: InputWithIconProps) {
   return (
     <div
-      className={`w-full flex items-center border
+      className={`w-full flex items-center border relative
         ${error ? 'border-red-500' : 'border-[#0f2b92]'}
         focus-within:border-blue-900`}
     >
       <input
-        className="flex-1 pl-3 py-2 outline-none text-sm  text-gray-900 placeholder:text-gray-800"
+        className={cn(
+          'focus:outline-[#5e75cb] flex-1 pl-3 pr-10 py-2 text-sm  text-gray-900 placeholder:text-gray-800',
+          className,
+        )}
         {...rest}
       />
 
       {Icon && (
         <div
-          className="h-full w-10 flex items-center justify-center cursor-pointer"
+          className="absolute right-0 h-full w-10 flex items-center justify-center cursor-pointer"
           onClick={handleIcon}
         >
           <Icon

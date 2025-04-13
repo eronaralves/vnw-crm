@@ -45,7 +45,7 @@ import {
 } from '@headlessui/react'
 import { Button } from '@/components/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Pagination } from '@/components/pagination'
+import { LIMIT_PER_PAGE, Pagination } from '@/components/pagination'
 import {
   Dialog,
   DialogContent,
@@ -108,7 +108,11 @@ export function ListStudent({ status }: ListStudentProps) {
     }
   })
 
-  const { data: dataStudents, isLoading } = useQuery({
+  const {
+    data: dataStudents,
+    isLoading,
+    isFetching,
+  } = useQuery({
     queryKey: [
       'get-students',
       courseName,
@@ -129,7 +133,7 @@ export function ListStudent({ status }: ListStudentProps) {
     ],
     queryFn: async () =>
       await getStudents({
-        offset: (Number(page) - 1) * 10,
+        offset: (Number(page) - 1) * LIMIT_PER_PAGE,
         filters: {
           course_name: courseName,
           group,
@@ -148,11 +152,17 @@ export function ListStudent({ status }: ListStudentProps) {
           age_max: debounceAgeMax,
           search,
         },
+      }).then((res) => {
+        if (res.message) {
+          toast.error(res.message, { duration: 3000, position: 'top-center' })
+        }
+
+        return res
       }),
 
     refetchOnWindowFocus: true,
     staleTime: 1000 * 60 * 2,
-    // placeholderData: (data) => data,
+    placeholderData: (data) => data,
   })
 
   useQuery({
@@ -344,7 +354,7 @@ export function ListStudent({ status }: ListStudentProps) {
                   key={filter.name}
                   className="px-5 pb-5 text-left whitespace-nowrap  min-w-[250px]"
                 >
-                  <div className="flex flex-col gap-2 z-50">
+                  <div className="relative flex flex-col gap-2 z-50">
                     <label className="text-black font-bold">
                       {filter.name}
                     </label>
@@ -369,7 +379,7 @@ export function ListStudent({ status }: ListStudentProps) {
 
                         <Transition
                           as={Fragment}
-                          leave="transition ease-in duration-100 overflow-auto"
+                          leave="transition ease-in duration-100 overflow-auto bg-white"
                           leaveFrom="opacity-100"
                           leaveTo="opacity-0"
                         >
@@ -427,7 +437,10 @@ export function ListStudent({ status }: ListStudentProps) {
           <TableBody>
             {dataStudents?.students?.length !== 0
               ? dataStudents?.students?.map((student) => (
-                  <TableRow key={student?.errolmentId}>
+                  <TableRow
+                    key={student?.errolmentId}
+                    className={`${isFetching ? 'opacity-40' : ''}`}
+                  >
                     <TableCell className="p-5 whitespace-nowrap">
                       <Checkbox
                         className="w-5 h-5"
@@ -519,13 +532,13 @@ export function ListStudent({ status }: ListStudentProps) {
 
                     <TableCell className="p-5 whitespace-nowrap">
                       <span className="text-xs text-[#1c1d21] ">
-                        {student.student_empregability.study ? 'Sim' : 'Não'}
+                        {student.student_empregability?.study ? 'Sim' : 'Não'}
                       </span>
                     </TableCell>
 
                     <TableCell className="p-5 whitespace-nowrap">
                       <span className="text-xs text-[#1c1d21] ">
-                        {student.student_empregability.work ? 'Sim' : 'Não'}
+                        {student.student_empregability?.work ? 'Sim' : 'Não'}
                       </span>
                     </TableCell>
                   </TableRow>
@@ -554,7 +567,6 @@ export function ListStudent({ status }: ListStudentProps) {
           <Pagination
             className="mt-4"
             pageIndex={Number(page)}
-            perPage={10}
             totalCount={dataStudents?.count}
             isLoading={isLoading}
           />

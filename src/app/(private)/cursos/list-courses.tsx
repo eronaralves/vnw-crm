@@ -2,9 +2,10 @@
 
 import { toast } from 'sonner'
 import { useQuery } from '@tanstack/react-query'
+import { useSearchParams } from 'next/navigation'
 
 // Icons
-import { Edit, PlusCircle, Trash } from 'lucide-react'
+import { Loader2, PlusCircle, Trash } from 'lucide-react'
 
 // Http
 import { getCourses } from '@/http/courses/get-courses'
@@ -19,207 +20,220 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { LIMIT_PER_PAGE, Pagination } from '@/components/pagination'
+import { ModalEditCourse } from './modal-edit-course'
 
 export function ListCourses() {
-  const { data } = useQuery({
-    queryKey: ['get-courses'],
+  const searchParams = useSearchParams()
+  const page = searchParams.get('page') ?? 1
+
+  const {
+    data: dataCourses,
+    isLoading,
+    isFetching,
+  } = useQuery({
+    queryKey: ['get-courses', page],
     queryFn: async () =>
-      getCourses({}).then((res) => {
+      getCourses({
+        offset: (Number(page) - 1) * LIMIT_PER_PAGE,
+      }).then((res) => {
         if (res.message) {
           toast.error(res.message, { duration: 3000, position: 'top-center' })
         }
 
         return res
       }),
+    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 2,
+    placeholderData: (data) => data,
   })
 
-  console.log(data)
-
   return (
-    <div className="w-full h-full gap-10 flex flex-col">
+    <div className="flex flex-col gap-10 h-screen p-4 ">
       <div className="w-full flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button title="Adicionar" />
         </div>
       </div>
 
-      <div className="w-full flex-1 h-full flex flex-col relative">
-        <Table>
-          <TableHeader className=" bg-[#f5f5fa]">
-            <TableRow>
-              <TableHead className="px-5 pb-5 text-left whitespace-nowrap overflow-visible">
-                <div className=" flex flex-col gap-2">
-                  <strong className="text-sm font-bold text-black ">
-                    Nome do curso
-                  </strong>
-                </div>
-              </TableHead>
-
-              <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
-                <div className="flex flex-col gap-2">
-                  <strong className="text-sm font-bold text-black">
-                    Linguagem
-                  </strong>
-                </div>
-              </TableHead>
-
-              <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
-                <div className="flex flex-col gap-2">
-                  <strong className="text-sm font-bold text-black">
-                    Investidor
-                  </strong>
-                </div>
-              </TableHead>
-
-              <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
-                <div className="flex flex-col gap-2">
-                  <strong className="text-sm font-bold text-black">
-                    Horário
-                  </strong>
-                </div>
-              </TableHead>
-
-              <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
-                <div className="flex flex-col gap-2">
-                  <strong className="text-sm font-bold text-black">
-                    Turma
-                  </strong>
-                </div>
-              </TableHead>
-
-              <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
-                <div className="flex flex-col gap-2">
-                  <strong className="text-sm font-bold text-black">
-                    Instrutor
-                  </strong>
-                </div>
-              </TableHead>
-
-              <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
-                <div className="flex flex-col gap-2">
-                  <strong className="text-sm font-bold text-black">
-                    Facilitador
-                  </strong>
-                </div>
-              </TableHead>
-
-              <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
-                <div className="flex flex-col gap-2">
-                  <strong className="text-sm font-bold text-black">
-                    Modalidade
-                  </strong>
-                </div>
-              </TableHead>
-
-              <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
-                <div className="flex flex-col gap-2">
-                  <strong className="text-sm font-bold text-black">Polo</strong>
-                </div>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            <TableRow>
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">
-                  Full Stack - EPW
-                </span>
-              </TableCell>
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">Python</span>
-              </TableCell>
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">Empower</span>
-              </TableCell>
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">18:00 às 19:30</span>
-              </TableCell>
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">Noite</span>
-              </TableCell>
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">Vinicius Bispo</span>
-              </TableCell>
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">Marina Gomes</span>
-              </TableCell>
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">Online</span>
-              </TableCell>
-
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">Alemão</span>
-              </TableCell>
-
-              <TableCell className="p-5 whitespace-nowrap">
-                <div className="flex items-center justify-end gap-4">
-                  <div className="flex flex-col items-center gap-1 cursor-pointer text-[#0f2b92]">
-                    <PlusCircle size={20} />
-                    <span className="text-xs">Modulos</span>
+      <div className="flex-1 overflow-hidden flex flex-col gap-2">
+        <div className="overflow-auto">
+          <Table className="min-w-full">
+            <TableHeader className=" bg-[#f5f5fa]">
+              <TableRow>
+                <TableHead className="px-5 pb-5 text-left whitespace-nowrap overflow-visible">
+                  <div className=" flex flex-col gap-2">
+                    <strong className="text-sm font-bold text-black">
+                      Nome do curso
+                    </strong>
                   </div>
-                  <div className="flex flex-col items-center gap-1 cursor-pointer text-[#0f2b92]">
-                    <Edit size={20} />
-                    <span className="text-xs">Editar</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 cursor-pointer text-[#0f2b92]">
-                    <Trash size={20} />
-                    <span className="text-xs">Deletar</span>
-                  </div>
-                </div>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">
-                  Full Stack - EPW
-                </span>
-              </TableCell>
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">Python</span>
-              </TableCell>
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">Empower</span>
-              </TableCell>
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">18:00 às 19:30</span>
-              </TableCell>
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">Noite</span>
-              </TableCell>
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">Vinicius Bispo</span>
-              </TableCell>
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">Marina Gomes</span>
-              </TableCell>
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">Online</span>
-              </TableCell>
+                </TableHead>
 
-              <TableCell className="p-5 whitespace-nowrap">
-                <span className="text-xs text-[#1c1d21] ">Alemão</span>
-              </TableCell>
+                <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
+                  <div className="flex flex-col gap-2">
+                    <strong className="text-sm font-bold text-black">
+                      Linguagem
+                    </strong>
+                  </div>
+                </TableHead>
 
-              <TableCell className="p-5 whitespace-nowrap">
-                <div className="flex items-center justify-end gap-4">
-                  <div className="flex flex-col items-center gap-1 cursor-pointer text-[#0f2b92]">
-                    <PlusCircle size={20} />
-                    <span className="text-xs">Modulos</span>
+                <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
+                  <div className="flex flex-col gap-2">
+                    <strong className="text-sm font-bold text-black">
+                      Investidor
+                    </strong>
                   </div>
-                  <div className="flex flex-col items-center gap-1 cursor-pointer text-[#0f2b92]">
-                    <Edit size={20} />
-                    <span className="text-xs">Editar</span>
+                </TableHead>
+
+                <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
+                  <div className="flex flex-col gap-2">
+                    <strong className="text-sm font-bold text-black">
+                      Horário
+                    </strong>
                   </div>
-                  <div className="flex flex-col items-center gap-1 cursor-pointer text-[#0f2b92]">
-                    <Trash size={20} />
-                    <span className="text-xs">Deletar</span>
+                </TableHead>
+
+                <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
+                  <div className="flex flex-col gap-2">
+                    <strong className="text-sm font-bold text-black">
+                      Turma
+                    </strong>
                   </div>
-                </div>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+                </TableHead>
+
+                <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
+                  <div className="flex flex-col gap-2">
+                    <strong className="text-sm font-bold text-black">
+                      Instrutor
+                    </strong>
+                  </div>
+                </TableHead>
+
+                <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
+                  <div className="flex flex-col gap-2">
+                    <strong className="text-sm font-bold text-black">
+                      Facilitador
+                    </strong>
+                  </div>
+                </TableHead>
+
+                <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
+                  <div className="flex flex-col gap-2">
+                    <strong className="text-sm font-bold text-black">
+                      Modalidade
+                    </strong>
+                  </div>
+                </TableHead>
+
+                <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
+                  <div className="flex flex-col gap-2">
+                    <strong className="text-sm font-bold text-black">
+                      Polo
+                    </strong>
+                  </div>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {dataCourses?.courses?.length !== 0
+                ? dataCourses?.courses?.map((course) => (
+                    <TableRow
+                      key={course.id}
+                      className={`${isFetching ? 'opacity-40' : ''}`}
+                    >
+                      <TableCell className="p-5 whitespace-nowrap">
+                        <span className="text-xs text-[#1c1d21]">
+                          {course.name}
+                        </span>
+                      </TableCell>
+                      <TableCell className="p-5 whitespace-nowrap">
+                        <span className="text-xs text-[#1c1d21] ">
+                          {course.programing_language}
+                        </span>
+                      </TableCell>
+                      <TableCell className="p-5 whitespace-nowrap">
+                        <span className="text-xs text-[#1c1d21] ">
+                          {course.partner?.name ?? 'Sem investidor'}
+                        </span>
+                      </TableCell>
+                      <TableCell className="p-5 whitespace-nowrap">
+                        <span className="text-xs text-[#1c1d21] ">
+                          {course.start_time.slice(0, 5)} às{' '}
+                          {course.finish_time.slice(0, 5)}
+                        </span>
+                      </TableCell>
+                      <TableCell className="p-5 whitespace-nowrap">
+                        <span className="text-xs text-[#1c1d21] ">
+                          {course.group}
+                        </span>
+                      </TableCell>
+                      <TableCell className="p-5 whitespace-nowrap">
+                        <span className="text-xs text-[#1c1d21] ">
+                          {course.instructor.fullname}
+                        </span>
+                      </TableCell>
+                      <TableCell className="p-5 whitespace-nowrap">
+                        <span className="text-xs text-[#1c1d21] ">
+                          {course.facilitator.fullname}
+                        </span>
+                      </TableCell>
+                      <TableCell className="p-5 whitespace-nowrap">
+                        <span className="text-xs text-[#1c1d21] ">
+                          {course.modality}
+                        </span>
+                      </TableCell>
+
+                      <TableCell className="p-5 whitespace-nowrap">
+                        <span className="text-xs text-[#1c1d21] ">
+                          {course.headquarter}
+                        </span>
+                      </TableCell>
+
+                      <TableCell className="p-5 whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-4">
+                          <div className="flex flex-col items-center gap-1 cursor-pointer text-[#0f2b92]">
+                            <PlusCircle size={20} />
+                            <span className="text-xs">Modulos</span>
+                          </div>
+                          <ModalEditCourse course={course} />
+                          <div className="flex flex-col items-center gap-1 cursor-pointer text-[#0f2b92]">
+                            <Trash size={20} />
+                            <span className="text-xs">Deletar</span>
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                : !isLoading && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={10}
+                        className="px-5 py-10 text-gray-500 text-center"
+                      >
+                        Nenhum curso encontrado.
+                      </TableCell>
+                    </TableRow>
+                  )}
+
+              {isLoading && (
+                <TableRow>
+                  <TableCell colSpan={10} className="px-5 py-6 text-center">
+                    <Loader2 className="animate-spin mx-auto" />
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        <div className="flex-1 mt-4 flex justify-center items-end">
+          <Pagination
+            pageIndex={Number(page)}
+            totalCount={dataCourses?.count}
+            isLoading={isLoading}
+          />
+        </div>
       </div>
     </div>
   )

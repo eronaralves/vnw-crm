@@ -62,7 +62,7 @@ type Lead = {
 
 export async function getLeads({
   offset = 0,
-  limit = 10,
+  limit = 7,
   filters,
 }: GetStudentsRequest) {
   try {
@@ -80,8 +80,6 @@ export async function getLeads({
       },
     })
     const data = response.data
-
-    console.log(data, 'FFF')
 
     return {
       count: data.count,

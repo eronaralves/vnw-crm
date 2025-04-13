@@ -13,13 +13,16 @@ import {
   PaginationItem,
 } from '@/components/ui/pagination'
 import { Button } from '@/components/ui/button'
+import { useEffect } from 'react'
+
+export const LIMIT_PER_PAGE = 7
 
 interface PaginationProps {
   pageIndex: number
   totalCount: number
-  perPage: number
   className?: string
   isLoading: boolean
+  perPage?: number
 }
 
 function getPaginationRange(
@@ -46,23 +49,32 @@ function getPaginationRange(
 export function Pagination({
   isLoading,
   pageIndex,
-  totalCount,
   perPage,
+  totalCount,
   className,
 }: PaginationProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const params = new URLSearchParams(searchParams.toString())
 
-  const totalPages = Math.ceil(totalCount / perPage) || 1
+  const totalPages = Math.ceil(totalCount / (perPage ?? LIMIT_PER_PAGE)) || 1
   const currentPage = Number(pageIndex) ?? 1
 
+  useEffect(() => {
+    params.delete('page')
+    router.push(`?${params.toString()}`)
+  }, [])
+
   function onPageChange(page: number) {
-    const params = new URLSearchParams(searchParams.toString())
     params.set('page', page.toString())
     router.push(`?${params.toString()}`)
   }
 
   const pages = getPaginationRange(currentPage, totalPages)
+
+  console.log({
+    totalPages,
+  })
 
   return (
     <div className={`flex justify-center ${className}`}>

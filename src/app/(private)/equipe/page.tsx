@@ -1,13 +1,11 @@
 import { Suspense } from 'react'
+import { ListTeam } from './list-teams'
 
-// Components
-import { ListCourses } from './list-courses'
-
-export default async function Cursos() {
+export default async function Equipe() {
   return (
     <div className="flex-1 flex flex-col overflow-auto">
       <Suspense>
-        <ListCourses />
+        <ListTeam />
       </Suspense>
     </div>
   )

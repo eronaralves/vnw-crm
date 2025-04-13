@@ -1,3 +1,5 @@
+import { Suspense } from 'react'
+
 // Components
 import { ListStudent } from './list-students'
 import { FormSearch } from '../../../components/form-search'
@@ -15,6 +17,7 @@ export default async function Alunos() {
             >
               Cursando
             </TabsTrigger>
+
             <TabsTrigger
               value="Evadidos"
               className="data-[state=active]:border-0 data-[state=active]:rounded-none data-[state=active]:text-[#173A92] data-[state=active]:border-[#7a82a7] p-4 text-sm "
@@ -42,22 +45,30 @@ export default async function Alunos() {
           value="Cursando"
           className="pt-4 flex-1 h-full flex flex-col gap-10 "
         >
-          <ListStudent status="Cursando" />
+          <Suspense>
+            <ListStudent status="Cursando" />
+          </Suspense>
         </TabsContent>
         <TabsContent value="Evadidos" className="pt-4 flex-1 h-full ">
-          <ListStudent status="Evadiu" />
+          <Suspense>
+            <ListStudent status="Evadiu" />
+          </Suspense>
         </TabsContent>
         <TabsContent
           value="Reprovados"
           className="pt-4 flex-1 h-full flex flex-col gap-10 "
         >
-          <ListStudent status="Reprovado" />
+          <Suspense>
+            <ListStudent status="Reprovado" />
+          </Suspense>
         </TabsContent>
         <TabsContent
           value="Formados"
           className="pt-4 flex-1 h-full flex flex-col gap-10 "
         >
-          <ListStudent status="Formado" />
+          <Suspense>
+            <ListStudent status="Formado" />
+          </Suspense>
         </TabsContent>
       </Tabs>
     </div>

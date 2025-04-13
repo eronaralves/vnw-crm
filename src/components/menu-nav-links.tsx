@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 // Icons
-import { BookOpen, GraduationCap, Users } from 'lucide-react'
+import { BookOpen, GraduationCap, UserCog, Users } from 'lucide-react'
 
 export function ManuNavLinks() {
   const pathname = usePathname()
@@ -25,6 +25,11 @@ export function ManuNavLinks() {
       href: '/cursos',
       icon: BookOpen,
     },
+    {
+      label: 'Equipe',
+      href: '/equipe',
+      icon: UserCog,
+    },
   ]
 
   return (
@@ -37,9 +42,9 @@ export function ManuNavLinks() {
           <Link
             key={item.href}
             href={item.href}
-            className={`w-full flex items-center gap-8 p-4 duration-300 group ${isActive ? 'bg-[#F5F5FA]' : 'bg-white'} `}
+            className={`w-full text-[#173A92] flex items-center gap-8 p-4 duration-300 group ${isActive ? 'bg-[#F5F5FA]' : 'bg-white'} `}
           >
-            <Icon size={22} fill="#173A92" color="#173A92" />
+            <Icon size={22} color="#173A92" />
             <span
               className={`duration-300  ${isActive ? 'text-[#FF611E]' : '#173A92'} group-hover:text-[#FF611E]`}
             >
