@@ -38,7 +38,9 @@ export default async function Alunos() {
             </TabsTrigger>
           </TabsList>
 
-          <FormSearch />
+          <Suspense>
+            <FormSearch />
+          </Suspense>
         </div>
 
         <TabsContent
