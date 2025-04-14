@@ -466,6 +466,7 @@ export function ListStudent({ status }: ListStudentProps) {
                         }
                       />
                     </TableCell>
+
                     <TableCell className="p-5 pl-[60px] whitespace-nowrap">
                       <div className="flex flex-col gap-2">
                         <strong className="text-sm font-bold text-[#1c1d21]">
@@ -474,8 +475,11 @@ export function ListStudent({ status }: ListStudentProps) {
                         <span className="text-xs text-[#1c1d21] ">
                           ID {student.id}
                         </span>
+
+                        {/* <Image src={student.} /> */}
                       </div>
                     </TableCell>
+
                     <TableCell className="p-5 whitespace-nowrap">
                       <div className="flex flex-col gap-2">
                         <span className="text-xs text-[#1c1d21] ">

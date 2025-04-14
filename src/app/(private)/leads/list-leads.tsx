@@ -434,7 +434,9 @@ export function ListLeads() {
 
                     <TableCell className="p-5 whitespace-nowrap">
                       <span className="text-xs text-[#1c1d21] ">
-                        {lead.student_address?.community ?? 'Não informado'}
+                        {lead.student_address?.community
+                          ? lead.student_address?.community
+                          : 'Não informado'}
                       </span>
                     </TableCell>
 
