@@ -49,7 +49,7 @@ export function ListCourses() {
   })
 
   return (
-    <div className="flex flex-col gap-10 h-screen p-4 ">
+    <div className="flex flex-col gap-8 h-screen p-4 ">
       <div className="w-full flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button title="Adicionar" />
@@ -143,7 +143,7 @@ export function ListCourses() {
                       className={`${isFetching ? 'opacity-40' : ''}`}
                     >
                       <TableCell className="p-5 whitespace-nowrap">
-                        <span className="text-xs text-[#1c1d21]">
+                        <span className="text-sm text-[#1c1d21]">
                           {course.name}
                         </span>
                       </TableCell>

@@ -45,6 +45,22 @@ const filtersTableStudents = [
     ],
   },
   {
+    name: 'Estuda',
+    options: ['Sim', 'Não'],
+    value: 'study',
+  },
+  {
+    name: 'Empregado',
+    options: ['Sim', 'Não'],
+    value: 'work',
+  },
+  {
+    id: 'community_options',
+    name: 'Comunidade',
+    options: [],
+    value: 'community',
+  },
+  {
     id: 'city_options',
     name: 'Cidade',
     options: [],
@@ -55,16 +71,6 @@ const filtersTableStudents = [
     name: 'UF',
     options: [],
     value: 'state',
-  },
-  {
-    name: 'Estuda',
-    options: ['Sim', 'Não'],
-    value: 'study',
-  },
-  {
-    name: 'Empregado',
-    options: ['Sim', 'Não'],
-    value: 'work',
   },
 ]
 

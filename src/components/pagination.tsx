@@ -72,10 +72,6 @@ export function Pagination({
 
   const pages = getPaginationRange(currentPage, totalPages)
 
-  console.log({
-    totalPages,
-  })
-
   return (
     <div className={`flex justify-center ${className}`}>
       <div className="flex items-center gap-2">

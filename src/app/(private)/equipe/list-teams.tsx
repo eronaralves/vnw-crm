@@ -24,7 +24,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Pagination } from '@/components/pagination'
-import { formatPhone } from '@/utils/formt-phone'
+import { formatPhone } from '@/utils/format-phone'
 import Image from 'next/image'
 import { ModalEditTeam } from './modal-edit-team'
 
@@ -64,7 +64,7 @@ export function ListTeam() {
           <Table className="min-w-full">
             <TableHeader className=" bg-[#f5f5fa]">
               <TableRow>
-                <TableHead className="w-[350px] px-5 pb-5 text-left whitespace-nowrap">
+                <TableHead className="w-[400px] px-5 pb-5 text-left whitespace-nowrap">
                   <div className="flex flex-col gap-2">
                     <strong className="text-sm font-bold text-black">
                       Nome
@@ -105,7 +105,7 @@ export function ListTeam() {
                       key={team.id}
                       className={`${isFetching ? 'opacity-40' : ''}`}
                     >
-                      <TableCell className="px-5 py-4 whitespace-nowrap">
+                      <TableCell className="w-[400px] px-5 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           {team.picture ? (
                             <Image
@@ -113,7 +113,7 @@ export function ListTeam() {
                               alt="Image de perfil"
                               width={50}
                               height={50}
-                              className="w-12 h-12 object-cover rounded-sm"
+                              className="min-w-12 min-h-12 max-w-12 max-h-12 object-cover rounded-sm"
                             />
                           ) : (
                             <Image
@@ -121,18 +121,18 @@ export function ListTeam() {
                               alt="Imagem padrão do membro"
                               width={50}
                               height={50}
-                              className="w-12 h-12 object-cover rounded-sm"
+                              className="min-w-12 min-h-12 max-w-12 max-h-12 object-cover rounded-sm"
                             />
                           )}
-                          <span className="text-xs text-[#1c1d21] ">
+                          <span className="text-sm text-[#1c1d21] ">
                             {team.fullname ?? 'Não informado'}
                           </span>
                         </div>
                       </TableCell>
 
                       <TableCell className="px-5 py-4 whitespace-nowrap">
-                        <span className="text-xs text-[#1c1d21] ">
-                          {team.role ?? 'Sem investidor'}
+                        <span className="inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-xs font-medium text-[#1c1d21]">
+                          {team?.role}
                         </span>
                       </TableCell>
 

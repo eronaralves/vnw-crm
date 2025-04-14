@@ -19,6 +19,8 @@ export type Filters = {
   age_max?: string
   status: 'Cursando' | 'Formado' | 'Evadiu' | 'Reprovado'
   search?: string | null
+  reason_give_up?: string[]
+  community?: string[]
 }
 
 interface GetStudentsRequest {

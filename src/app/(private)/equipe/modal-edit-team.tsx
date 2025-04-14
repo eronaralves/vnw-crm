@@ -12,6 +12,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // Http
+import { editTeam } from '@/http/team/edit-team'
 import { type Team } from '@/http/team/get-teams'
 
 // Icons
@@ -23,6 +24,7 @@ import UserProfileDefault from '@/assets/images/profile-default.webp'
 // Utils
 import { cn } from '@/lib/utils'
 import { formatCpf } from '@/utils/format-cpf'
+import { formatPhone } from '@/utils/format-phone'
 
 // Components
 import {
@@ -37,7 +39,6 @@ import { Input } from '@/components/input'
 import { Button } from '@/components/button'
 import { DatePicker } from '@/components/date-picker'
 import { Button as UiButton } from '@/components/ui/button'
-import { editTeam } from '@/http/team/edit-team'
 
 interface ModalEditCourseProps {
   team: Team
@@ -47,7 +48,10 @@ export const editCourseSchema = z.object({
   fullname: z.string().min(1, 'Digite o nome.'),
   cpf: z.string().min(1, 'Digite o cpf.').length(14, 'Digite o CPF completo'),
   role: z.enum(['Instrutor', 'Facilitador']),
-  phone: z.string(),
+  phone: z
+    .string()
+    .min(1, 'Digite o número de celular.')
+    .length(15, 'Digite o número de cecular completo'),
   email: z.string().min(1, 'Digite o email.').email('Digite um e-mail válido'),
   picture: z.union([z.instanceof(File), z.string().url()]),
   birth_date: z.date(),
@@ -75,6 +79,7 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
       cpf: formatCpf(team.cpf),
       birth_date: new UTCDate(team.birth_date),
       admission_date: new UTCDate(team.admission_date),
+      phone: formatPhone(team.phone),
     },
   })
 
@@ -131,7 +136,7 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
       'birth_date',
       format(new UTCDate(data.birth_date), 'yyyy-MM-dd'),
     )
-    formData.append('phone', data.phone)
+    formData.append('phone', data.phone.replace(/\D/g, ''))
     formData.append('email', data.email)
 
     updatedTeam({
@@ -139,8 +144,6 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
       formData,
     })
   }
-
-  console.log(team, 'FF')
 
   return (
     <Dialog open={openModal} onOpenChange={onOpenChange}>
@@ -295,7 +298,20 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
               <label className="text-sm font-medium text-[#0f2b92]">
                 Celular
               </label>
-              <Input {...register('phone')} />
+              <Input
+                {...register('phone')}
+                onChange={(e) => {
+                  const formatted = formatPhone(e.target.value)
+                  setValue('phone', formatted, { shouldValidate: isSubmitted })
+                }}
+                maxLength={15}
+              />
+
+              {errors.phone && (
+                <span className="text-xs text-red-500">
+                  {errors.phone.message}
+                </span>
+              )}
             </div>
 
             <div className="flex flex-col gap-1">

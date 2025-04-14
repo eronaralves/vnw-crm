@@ -19,8 +19,6 @@ export async function signIn({ email, password }: SignInRequest) {
     })
     const data = await response.json()
 
-    console.log(response, 'DATA SIGNIN')
-
     if (!response.ok) {
       throw new AppError(data?.detail)
     }
@@ -33,8 +31,6 @@ export async function signIn({ email, password }: SignInRequest) {
     const errorMessage = isAppError
       ? error.detail
       : 'Error ao fazer entrar na conta, tente novamente.'
-
-    console.log(error, 'ERROR')
 
     return {
       message: errorMessage,

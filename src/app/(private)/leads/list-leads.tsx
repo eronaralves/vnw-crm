@@ -313,11 +313,11 @@ export function ListLeads() {
 
                         <Transition
                           as={Fragment}
-                          leave="transition ease-in duration-100 overflow-auto"
+                          leave="transition ease-in duration-100 overflow-auto hover:ring-black"
                           leaveFrom="opacity-100"
                           leaveTo="opacity-0"
                         >
-                          <ListboxOptions className="absolute mt-1 overflow-auto max-h-[300px] min-w-[150px] z-[999px] rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                          <ListboxOptions className="absolute mt-1 hover:ring-black overflow-auto max-h-[300px] min-w-[150px] z-[999px] rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none cursor-pointer">
                             {filter?.options?.map((option, index) => (
                               <ListboxOption
                                 key={index}

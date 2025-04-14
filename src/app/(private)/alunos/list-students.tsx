@@ -91,7 +91,9 @@ export function ListStudent({ status }: ListStudentProps) {
   const gender = searchParams.getAll('gender')
   const modality = searchParams.getAll('modality')
   const sexuality = searchParams.getAll('sexuality')
+  const community = searchParams.getAll('community')
   const courseName = searchParams.getAll('course_name')
+  const reasonGiveUp = searchParams.getAll('reason_give_up')
   const programingLanguage = searchParams.getAll('programing_language')
 
   const filtersInobject: Record<string, string[]> = {}
@@ -127,9 +129,11 @@ export function ListStudent({ status }: ListStudentProps) {
       status,
       gender,
       sexuality,
-      programingLanguage,
+      community,
+      reasonGiveUp,
       debounceAgeMin,
       debounceAgeMax,
+      programingLanguage,
     ],
     queryFn: async () =>
       await getStudents({
@@ -151,6 +155,8 @@ export function ListStudent({ status }: ListStudentProps) {
           age_min: debounceAgeMin,
           age_max: debounceAgeMax,
           search,
+          reason_give_up: reasonGiveUp,
+          community,
         },
       }).then((res) => {
         if (res.message) {
@@ -349,88 +355,98 @@ export function ListStudent({ status }: ListStudentProps) {
                 </div>
               </TableHead>
 
-              {filters.map((filter) => (
-                <TableHead
-                  key={filter.name}
-                  className="px-5 pb-5 text-left whitespace-nowrap  min-w-[250px]"
-                >
-                  <div className="relative flex flex-col gap-2 z-50">
-                    <label className="text-black font-bold">
-                      {filter.name}
-                    </label>
-                    <Listbox
-                      value={searchParams.getAll(filter.value)}
-                      onChange={(value) =>
-                        handleMultiSelect(filter.value, value)
-                      }
-                      multiple
-                    >
-                      <div className="relative w-[180px] z-[999px]">
-                        <ListboxButton className="z-50 w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500">
-                          <span className="block truncate ">
-                            {params?.getAll(filter.value)?.length
-                              ? `${params?.getAll(filter.value)?.length} selecionado(s)`
-                              : 'Todos'}
-                          </span>
-                          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                            <ChevronDown className="h-4 w-4 text-gray-400" />
-                          </span>
-                        </ListboxButton>
+              {filters.map((filter) => {
+                if (filter.value === 'reason_give_up' && status !== 'Evadiu') {
+                  return null
+                }
 
-                        <Transition
-                          as={Fragment}
-                          leave="transition ease-in duration-100 overflow-auto bg-white"
-                          leaveFrom="opacity-100"
-                          leaveTo="opacity-0"
-                        >
-                          <ListboxOptions className="absolute mt-1 overflow-auto max-h-[300px] min-w-[150px] z-[999px] rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                            {filter?.options?.map((option, index) => (
-                              <ListboxOption
-                                key={index}
-                                value={option}
-                                className={({ active }) =>
-                                  `relative z-[999px] cursor-default select-none py-2 pl-10 pr-4 ${
-                                    active
-                                      ? 'bg-blue-100 text-blue-900'
-                                      : 'text-gray-900'
-                                  }`
-                                }
-                              >
-                                {({ selected }) => (
-                                  <>
-                                    <span
-                                      className={`block truncate ${
-                                        selected ? 'font-medium' : 'font-normal'
-                                      }`}
-                                    >
-                                      {option}
-                                    </span>
-                                    {selected && (
-                                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
-                                        <Check className="w-4 h-4" />
-                                      </span>
-                                    )}
-                                  </>
-                                )}
-                              </ListboxOption>
-                            ))}
-                          </ListboxOptions>
-                        </Transition>
+                return (
+                  <TableHead
+                    key={filter.name}
+                    className="px-5 pb-5 text-left whitespace-nowrap  min-w-[250px]"
+                  >
+                    <div className="relative flex flex-col gap-2 z-50">
+                      <label className="text-black font-bold">
+                        {filter.name}
+                      </label>
+                      <Listbox
+                        value={searchParams.getAll(filter.value)}
+                        onChange={(value) =>
+                          handleMultiSelect(filter.value, value)
+                        }
+                        multiple
+                      >
+                        <div className="relative w-[180px] z-[999px]">
+                          <ListboxButton className="z-50 w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500">
+                            <span className="block truncate ">
+                              {params?.getAll(filter.value)?.length
+                                ? `${params?.getAll(filter.value)?.length} selecionado(s)`
+                                : 'Todos'}
+                            </span>
+                            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                              <ChevronDown className="h-4 w-4 text-gray-400" />
+                            </span>
+                          </ListboxButton>
 
-                        {params?.getAll(filter.value)?.length > 0 && (
-                          <button
-                            onClick={() => handleRemoveAllFilter(filter.value)}
-                            className="absolute -right-7 top-2 cursor-pointer"
-                            title="Apagar filtros"
+                          <Transition
+                            as={Fragment}
+                            leave="transition ease-in duration-100 overflow-auto bg-white"
+                            leaveFrom="opacity-100"
+                            leaveTo="opacity-0"
                           >
-                            <Trash size={18} className="text-red-500" />
-                          </button>
-                        )}
-                      </div>
-                    </Listbox>
-                  </div>
-                </TableHead>
-              ))}
+                            <ListboxOptions className="absolute mt-1 overflow-auto max-h-[300px] min-w-[150px] z-[999px] rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                              {filter?.options?.map((option, index) => (
+                                <ListboxOption
+                                  key={index}
+                                  value={option}
+                                  className={({ active }) =>
+                                    `relative z-[999px] cursor-default select-none py-2 pl-10 pr-4 ${
+                                      active
+                                        ? 'bg-blue-100 text-blue-900'
+                                        : 'text-gray-900'
+                                    }`
+                                  }
+                                >
+                                  {({ selected }) => (
+                                    <>
+                                      <span
+                                        className={`block truncate ${
+                                          selected
+                                            ? 'font-medium'
+                                            : 'font-normal'
+                                        }`}
+                                      >
+                                        {option}
+                                      </span>
+                                      {selected && (
+                                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
+                                          <Check className="w-4 h-4" />
+                                        </span>
+                                      )}
+                                    </>
+                                  )}
+                                </ListboxOption>
+                              ))}
+                            </ListboxOptions>
+                          </Transition>
+
+                          {params?.getAll(filter.value)?.length > 0 && (
+                            <button
+                              onClick={() =>
+                                handleRemoveAllFilter(filter.value)
+                              }
+                              className="absolute -right-7 top-2 cursor-pointer"
+                              title="Apagar filtros"
+                            >
+                              <Trash size={18} className="text-red-500" />
+                            </button>
+                          )}
+                        </div>
+                      </Listbox>
+                    </div>
+                  </TableHead>
+                )
+              })}
             </TableRow>
           </TableHeader>
 
@@ -508,10 +524,32 @@ export function ListStudent({ status }: ListStudentProps) {
                       </span>
                     </TableCell>
 
+                    {status === 'Evadiu' && (
+                      <TableCell className="p-5 whitespace-nowrap">
+                        <p className="w-[200px] truncate text-xs text-[#1c1d21] ">
+                          {student.reason_give_up ?? 'Não informado'}
+                        </p>
+                      </TableCell>
+                    )}
+
                     <TableCell className="p-5 whitespace-nowrap">
-                      <p className="w-[200px] truncate text-xs text-[#1c1d21] ">
-                        {student.reason_give_up ?? 'Não informado'}
-                      </p>
+                      <span className="text-xs text-[#1c1d21] ">
+                        {student.student_empregability?.study ? 'Sim' : 'Não'}
+                      </span>
+                    </TableCell>
+
+                    <TableCell className="p-5 whitespace-nowrap">
+                      <span className="text-xs text-[#1c1d21] ">
+                        {student.student_empregability?.work ? 'Sim' : 'Não'}
+                      </span>
+                    </TableCell>
+
+                    <TableCell className="p-5 whitespace-nowrap">
+                      <span className="text-xs text-[#1c1d21] ">
+                        {student.student_address?.community
+                          ? student.student_address?.community
+                          : 'Não informado'}
+                      </span>
                     </TableCell>
 
                     <TableCell className="p-5 whitespace-nowrap">
@@ -527,18 +565,6 @@ export function ListStudent({ status }: ListStudentProps) {
                         {student?.student_address?.address?.state
                           ? student?.student_address?.address?.state
                           : 'Não informado'}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {student.student_empregability?.study ? 'Sim' : 'Não'}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {student.student_empregability?.work ? 'Sim' : 'Não'}
                       </span>
                     </TableCell>
                   </TableRow>
