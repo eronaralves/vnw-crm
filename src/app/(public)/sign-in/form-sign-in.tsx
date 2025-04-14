@@ -59,7 +59,7 @@ export function FormSignIn() {
       })
     }
 
-    router.replace('/')
+    router.replace('/leads')
   }
 
   return (
