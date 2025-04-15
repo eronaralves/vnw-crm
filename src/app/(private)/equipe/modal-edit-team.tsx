@@ -305,7 +305,7 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
               <Input
                 {...register('phone')}
                 onChange={(e) => {
-                  const formatted = formatPhone(e.target.value)
+                  const formatted = formatPhone(e.target.value) as string
                   setValue('phone', formatted, { shouldValidate: isSubmitted })
                 }}
                 maxLength={15}
