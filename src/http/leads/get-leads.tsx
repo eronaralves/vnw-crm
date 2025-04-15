@@ -31,7 +31,7 @@ type Lead = {
   fullname: string
   gender: string
   id: string
-  phone: string | null
+  phone: string
   reason_give_up: null
   sexuality: string
   interested_course: string

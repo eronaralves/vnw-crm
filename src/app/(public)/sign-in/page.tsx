@@ -15,7 +15,7 @@ export default async function SignIn() {
         <div className="w-full max-w-[500px] h-full flex flex-col justify-center overflow-auto">
           <Image src={Logo} alt="Logo Vai na Web" className="mx-auto mb-15" />
 
-          <h1 className="text-2xl lg:text-3xl font-bold mb-4">
+          <h1 className="text-xl lg:text-3xl font-bold mb-4">
             Bem-vindo ao nosso CRM. Entre para ver as atualizações mais
             recentes.
           </h1>

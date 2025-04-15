@@ -1,4 +1,4 @@
-export function formatPhone(phone: string) {
+export function formatPhone(phone?: string) {
   return phone
     ?.replace(/\D/g, '')
     ?.replace(/(\d{2})(\d)/, '($1) $2')

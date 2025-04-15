@@ -14,6 +14,7 @@ import { getOptionsFilters } from '@/http/students/get-options-filters'
 import { useDebounce } from '@/hooks/useDebouce'
 
 // Utils
+import { formatPhone } from '@/utils/format-phone'
 import { filtersTableStudents } from '@/utils/filters'
 
 // Icons
@@ -486,7 +487,7 @@ export function ListStudent({ status }: ListStudentProps) {
                           {student.email}
                         </span>
                         <span className="text-xs text-[#1c1d21] ">
-                          {student.phone}
+                          {formatPhone(student?.phone)}
                         </span>
                       </div>
                     </TableCell>

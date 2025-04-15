@@ -14,6 +14,7 @@ import { getOptionsFilters } from '@/http/leads/get-options-filters'
 import { useDebounce } from '@/hooks/useDebouce'
 
 // Utils
+import { formatPhone } from '@/utils/format-phone'
 import { filtersTableLeads } from '@/utils/filters'
 
 // Icons
@@ -391,7 +392,7 @@ export function ListLeads() {
                           {lead.email}
                         </span>
                         <span className="text-xs text-[#1c1d21] ">
-                          {lead.phone}
+                          {formatPhone(lead?.phone)}
                         </span>
                       </div>
                     </TableCell>
