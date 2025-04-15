@@ -413,6 +413,7 @@ export function ModalEditCourse({ course }: ModalEditCourseProps) {
             <div className="flex items-center justify-end gap-2 mt-4">
               <DialogClose asChild>
                 <Button
+                  type="button"
                   title="Cancelar"
                   disabled={isPending}
                   className="self-end bg-red-500 hover:bg-red-400"

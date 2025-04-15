@@ -124,6 +124,10 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
   async function onSubmit(data: EditTeamType) {
     const formData = new FormData()
 
+    if (typeof watchPicture !== 'string') {
+      formData.append('picture', data.picture)
+    }
+
     formData.append('role', data.role)
     formData.append(
       'admission_date',
@@ -172,7 +176,6 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
                     width={100}
                     height={100}
                     className="w-22 h-22 rounded-full object-cover"
-                    priority
                   />
                 ) : typeof watchPicture === 'string' ? (
                   <Image
@@ -181,7 +184,6 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
                     width={100}
                     height={100}
                     className="w-22 h-22 rounded-full object-cover"
-                    priority
                   />
                 ) : (
                   <Image
@@ -231,6 +233,7 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
 
                 <div className="flex items-center gap-2">
                   <UiButton
+                    type="button"
                     className={cn(
                       'text-[#0f2b92] border border-[#0f2b92]',
                       watchRole === 'Instrutor' &&
@@ -242,6 +245,7 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
                     Instrutor
                   </UiButton>
                   <UiButton
+                    type="button"
                     onClick={() => setValue('role', 'Facilitador')}
                     className={cn(
                       'text-[#0f2b92] border border-[#0f2b92]',
