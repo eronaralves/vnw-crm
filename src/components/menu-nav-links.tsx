@@ -4,7 +4,13 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 // Icons
-import { BookOpen, GraduationCap, UserCog, Users } from 'lucide-react'
+import {
+  BookOpen,
+  GraduationCap,
+  HeartHandshake,
+  UserCog,
+  Users,
+} from 'lucide-react'
 
 export function ManuNavLinks() {
   const pathname = usePathname()
@@ -29,6 +35,11 @@ export function ManuNavLinks() {
       label: 'Equipe',
       href: '/equipe',
       icon: UserCog,
+    },
+    {
+      label: 'Parceiros',
+      href: '/parceiros',
+      icon: HeartHandshake,
     },
   ]
 

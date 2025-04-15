@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 
 import { toast } from 'sonner'
@@ -10,16 +9,9 @@ import { useQuery } from '@tanstack/react-query'
 import { Loader2, Trash } from 'lucide-react'
 
 // Http
-import { getTeams } from '@/http/team/get-teams'
-
-// Utils
-import { formatPhone } from '@/utils/format-phone'
-
-// Images
-import UserProfileDefault from '@/assets/images/profile-default.webp'
+import { getPartners } from '@/http/partners/get-partners'
 
 // Components
-import { Button } from '@/components/button'
 import {
   Table,
   TableBody,
@@ -28,21 +20,21 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Button } from '@/components/button'
 import { Pagination } from '@/components/pagination'
-import { ModalEditTeam } from './modal-edit-team'
 
-export function ListTeam() {
+export function ListPartners() {
   const searchParams = useSearchParams()
   const page = searchParams.get('page') ?? 1
 
   const {
-    data: dataTeam,
+    data: dataPartner,
     isLoading,
     isFetching,
   } = useQuery({
-    queryKey: ['get-teams', page],
+    queryKey: ['get-partners', page],
     queryFn: async () =>
-      getTeams().then((res) => {
+      getPartners().then((res) => {
         if (res.message) {
           toast.error(res.message, { duration: 3000, position: 'top-center' })
         }
@@ -53,6 +45,8 @@ export function ListTeam() {
     staleTime: 1000 * 60 * 60, // 1hour
     placeholderData: (data) => data,
   })
+
+  console.log(dataPartner, 'FFF')
 
   return (
     <div className="flex flex-col gap-10 h-screen p-4 ">
@@ -67,10 +61,10 @@ export function ListTeam() {
           <Table className="min-w-full">
             <TableHeader className=" bg-[#f5f5fa]">
               <TableRow>
-                <TableHead className="w-[400px] px-5 pb-5 text-left whitespace-nowrap">
+                <TableHead className="w-[300px] px-5 pb-5 text-left whitespace-nowrap">
                   <div className="flex flex-col gap-2">
                     <strong className="text-sm font-bold text-black">
-                      Nome
+                      Empresa
                     </strong>
                   </div>
                 </TableHead>
@@ -78,7 +72,7 @@ export function ListTeam() {
                 <TableHead className="w-[300px] px-5 pb-5 text-left whitespace-nowrap overflow-visible">
                   <div className=" flex flex-col gap-2">
                     <strong className="text-sm font-bold text-black">
-                      Função
+                      Razão social
                     </strong>
                   </div>
                 </TableHead>
@@ -86,7 +80,7 @@ export function ListTeam() {
                 <TableHead className="w-[250px] px-5 pb-5 text-left whitespace-nowrap">
                   <div className="flex flex-col gap-2">
                     <strong className="text-sm font-bold text-black">
-                      Celular
+                      Ciclo
                     </strong>
                   </div>
                 </TableHead>
@@ -94,66 +88,62 @@ export function ListTeam() {
                 <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
                   <div className="flex flex-col gap-2">
                     <strong className="text-sm font-bold text-black">
-                      Email
+                      Ano
+                    </strong>
+                  </div>
+                </TableHead>
+
+                <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
+                  <div className="flex flex-col gap-2">
+                    <strong className="text-sm font-bold text-black">
+                      Valor investido
                     </strong>
                   </div>
                 </TableHead>
               </TableRow>
             </TableHeader>
-
             <TableBody>
-              {dataTeam?.data?.length !== 0
-                ? dataTeam?.data?.map((team) => (
+              {dataPartner?.data?.length !== 0
+                ? dataPartner?.data?.map((partner) => (
                     <TableRow
-                      key={team.id}
+                      key={partner.id}
                       className={`${isFetching ? 'opacity-40' : ''}`}
                     >
-                      <TableCell className="w-[400px] px-5 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-3">
-                          {team.picture ? (
-                            <Image
-                              src={team.picture}
-                              alt="Image de perfil"
-                              width={50}
-                              height={50}
-                              className="min-w-12 min-h-12 max-w-12 max-h-12 object-cover rounded-sm"
-                            />
-                          ) : (
-                            <Image
-                              src={UserProfileDefault}
-                              alt="Imagem padrão do membro"
-                              width={50}
-                              height={50}
-                              className="min-w-12 min-h-12 max-w-12 max-h-12 object-cover rounded-sm"
-                            />
-                          )}
-                          <span className="text-sm text-[#1c1d21] ">
-                            {team.fullname ?? 'Não informado'}
-                          </span>
-                        </div>
-                      </TableCell>
-
                       <TableCell className="px-5 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-xs font-medium text-[#1c1d21]">
-                          {team?.role}
+                        <span className="text-sm text-[#1c1d21] ">
+                          {partner.name}
                         </span>
                       </TableCell>
 
                       <TableCell className="px-5 py-4 whitespace-nowrap">
                         <span className="text-xs text-[#1c1d21] ">
-                          {formatPhone(team?.phone) ?? 'Não informado'}
+                          {partner.company_name}
                         </span>
                       </TableCell>
 
                       <TableCell className="px-5 py-4 whitespace-nowrap">
                         <span className="text-xs text-[#1c1d21] ">
-                          {team.email ?? 'Sem investidor'}
+                          {partner.cycle}
+                        </span>
+                      </TableCell>
+
+                      <TableCell className="px-5 py-4 whitespace-nowrap">
+                        <span className="text-xs text-[#1c1d21] ">
+                          {partner.year}
+                        </span>
+                      </TableCell>
+
+                      <TableCell className="px-5 py-4 whitespace-nowrap">
+                        <span className="text-xs text-[#1c1d21] ">
+                          {new Intl.NumberFormat('pt-br', {
+                            style: 'currency',
+                            currency: 'BRL',
+                          }).format(Number(partner.investment))}
                         </span>
                       </TableCell>
 
                       <TableCell className="px-5 py-4 whitespace-nowrap">
                         <div className="flex items-center justify-end gap-4">
-                          <ModalEditTeam team={team} />
                           <button
                             disabled
                             className="flex flex-col items-center gap-1 cursor-pointer text-gray-400 disabled:cursor-not-allowed"
@@ -189,10 +179,10 @@ export function ListTeam() {
 
         <div className="mt-4 flex justify-center items-end">
           <Pagination
-            pageIndex={Number(page)}
-            totalCount={dataTeam?.count}
+            pageIndex={1}
+            totalCount={10}
             perPage={10}
-            isLoading={isLoading}
+            isLoading={false}
           />
         </div>
       </div>

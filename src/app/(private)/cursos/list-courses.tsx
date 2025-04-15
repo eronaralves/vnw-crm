@@ -192,15 +192,21 @@ export function ListCourses() {
 
                       <TableCell className="p-5 whitespace-nowrap">
                         <div className="flex items-center justify-end gap-4">
-                          <div className="flex flex-col items-center gap-1 cursor-pointer text-[#0f2b92]">
+                          <button
+                            disabled
+                            className="flex flex-col items-center gap-1 cursor-pointer text-gray-400 disabled:cursor-not-allowed"
+                          >
                             <PlusCircle size={20} />
                             <span className="text-xs">Modulos</span>
-                          </div>
+                          </button>
                           <ModalEditCourse course={course} />
-                          <div className="flex flex-col items-center gap-1 cursor-pointer text-[#0f2b92]">
+                          <button
+                            disabled
+                            className="flex flex-col items-center gap-1 cursor-pointer text-gray-400 disabled:cursor-not-allowed"
+                          >
                             <Trash size={20} />
                             <span className="text-xs">Deletar</span>
-                          </div>
+                          </button>
                         </div>
                       </TableCell>
                     </TableRow>

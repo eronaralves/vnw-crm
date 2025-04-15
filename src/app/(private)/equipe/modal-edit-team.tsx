@@ -76,7 +76,7 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
     resolver: zodResolver(editCourseSchema),
     defaultValues: {
       ...team,
-      cpf: formatCpf(team.cpf),
+      cpf: formatCpf(team?.cpf),
       birth_date: new UTCDate(team.birth_date),
       admission_date: new UTCDate(team.admission_date),
       phone: formatPhone(team.phone),

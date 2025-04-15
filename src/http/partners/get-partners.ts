@@ -6,6 +6,14 @@ import { AppError } from '@/utils/app-error'
 type Partner = {
   id: string
   name: string
+  address: null
+  cnpj: string
+  company_name: string
+  cycle: string
+  enterprise_email: string
+  investment: string
+  partner_contact: string
+  year: number
 }
 
 export async function getPartners() {
@@ -20,7 +28,7 @@ export async function getPartners() {
     const isAppError = error instanceof AppError
     const errorMessage = isAppError
       ? error.detail
-      : 'Error ao listar equipe, tente novamente.'
+      : 'Error ao listar parceiros, tente novamente.'
 
     return {
       message: errorMessage,
