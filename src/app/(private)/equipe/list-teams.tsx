@@ -42,7 +42,10 @@ export function ListTeam() {
   } = useQuery({
     queryKey: ['get-teams', page],
     queryFn: async () =>
-      getTeams().then((res) => {
+      getTeams({
+        limit: 10,
+        offset: (Number(page) - 1) * 10,
+      }).then((res) => {
         if (res.message) {
           toast.error(res.message, { duration: 3000, position: 'top-center' })
         }

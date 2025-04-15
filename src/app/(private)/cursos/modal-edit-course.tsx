@@ -95,7 +95,7 @@ export function ModalEditCourse({ course }: ModalEditCourseProps) {
 
   const { data: teams, isLoading: loadingTeams } = useQuery({
     queryKey: ['get-teams'],
-    queryFn: async () => getTeams(),
+    queryFn: async () => getTeams({}),
     enabled: openModal,
   })
 

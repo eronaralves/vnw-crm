@@ -17,9 +17,19 @@ export type Team = {
   is_active: boolean
 }
 
-export async function getTeams() {
+interface GetTeamsRequest {
+  offset?: number
+  limit?: number
+}
+
+export async function getTeams({ limit = 100, offset = 0 }: GetTeamsRequest) {
   try {
-    const response = await api.get('/employee?limit=100')
+    const response = await api.get('/employee', {
+      params: {
+        limit,
+        offset,
+      },
+    })
     const data = response.data.results as Team[]
 
     return {
