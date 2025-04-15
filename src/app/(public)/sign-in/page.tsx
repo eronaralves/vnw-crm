@@ -11,11 +11,11 @@ import { ContainerLayoutAuth } from '@/components/container-layout-auth'
 export default async function SignIn() {
   return (
     <ContainerLayoutAuth background={BackgroundLogin}>
-      <div className="flex-1 flex flex-col justify-center items-center">
-        <div className="w-full max-w-[500px]">
+      <div className="h-full flex flex-col justify-center items-center px-4 md:px-8 py-8">
+        <div className="w-full max-w-[500px] h-full flex flex-col justify-center overflow-auto">
           <Image src={Logo} alt="Logo Vai na Web" className="mx-auto mb-15" />
 
-          <h1 className="text-3xl font-bold mb-6">
+          <h1 className="text-2xl lg:text-3xl font-bold mb-4">
             Bem-vindo ao nosso CRM. Entre para ver as atualizações mais
             recentes.
           </h1>

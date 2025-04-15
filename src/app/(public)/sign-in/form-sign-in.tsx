@@ -65,7 +65,7 @@ export function FormSignIn() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="w-full max-w-96 flex flex-col gap-3 mt-15"
+      className="w-full max-w-96 flex flex-col gap-3 mt-8"
     >
       <div className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
@@ -111,7 +111,7 @@ export function FormSignIn() {
         {isSubmitting ? <Loader2 className="animate-spin" /> : 'Entrar'}
       </button>
 
-      <span className="mt-18 text-xs font-normal text-[#8181a5]">
+      <span className="mt-9 text-xs font-normal text-[#8181a5]">
         Esse sistema está em conformidade com a <strong>LGPD</strong>.
       </span>
     </form>

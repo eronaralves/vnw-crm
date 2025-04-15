@@ -20,7 +20,9 @@ export function ContainerLayoutAuth({
         className="hidden lg:flex flex-1 object-cover object-top"
       />
 
-      <div className="w-full h-full lg:w-[732px] flex flex-col">{children}</div>
+      <div className="w-full h-full lg:w-[732px] flex flex-col overflow-auto">
+        {children}
+      </div>
     </div>
   )
 }
