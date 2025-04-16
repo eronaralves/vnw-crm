@@ -8,6 +8,7 @@ import {
   BookOpen,
   GraduationCap,
   HeartHandshake,
+  PlusCircle,
   UserCog,
   Users,
 } from 'lucide-react'
@@ -40,6 +41,11 @@ export function ManuNavLinks() {
       label: 'Parceiros',
       href: '/parceiros',
       icon: HeartHandshake,
+    },
+    {
+      label: 'Administração',
+      href: '/admins',
+      icon: PlusCircle,
     },
   ]
 

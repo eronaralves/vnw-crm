@@ -19,10 +19,13 @@ type Partner = {
 export async function getPartners() {
   try {
     const response = await api.get('/partners?limit=100')
-    const data = response.data.results as Partner[]
+    const partners = response.data.results as Partner[]
+
+    console.log(response, 'FFF')
 
     return {
-      data,
+      partners,
+      count: response.data.count,
     }
   } catch (error) {
     const isAppError = error instanceof AppError

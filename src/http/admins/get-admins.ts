@@ -3,44 +3,40 @@
 import { api } from '@/lib/axios'
 import { AppError } from '@/utils/app-error'
 
-export type Team = {
+export type Admin = {
   id: string
-  fullname: string
-  role: 'Instrutor' | 'Facilitador'
-  cpf: string
-  gender: string
-  birth_date: string
-  phone: string
   email: string
-  admission_date: string
-  picture: string
+  fullname: string
   is_active: boolean
+  is_admin: boolean
 }
 
-interface GetTeamsRequest {
+interface GetAdminsRquest {
   offset?: number
   limit?: number
 }
 
-export async function getTeams({ limit, offset }: GetTeamsRequest) {
+export async function getAdmins({ limit, offset }: GetAdminsRquest) {
   try {
-    const response = await api.get('/employee', {
+    const response = await api.get('/user', {
       params: {
         limit,
         offset,
       },
     })
-    const data = response.data.results as Team[]
+    const data = response.data.results as Admin[]
+
+    const admins = data.filter((admin) => admin.is_admin && admin.is_active)
 
     return {
-      data,
+      admins,
       count: response.data.count,
     }
   } catch (error) {
     const isAppError = error instanceof AppError
     const errorMessage = isAppError
       ? error.detail
-      : 'Error ao listar equipe, tente novamente.'
+      : 'Error ao listar administradores, tente novamente.'
 
     return {
       message: errorMessage,

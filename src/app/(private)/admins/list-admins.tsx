@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Loader2, Trash } from 'lucide-react'
 
 // Http
-import { getPartners } from '@/http/partners/get-partners'
+import { getAdmins } from '@/http/admins/get-admins'
 
 // Components
 import {
@@ -22,19 +22,20 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/button'
 import { Pagination } from '@/components/pagination'
+import { ModalEditAdmin } from './modal-edit-admin'
 
-export function ListPartners() {
+export function ListAdmins() {
   const searchParams = useSearchParams()
   const page = searchParams.get('page') ?? 1
 
   const {
-    data: dataPartner,
+    data: dataAdmin,
     isLoading,
     isFetching,
   } = useQuery({
-    queryKey: ['get-partners', page],
+    queryKey: ['get-admins', page],
     queryFn: async () =>
-      getPartners().then((res) => {
+      getAdmins({}).then((res) => {
         if (res.message) {
           toast.error(res.message, { duration: 3000, position: 'top-center' })
         }
@@ -46,10 +47,10 @@ export function ListPartners() {
     placeholderData: (data) => data,
   })
 
-  console.log(dataPartner, 'FFF')
+  console.log(dataAdmin, 'FFF')
 
   return (
-    <div className="flex flex-col gap-10 h-screen p-4 ">
+    <div className="flex flex-col gap-8 h-screen p-4 ">
       <div className="w-full flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button title="Adicionar" />
@@ -61,26 +62,10 @@ export function ListPartners() {
           <Table className="min-w-full">
             <TableHeader className=" bg-[#f5f5fa]">
               <TableRow>
-                <TableHead className="w-[300px] px-5 pb-5 text-left whitespace-nowrap">
-                  <div className="flex flex-col gap-2">
-                    <strong className="text-sm font-bold text-black">
-                      Empresa
-                    </strong>
-                  </div>
-                </TableHead>
-
-                <TableHead className="w-[300px] px-5 pb-5 text-left whitespace-nowrap overflow-visible">
+                <TableHead className="px-5 pb-5 text-left whitespace-nowrap overflow-visible">
                   <div className=" flex flex-col gap-2">
                     <strong className="text-sm font-bold text-black">
-                      Razão social
-                    </strong>
-                  </div>
-                </TableHead>
-
-                <TableHead className="w-[250px] px-5 pb-5 text-left whitespace-nowrap">
-                  <div className="flex flex-col gap-2">
-                    <strong className="text-sm font-bold text-black">
-                      Ciclo
+                      Nome
                     </strong>
                   </div>
                 </TableHead>
@@ -88,62 +73,35 @@ export function ListPartners() {
                 <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
                   <div className="flex flex-col gap-2">
                     <strong className="text-sm font-bold text-black">
-                      Ano
-                    </strong>
-                  </div>
-                </TableHead>
-
-                <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
-                  <div className="flex flex-col gap-2">
-                    <strong className="text-sm font-bold text-black">
-                      Valor investido
+                      Email
                     </strong>
                   </div>
                 </TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
-              {dataPartner?.partners?.length !== 0
-                ? dataPartner?.partners?.map((partner) => (
+              {dataAdmin?.admins?.length !== 0
+                ? dataAdmin?.admins?.map((admin) => (
                     <TableRow
-                      key={partner.id}
+                      key={admin.id}
                       className={`${isFetching ? 'opacity-40' : ''}`}
                     >
                       <TableCell className="px-5 py-4 whitespace-nowrap">
                         <span className="text-sm text-[#1c1d21] ">
-                          {partner.name}
+                          {admin.fullname}
                         </span>
                       </TableCell>
 
                       <TableCell className="px-5 py-4 whitespace-nowrap">
-                        <span className="text-xs text-[#1c1d21] ">
-                          {partner.company_name}
-                        </span>
-                      </TableCell>
-
-                      <TableCell className="px-5 py-4 whitespace-nowrap">
-                        <span className="text-xs text-[#1c1d21] ">
-                          {partner.cycle}
-                        </span>
-                      </TableCell>
-
-                      <TableCell className="px-5 py-4 whitespace-nowrap">
-                        <span className="text-xs text-[#1c1d21] ">
-                          {partner.year}
-                        </span>
-                      </TableCell>
-
-                      <TableCell className="px-5 py-4 whitespace-nowrap">
-                        <span className="text-xs text-[#1c1d21] ">
-                          {new Intl.NumberFormat('pt-br', {
-                            style: 'currency',
-                            currency: 'BRL',
-                          }).format(Number(partner.investment))}
+                        <span className="text-sm text-[#1c1d21] ">
+                          {admin.email}
                         </span>
                       </TableCell>
 
                       <TableCell className="px-5 py-4 whitespace-nowrap">
                         <div className="flex items-center justify-end gap-4">
+                          <ModalEditAdmin admin={admin} />
                           <button
                             disabled
                             className="flex flex-col items-center gap-1 cursor-pointer text-gray-400 disabled:cursor-not-allowed"
@@ -176,11 +134,10 @@ export function ListPartners() {
             </TableBody>
           </Table>
         </div>
-
         <div className="mt-4 flex justify-center items-end">
           <Pagination
             pageIndex={1}
-            totalCount={dataPartner?.count}
+            totalCount={10}
             perPage={10}
             isLoading={false}
           />

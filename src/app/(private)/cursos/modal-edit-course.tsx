@@ -87,7 +87,7 @@ export function ModalEditCourse({ course }: ModalEditCourseProps) {
     },
   })
 
-  const { data: partners, isLoading: loadingPartners } = useQuery({
+  const { data: dataPartners, isLoading: loadingPartners } = useQuery({
     queryKey: ['get-partners'],
     queryFn: async () => getPartners(),
     enabled: openModal,
@@ -163,6 +163,12 @@ export function ModalEditCourse({ course }: ModalEditCourseProps) {
                 Nome do curso
               </label>
               <Input {...register('name')} />
+
+              {errors.name && (
+                <span className="text-xs text-red-500">
+                  {errors.name.message}
+                </span>
+              )}
             </div>
 
             <div className="flex flex-col gap-1">
@@ -190,7 +196,7 @@ export function ModalEditCourse({ course }: ModalEditCourseProps) {
                     </SelectTrigger>
 
                     <SelectContent className="text-gray-900">
-                      {partners?.data?.map((partner) => (
+                      {dataPartners?.partners?.map((partner) => (
                         <SelectItem key={partner.id} value={partner.id}>
                           {partner.name}
                         </SelectItem>
