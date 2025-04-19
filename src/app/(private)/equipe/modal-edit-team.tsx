@@ -179,7 +179,7 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
                   />
                 ) : typeof watchPicture === 'string' ? (
                   <Image
-                    src={watchPicture}
+                    src={team.picture}
                     alt="Imagem de perfl do membro"
                     width={100}
                     height={100}

@@ -5,7 +5,7 @@ import { ListStudent } from './list-students'
 import { FormSearch } from '../../../components/form-search'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
-export default async function Alunos() {
+export default async function Students() {
   return (
     <div className="flex-1 h-full flex flex-col p-4 overflow-auto">
       <Tabs defaultValue="Cursando" className="flex-1">
@@ -51,11 +51,13 @@ export default async function Alunos() {
             <ListStudent status="Cursando" />
           </Suspense>
         </TabsContent>
+
         <TabsContent value="Evadidos" className="pt-4 flex-1 h-full ">
           <Suspense>
             <ListStudent status="Evadiu" />
           </Suspense>
         </TabsContent>
+
         <TabsContent
           value="Reprovados"
           className="pt-4 flex-1 h-full flex flex-col gap-10 "
@@ -64,6 +66,7 @@ export default async function Alunos() {
             <ListStudent status="Reprovado" />
           </Suspense>
         </TabsContent>
+
         <TabsContent
           value="Formados"
           className="pt-4 flex-1 h-full flex flex-col gap-10 "

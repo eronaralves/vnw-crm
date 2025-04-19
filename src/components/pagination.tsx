@@ -13,7 +13,6 @@ import {
   PaginationItem,
 } from '@/components/ui/pagination'
 import { Button } from '@/components/ui/button'
-import { useEffect } from 'react'
 
 export const LIMIT_PER_PAGE = 7
 
@@ -60,10 +59,10 @@ export function Pagination({
   const totalPages = Math.ceil(totalCount / (perPage ?? LIMIT_PER_PAGE)) || 1
   const currentPage = Number(pageIndex) ?? 1
 
-  useEffect(() => {
-    params.delete('page')
-    router.push(`?${params.toString()}`)
-  }, [])
+  // useEffect(() => {
+  //   params.delete('page')
+  //   router.push(`?${params.toString()}`)
+  // }, [])
 
   function onPageChange(page: number) {
     params.set('page', page.toString())

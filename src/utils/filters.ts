@@ -76,6 +76,12 @@ const filtersTableStudents = [
 
 const filtersTableLeads = [
   {
+    id: 'course_options',
+    name: 'Curso Interessado',
+    options: [],
+    value: 'interested_course_in',
+  },
+  {
     id: 'sexuality_options',
     name: 'Orientação sexual',
     options: [],
@@ -92,12 +98,6 @@ const filtersTableLeads = [
     name: 'Raça/Cor',
     options: [],
     value: 'skin_color_in',
-  },
-  {
-    id: 'course_options',
-    name: 'Curso Interessado',
-    options: [],
-    value: 'interested_course_in',
   },
   {
     id: 'income_options',

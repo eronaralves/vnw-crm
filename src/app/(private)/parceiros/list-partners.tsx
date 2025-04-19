@@ -46,8 +46,6 @@ export function ListPartners() {
     placeholderData: (data) => data,
   })
 
-  console.log(dataPartner, 'FFF')
-
   return (
     <div className="flex flex-col gap-10 h-screen p-4 ">
       <div className="w-full flex items-center justify-between">

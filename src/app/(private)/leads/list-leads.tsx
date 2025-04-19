@@ -404,6 +404,12 @@ export function ListLeads() {
 
                     <TableCell className="p-5 whitespace-nowrap">
                       <span className="text-xs text-[#1c1d21] ">
+                        {lead?.interested_course ?? 'Não informado'}
+                      </span>
+                    </TableCell>
+
+                    <TableCell className="p-5 whitespace-nowrap">
+                      <span className="text-xs text-[#1c1d21] ">
                         {lead.sexuality ?? 'Não informado'}
                       </span>
                     </TableCell>
@@ -417,12 +423,6 @@ export function ListLeads() {
                     <TableCell className="p-5 whitespace-nowrap">
                       <span className="text-xs text-[#1c1d21] ">
                         {lead.skin_color ?? 'Não informado'}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {lead?.interested_course ?? 'Não informado'}
                       </span>
                     </TableCell>
 

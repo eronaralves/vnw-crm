@@ -21,8 +21,6 @@ export async function getPartners() {
     const response = await api.get('/partners?limit=100')
     const partners = response.data.results as Partner[]
 
-    console.log(response, 'FFF')
-
     return {
       partners,
       count: response.data.count,

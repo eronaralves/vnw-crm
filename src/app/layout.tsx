@@ -24,7 +24,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-      <body className={`${geistSans.className} bg-[#F5F5FA] antialiased`}>
+      <body
+        className={`${geistSans.className} bg-[#F5F5FA] antialiased overflow-hidden`}
+      >
         <NextAuthSessionProvider>
           <QueryClientProvider>
             <Toaster richColors />

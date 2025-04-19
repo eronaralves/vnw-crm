@@ -457,9 +457,17 @@ export function ListStudent({ status }: ListStudentProps) {
                   <TableRow
                     key={student?.errolmentId}
                     className={`${isFetching ? 'opacity-40' : ''}`}
+                    onClick={(e) => {
+                      const target = e.target as HTMLElement
+
+                      if (target.closest('[data-ignore-row-click]')) return
+
+                      router.push(`/alunos/${student.errolmentId}`)
+                    }}
                   >
                     <TableCell className="p-5 whitespace-nowrap">
                       <Checkbox
+                        data-ignore-row-click
                         className="w-5 h-5"
                         checked={selectedStudents.includes(student.id)}
                         onCheckedChange={() =>
