@@ -23,6 +23,7 @@ import { Button } from '@/components/button'
 import { PersonalData } from '@/components/tabs-profile/personal-data'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SocioeconomicData } from '@/components/tabs-profile/socioeconomic-data'
+import { differenceInYears } from 'date-fns'
 
 interface ContentProfileProps {
   lead: LeadProfile
@@ -93,6 +94,7 @@ export function ContainerTabsLeads({ lead }: ContentProfileProps) {
       phone: formatPhone(lead.phone),
       cpf: formatCpf(lead.cpf),
       birth_date: new UTCDate(lead.birth_date),
+      age: differenceInYears(new Date(), new UTCDate(lead.birth_date)),
     },
   })
 

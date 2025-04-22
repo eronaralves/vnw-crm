@@ -26,6 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SocioeconomicData } from '@/components/tabs-profile/socioeconomic-data'
 import { TagStatus } from '@/components/tag-status'
 import { ReasonEvasion } from '@/components/tabs-profile/reason-evasion'
+import { differenceInYears } from 'date-fns'
 
 interface ContentProfileProps {
   student: ProfileStudent
@@ -97,6 +98,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
       phone: formatPhone(student.phone),
       cpf: formatCpf(student.cpf),
       birth_date: new UTCDate(student.birth_date),
+      age: differenceInYears(new Date(), new UTCDate(student.birth_date)),
     },
   })
 

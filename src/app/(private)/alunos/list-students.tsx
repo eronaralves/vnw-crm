@@ -505,6 +505,11 @@ export function ListStudent({ status }: ListStudentProps) {
                     <TableCell className="text-center p-5 whitespace-nowrap">
                       <span className="text-xs text-[#1c1d21] ">
                         {student.age}
+
+                        {/* {differenceInYears(
+                          new Date(),
+                          new UTCDate(student.birth_date),
+                        )} */}
                       </span>
                     </TableCell>
                     <TableCell className="p-5 whitespace-nowrap">

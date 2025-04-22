@@ -1,4 +1,5 @@
 import { Controller, useFormContext } from 'react-hook-form'
+import { differenceInYears } from 'date-fns'
 
 // Utils
 import { formatPhone } from '@/utils/format-phone'
@@ -9,7 +10,6 @@ import { Input } from '../input'
 import { DatePicker } from '../date-picker'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
 import { FormStudentProfileType } from '@/app/(private)/alunos/[id]/container-tabs'
-import { differenceInYears } from 'date-fns'
 import {
   Select,
   SelectContent,

@@ -176,6 +176,7 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
                     width={100}
                     height={100}
                     className="w-22 h-22 rounded-full object-cover"
+                    priority
                   />
                 ) : typeof watchPicture === 'string' ? (
                   <Image
@@ -184,6 +185,7 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
                     width={100}
                     height={100}
                     className="w-22 h-22 rounded-full object-cover"
+                    priority
                   />
                 ) : (
                   <Image
@@ -192,6 +194,7 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
                     width={100}
                     height={100}
                     className="w-22 h-22 rounded-full object-cover"
+                    priority
                   />
                 )}
 
