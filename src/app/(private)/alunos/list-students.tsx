@@ -271,18 +271,21 @@ export function ListStudent({ status }: ListStudentProps) {
           </>
         )}
 
-        {selectedStudents.length > 0 && (
+        {selectedStudents.length > 0 && status === 'Cursando' && (
           <>
             <Button title="Evadir" className="bg-red-500 hover:bg-red-400" />
-            <Button
-              title="Rematricula"
-              className="bg-orange-400 hover:bg-orange-400/80"
-            />
             <Button
               title="Formar alunos"
               className="bg-emerald-600 hover:bg-emerald-500"
             />
           </>
+        )}
+
+        {selectedStudents.length > 0 && status === 'Formado' && (
+          <Button
+            title="Rematricula"
+            className="bg-orange-400 hover:bg-orange-400/80"
+          />
         )}
       </div>
 

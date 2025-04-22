@@ -6,11 +6,11 @@ import { getStudent } from '@/http/students/get-student'
 // Components
 import { ContainerTabs } from './container-tabs'
 
-interface Student {
+interface StudentProfile {
   params: Promise<{ id: string }>
 }
 
-export default async function Student({ params }: Student) {
+export default async function StudentProfile({ params }: StudentProfile) {
   const { id } = await params
   const { student } = await getStudent(id)
 

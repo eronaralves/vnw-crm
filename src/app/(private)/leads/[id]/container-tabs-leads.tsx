@@ -9,26 +9,23 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, FormProvider } from 'react-hook-form'
 
 // Icons
-import { DoorOpen, GraduationCap, Pencil, XCircle, Share } from 'lucide-react'
+import { Pencil } from 'lucide-react'
 
 // Utils
 import { formatCpf } from '@/utils/format-cpf'
 import { formatPhone } from '@/utils/format-phone'
 
 // Http
-import type { ProfileStudent } from '@/http/students/get-student'
+import type { LeadProfile } from '@/http/leads/get-lead'
 
 // Components
 import { Button } from '@/components/button'
-import { Journey } from '@/components/tabs-profile/journey'
 import { PersonalData } from '@/components/tabs-profile/personal-data'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SocioeconomicData } from '@/components/tabs-profile/socioeconomic-data'
-import { TagStatus } from '@/components/tag-status'
-import { ReasonEvasion } from '@/components/tabs-profile/reason-evasion'
 
 interface ContentProfileProps {
-  student: ProfileStudent
+  lead: LeadProfile
 }
 
 const formProfileSchema = yup.object().shape({
@@ -46,7 +43,6 @@ const formProfileSchema = yup.object().shape({
   emergency_phone: yup.string().nullable(),
   emergency_name: yup.string().nullable(),
   emergency_kinship: yup.string().nullable(),
-  reason_give_up: yup.string(),
   marital_status: yup.string(),
   skin_color: yup.string(),
   gender: yup.string(),
@@ -85,24 +81,24 @@ const formProfileSchema = yup.object().shape({
   }),
 })
 
-export type FormStudentProfileType = yup.InferType<typeof formProfileSchema>
+export type FormProfileType = yup.InferType<typeof formProfileSchema>
 
-export function ContainerTabs({ student }: ContentProfileProps) {
+export function ContainerTabsLeads({ lead }: ContentProfileProps) {
   const [isEditing, setIsEditing] = useState(false)
 
   const methods = useForm({
     resolver: yupResolver(formProfileSchema),
     defaultValues: {
-      ...student,
-      phone: formatPhone(student.phone),
-      cpf: formatCpf(student.cpf),
-      birth_date: new UTCDate(student.birth_date),
+      ...lead,
+      phone: formatPhone(lead.phone),
+      cpf: formatCpf(lead.cpf),
+      birth_date: new UTCDate(lead.birth_date),
     },
   })
 
   const router = useRouter()
 
-  function onSubmit(data: FormStudentProfileType) {
+  function onSubmit(data: FormProfileType) {
     console.log(data)
   }
 
@@ -112,11 +108,8 @@ export function ContainerTabs({ student }: ContentProfileProps) {
         <div className="flex items-center gap-8 flex-wrap mt-2">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
             <div>
-              <h1 className="text-2xl font-bold">{student.fullname}</h1>
-              <p className="text-sm text-gray-500">{student.course.name}</p>
+              <h1 className="text-2xl font-bold">{lead.fullname}</h1>
             </div>
-
-            <TagStatus status={student.status} />
           </div>
 
           <div className="flex flex-wrap gap-x-2 gap-y-4">
@@ -127,31 +120,6 @@ export function ContainerTabs({ student }: ContentProfileProps) {
             >
               <Pencil size={16} />
             </Button>
-            {student.status === 'Cursando' && (
-              <>
-                <Button
-                  title="Formar"
-                  className="bg-emerald-600 hover:bg-emerald-500"
-                >
-                  <GraduationCap size={16} />
-                </Button>
-                <Button
-                  title="Reprovar"
-                  className="bg-red-500 hover:bg-red-400"
-                >
-                  <XCircle size={16} />
-                </Button>
-                <Button title="Evadir" className="bg-red-500 hover:bg-red-400">
-                  <DoorOpen size={16} />
-                </Button>
-                <Button
-                  title="Transferir"
-                  className="border border-zinc-500 bg-transparent text-zinc-500 hover:bg-zinc-500 hover:text-white"
-                >
-                  <Share size={16} />
-                </Button>
-              </>
-            )}
           </div>
         </div>
 
@@ -159,22 +127,8 @@ export function ContainerTabs({ student }: ContentProfileProps) {
           onSubmit={methods.handleSubmit(onSubmit)}
           className="h-full flex flex-col"
         >
-          <Tabs defaultValue="journey" className="flex-1 gap-0">
+          <Tabs defaultValue="personal-data" className="flex-1 gap-0">
             <TabsList className="w-full min-h-max flex justify-start overflow-x-auto gap-1 border-b border-[#dee2e6]">
-              <TabsTrigger
-                value="journey"
-                className="data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
-              >
-                Jornada do aluno
-              </TabsTrigger>
-              {student.status === 'Evadiu' && (
-                <TabsTrigger
-                  value="reason-evasion"
-                  className="data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
-                >
-                  Motivo da Evasão
-                </TabsTrigger>
-              )}
               <TabsTrigger
                 value="personal-data"
                 className="data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
@@ -206,20 +160,6 @@ export function ContainerTabs({ student }: ContentProfileProps) {
                 Anexos
               </TabsTrigger>
             </TabsList>
-
-            <TabsContent value="journey" asChild>
-              <div className="h-full  flex-1 flex flex-col overflow-auto">
-                <Journey modules={student.course.modules} />
-              </div>
-            </TabsContent>
-
-            {student.status === 'Evadiu' && (
-              <TabsContent value="reason-evasion" asChild>
-                <div className="h-full  flex-1 flex flex-col overflow-auto">
-                  <ReasonEvasion isEditing={isEditing} />
-                </div>
-              </TabsContent>
-            )}
 
             <TabsContent value="personal-data" asChild>
               <div className="h-full flex-1 flex flex-col">

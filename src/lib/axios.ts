@@ -31,6 +31,8 @@ api.interceptors.response.use(
 
       const cookie = await cookies()
       cookie.delete('next-auth.session-token')
+      cookie.delete('next-auth.callback-url')
+      cookie.delete('next-auth.csrf-token')
 
       return Promise.reject(
         new AppError('Token expirado ou inválido. Faça login novamente.'),

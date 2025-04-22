@@ -3,7 +3,7 @@ import { Controller, useFormContext } from 'react-hook-form'
 // Components
 import { Input } from '../input'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
-import { FormProfileType } from '@/app/(private)/alunos/[id]/container-tabs'
+import { FormStudentProfileType } from '@/app/(private)/alunos/[id]/container-tabs'
 
 import {
   Select,
@@ -18,7 +18,7 @@ interface PersonalDataProps {
 }
 
 export function SocioeconomicData({ isEditing }: PersonalDataProps) {
-  const { register, control } = useFormContext<FormProfileType>()
+  const { register, control } = useFormContext<FormStudentProfileType>()
 
   return (
     <div className="flex-1 px-6 py-8 bg-white">
@@ -31,7 +31,7 @@ export function SocioeconomicData({ isEditing }: PersonalDataProps) {
             <Input
               variant="secondary"
               type="nunber"
-              placeholder="Digite o UF"
+              placeholder="Digite quantas pessoas moram juntas"
               disabled={!isEditing}
               {...register('student_socioeconomic_data.housemates')}
             />
@@ -52,9 +52,9 @@ export function SocioeconomicData({ isEditing }: PersonalDataProps) {
                 <SelectTrigger
                   variant="secondary"
                   disabled={!isEditing}
-                  className="flex-1  w-full py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
+                  className="flex-1 w-full py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                 >
-                  <SelectValue placeholder="Selecione um estado civil" />
+                  <SelectValue placeholder="Selecione o tipo de moradia" />
                 </SelectTrigger>
 
                 <SelectContent className="text-gray-900">
@@ -66,6 +66,7 @@ export function SocioeconomicData({ isEditing }: PersonalDataProps) {
                   </SelectItem>
                   <SelectItem value="Pau a Pique">Pau a Pique</SelectItem>
                   <SelectItem value="Palafita">Palafita</SelectItem>
+                  <SelectItem value="Edifício">Edifício</SelectItem>
                 </SelectContent>
               </Select>
             )}
@@ -86,7 +87,7 @@ export function SocioeconomicData({ isEditing }: PersonalDataProps) {
                   disabled={!isEditing}
                   className="flex-1 w-full py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                 >
-                  <SelectValue placeholder="Selecione um estado civil" />
+                  <SelectValue placeholder="Selecione a condição da casa" />
                 </SelectTrigger>
 
                 <SelectContent className="text-gray-900">
@@ -117,7 +118,7 @@ export function SocioeconomicData({ isEditing }: PersonalDataProps) {
                   disabled={!isEditing}
                   className="flex-1 w-full py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                 >
-                  <SelectValue placeholder="Selecione um estado civil" />
+                  <SelectValue placeholder="Selecione o résponsavel financeiro" />
                 </SelectTrigger>
 
                 <SelectContent className="text-gray-900">
@@ -155,7 +156,7 @@ export function SocioeconomicData({ isEditing }: PersonalDataProps) {
                   disabled={!isEditing}
                   className="flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                 >
-                  <SelectValue placeholder="Selecione um estado civil" />
+                  <SelectValue placeholder="Selecione a renda" />
                 </SelectTrigger>
 
                 <SelectContent className="text-gray-900">
@@ -181,15 +182,13 @@ export function SocioeconomicData({ isEditing }: PersonalDataProps) {
           <label className="text-sm font-normal">
             Você ou algum membro da família recebe alguma auxilio do governo?
           </label>
-          <div className="max-w-64">
-            <Input
-              variant="secondary"
-              type="nunber"
-              placeholder="Digite o UF"
-              disabled={!isEditing}
-              {...register('student_socioeconomic_data.housemates')}
-            />
-          </div>
+          <Input
+            variant="secondary"
+            type="nunber"
+            placeholder="Digite o auxilo do governo"
+            disabled={!isEditing}
+            {...register('student_socioeconomic_data.government_benefit')}
+          />
         </div>
 
         <div className="flex flex-col gap-1">
@@ -198,39 +197,95 @@ export function SocioeconomicData({ isEditing }: PersonalDataProps) {
             deficiência?
           </label>
 
-          <RadioGroup
-            defaultValue="option-one"
-            className="flex gap-7"
-            disabled={!isEditing}
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem
-                value="true"
-                id="isOfLegalAge_yes"
-                className="accent-blue-500"
-              />
+          <Controller
+            name="student_socioeconomic_data.chronic_diseases"
+            control={control}
+            render={({ field }) => (
+              <RadioGroup
+                className="flex gap-7"
+                disabled={!isEditing}
+                onValueChange={field.onChange}
+                value={field.value ? String(field.value) : 'false'}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    id="chronic_diseases_yes"
+                    value="true"
+                    className="accent-blue-500"
+                  />
+                  <label
+                    htmlFor="chronic_diseases_yes"
+                    className="text-base font-normal"
+                  >
+                    Sim
+                  </label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    id="chronic_diseases_no"
+                    value="false"
+                    className="data-[state=checked]:after:bg-red-600"
+                  />
+                  <label
+                    htmlFor="chronic_diseases_no"
+                    className="text-base font-normal"
+                  >
+                    Não
+                  </label>
+                </div>
+              </RadioGroup>
+            )}
+          />
+        </div>
+      </div>
 
-              <label
-                htmlFor="isOfLegalAge_yes"
-                className="text-base font-normal"
+      <div className="flex flex-wrap gap-x-4 gap-y-6 mt-6">
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-normal">
+            Você mora com algum(a) PNE - portador(a) de necessidades especiais?
+          </label>
+
+          <Controller
+            name="student_socioeconomic_data.live_with_pwd"
+            control={control}
+            render={({ field }) => (
+              <RadioGroup
+                defaultValue="option-one"
+                className="flex gap-7"
+                disabled={!isEditing}
+                onValueChange={field.onChange}
+                value={field.value ? String(field.value) : 'false'}
               >
-                Sim
-              </label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem
-                id="isOfLegalAge_no"
-                value="false"
-                className="data-[state=checked]:after:bg-red-600"
-              />
-              <label
-                htmlFor="isOfLegalAge_no"
-                className="text-base font-normal"
-              >
-                Não
-              </label>
-            </div>
-          </RadioGroup>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    value="true"
+                    id="live_with_pwd_yes"
+                    className="accent-blue-500"
+                  />
+
+                  <label
+                    htmlFor="live_with_pwd_yes"
+                    className="text-base font-normal"
+                  >
+                    Sim
+                  </label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    id="live_with_pwd_no"
+                    value="false"
+                    className="data-[state=checked]:after:bg-red-600"
+                  />
+                  <label
+                    htmlFor="live_with_pwd_no"
+                    className="text-base font-normal"
+                  >
+                    Não
+                  </label>
+                </div>
+              </RadioGroup>
+            )}
+          />
         </div>
       </div>
     </div>

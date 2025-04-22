@@ -8,7 +8,7 @@ import { formatCpf } from '@/utils/format-cpf'
 import { Input } from '../input'
 import { DatePicker } from '../date-picker'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
-import { FormProfileType } from '@/app/(private)/alunos/[id]/container-tabs'
+import { FormStudentProfileType } from '@/app/(private)/alunos/[id]/container-tabs'
 import { differenceInYears } from 'date-fns'
 import {
   Select,
@@ -24,7 +24,7 @@ interface PersonalDataProps {
 
 export function PersonalData({ isEditing }: PersonalDataProps) {
   const { register, setValue, control, watch } =
-    useFormContext<FormProfileType>()
+    useFormContext<FormStudentProfileType>()
   const watchBirthDate = watch('birth_date')
   const age = watchBirthDate
     ? differenceInYears(new Date(), watchBirthDate)
@@ -444,7 +444,7 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
                   <SelectTrigger
                     variant="secondary"
                     disabled={!isEditing}
-                    className="flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
+                    className="min-w-28 flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                   >
                     <SelectValue placeholder="Selecione um estado civil" />
                   </SelectTrigger>
@@ -472,7 +472,7 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
                   <SelectTrigger
                     variant="secondary"
                     disabled={!isEditing}
-                    className="flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
+                    className="min-w-28 flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                   >
                     <SelectValue placeholder="Selecione uma Raça /Cor" />
                   </SelectTrigger>
@@ -501,7 +501,7 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
                   <SelectTrigger
                     variant="secondary"
                     disabled={!isEditing}
-                    className="flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
+                    className="min-w-28 flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                   >
                     <SelectValue placeholder="Selecione uma Orientação sexual" />
                   </SelectTrigger>
@@ -533,7 +533,7 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
                   <SelectTrigger
                     variant="secondary"
                     disabled={!isEditing}
-                    className="flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
+                    className="min-w-28 flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                   >
                     <SelectValue placeholder="Selecione um Gênero" />
                   </SelectTrigger>

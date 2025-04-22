@@ -375,6 +375,13 @@ export function ListLeads() {
                   <TableRow
                     key={lead.id}
                     className={`${isFetching ? 'opacity-40' : ''}`}
+                    onClick={(e) => {
+                      const target = e.target as HTMLElement
+
+                      if (target.closest('[data-ignore-row-click]')) return
+
+                      router.push(`/leads/${lead.id}`)
+                    }}
                   >
                     <TableCell className="p-5 pl-[60px] whitespace-nowrap">
                       <div className="flex flex-col gap-2">

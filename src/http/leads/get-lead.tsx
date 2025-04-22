@@ -1,97 +1,49 @@
-'use server'
-
 import { api } from '@/lib/axios'
 import { AppError } from '@/utils/app-error'
 
-export type STATUS =
-  | 'Cursando'
-  | 'Evadiu'
-  | 'Transferido'
-  | 'Formado'
-  | 'Reprovado'
-
-export type ProfileStudent = {
+export type LeadProfile = {
   id: string
-  errolmentId: string
   able: boolean
   age: number
   birth_date: string
   fullname: string
   gender: string
-  reason_give_up: string
-
+  reason_give_up: string | null
   cpf: string
   created_at: string
   documents: unknown[]
-
   email: string
   emergency_kinship: string | null
   emergency_name: string | null
   emergency_phone: string | null
-
   emitter: string
   father_name: string
   mother_name: string
-
   has_algorithm: boolean | null
   has_math: boolean | null
-
   hometown: string
   hometown_state: string
   indication: string | null
-
   interested_course: string | null
   interested_modality: string | null
   interested_time: string | null
   course_enrolled: string | null
-
   is_active: boolean
   knowledge_languages: string | null
-
   marital_status: string
   modality: string
   module: string
-
   phone: string
   presencial_availability: string | null
-
   profile_picture: string
-
   quiz: unknown | null
   quiz_waits: boolean
-
   religion: string
   rg: string
   sexuality: string
   skin_color: string
   social_name: string
-
-  status: STATUS
-
-  course: {
-    id: string
-    group: string
-    headquarter: string | null
-    modality: string | null
-    name: string
-    programing_language: string | null
-    partner: string | null
-    status: string
-    modules: {
-      id: string
-      name: string
-      frequency: number
-      desafio: {
-        status: string
-        github_username: string
-        github_repository: string
-      } | null
-      feedback: {
-        message: string
-        performance: string
-      } | null
-    }[]
-  }
+  status: string
 
   student_address: {
     address: {
@@ -184,33 +136,19 @@ export type ProfileStudent = {
   }
 }
 
-export async function getStudent(id: string) {
+export async function getLead(id: string) {
   try {
-    const response = await api.get(`/enrollment/student/${id}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const data = response.data[0]
-
-    const student = {
-      ...data.id_student,
-      reason_give_up: data.reason_give_up,
-      status: data.status,
-      course: {
-        ...data.id_student.course,
-        modules: data.id_module,
-      },
-    } as ProfileStudent
+    const response = await api.get(`/students/${id}`)
+    const lead = response.data as LeadProfile
 
     return {
-      student,
+      lead,
     }
   } catch (error) {
     const isAppError = error instanceof AppError
     const errorMessage = isAppError
       ? error.detail
-      : 'Error ao buscar dados do aluno, tente novamente.'
+      : 'Error ao buscar dados do lead, tente novamente.'
 
     return {
       message: errorMessage,
