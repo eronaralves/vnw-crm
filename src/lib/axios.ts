@@ -28,9 +28,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
 
-      await fetch(`${env.BASE_URL}/api/auth/logout`, {
-        method: 'POST',
-      })
+      await fetch(`${env.BASE_URL}/api/auth/logout`)
 
       return Promise.reject(
         new AppError('Token expirado ou inválido. Faça login novamente.'),
