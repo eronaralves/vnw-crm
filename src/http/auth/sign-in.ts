@@ -27,6 +27,7 @@ export async function signIn({ email, password }: SignInRequest) {
       data,
     }
   } catch (error) {
+    console.log(error)
     const isAppError = error instanceof AppError
     const errorMessage = isAppError
       ? error.detail

@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { env } from '@/env'
 import { getServerSession } from 'next-auth'
-import { cookies } from 'next/headers'
 
 // Utils
 import { authOptions } from '@/utils/auth-options'
@@ -29,10 +28,9 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
 
-      const cookie = await cookies()
-      cookie.delete('next-auth.session-token')
-      cookie.delete('next-auth.callback-url')
-      cookie.delete('next-auth.csrf-token')
+      await fetch(`${env.BASE_URL}/api/auth/logout`, {
+        method: 'POST',
+      })
 
       return Promise.reject(
         new AppError('Token expirado ou inválido. Faça login novamente.'),
