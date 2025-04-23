@@ -50,7 +50,6 @@ export type ProfileStudent = {
 
   marital_status: string
   modality: string
-  module: string
 
   phone: string
   presencial_availability: string | null
@@ -77,6 +76,7 @@ export type ProfileStudent = {
     programing_language: string | null
     partner: string | null
     status: string
+    moduleCurrent: string
     modules: {
       id: string
       name: string
@@ -200,6 +200,7 @@ export async function getStudent(id: string) {
       course: {
         ...data.id_student.course,
         modules: data.id_module,
+        moduleCurrent: data.id_student.module,
       },
     } as ProfileStudent
 

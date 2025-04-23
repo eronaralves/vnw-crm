@@ -53,6 +53,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { ButtonFailStudents } from '@/components/button-fail-students'
+import { ButtonEvadeStudents } from '@/components/button-evade-students'
 
 type Spreadsheet = {
   link: string
@@ -68,7 +70,9 @@ export function ListStudent({ status }: ListStudentProps) {
   const [isExporting, setisExporting] = useState(false)
   const [exportedSpreadsheet, setExportedSpreadsheet] =
     useState<null | Spreadsheet>(null)
-  const [selectedStudents, setSelectedStudents] = useState<string[]>([])
+  const [selectedStudents, setSelectedStudents] = useState<
+    { id_student: string; id_module: string }[]
+  >([])
 
   const [filters, setFilters] = useState(filtersTableStudents)
   const [ageMin, setAgeMin] = useState('')
@@ -198,14 +202,29 @@ export function ListStudent({ status }: ListStudentProps) {
       }),
   })
 
-  function handleStudentSelection(id: string) {
-    if (selectedStudents.includes(id)) {
+  function handleStudentSelection({
+    studentId,
+    moduleId,
+  }: {
+    studentId: string
+    moduleId: string
+  }) {
+    const hasStudentSelected = selectedStudents.find(
+      (student) => student.id_student === studentId,
+    )
+
+    if (hasStudentSelected) {
       setSelectedStudents(
-        selectedStudents.filter((studentId) => studentId !== id),
+        selectedStudents.filter(
+          (studentSelect) => studentSelect.id_student !== studentId,
+        ),
       )
       setAllChecked(false)
     } else {
-      setSelectedStudents([...selectedStudents, id])
+      setSelectedStudents([
+        ...selectedStudents,
+        { id_student: studentId, id_module: moduleId },
+      ])
       if (selectedStudents.length + 1 === dataStudents?.students?.length) {
         setAllChecked(true)
       }
@@ -259,6 +278,8 @@ export function ListStudent({ status }: ListStudentProps) {
     }
   }
 
+  const studentsEvaded = selectedStudents.map((student) => student.id_student)
+
   return (
     <div className="flex-1 h-full flex flex-col gap-10">
       <div className="flex items-center gap-4 h-8">
@@ -273,9 +294,16 @@ export function ListStudent({ status }: ListStudentProps) {
 
         {selectedStudents.length > 0 && status === 'Cursando' && (
           <>
-            <Button title="Evadir" className="bg-red-500 hover:bg-red-400" />
+            <ButtonEvadeStudents
+              studentsEvaded={studentsEvaded}
+              onSuccess={() => setSelectedStudents([])}
+            />
+            <ButtonFailStudents
+              studentsFaileds={selectedStudents}
+              onSuccess={() => setSelectedStudents([])}
+            />
             <Button
-              title="Formar alunos"
+              title="Formar"
               className="bg-emerald-600 hover:bg-emerald-500"
             />
           </>
@@ -301,7 +329,12 @@ export function ListStudent({ status }: ListStudentProps) {
                     if (checked) {
                       setSelectedStudents(
                         dataStudents?.students
-                          ? dataStudents?.students?.map((student) => student.id)
+                          ? dataStudents?.students?.map((student) => {
+                              return {
+                                id_student: student.id,
+                                id_module: student.course.moduleCurrent,
+                              }
+                            })
                           : [],
                       )
                       setAllChecked(true)
@@ -472,9 +505,17 @@ export function ListStudent({ status }: ListStudentProps) {
                       <Checkbox
                         data-ignore-row-click
                         className="w-5 h-5"
-                        checked={selectedStudents.includes(student.id)}
+                        checked={Boolean(
+                          selectedStudents.find(
+                            (studentSelect) =>
+                              studentSelect.id_student === student.id,
+                          ),
+                        )}
                         onCheckedChange={() =>
-                          handleStudentSelection(student.id)
+                          handleStudentSelection({
+                            moduleId: student.course.moduleCurrent,
+                            studentId: student.id,
+                          })
                         }
                       />
                     </TableCell>
@@ -487,8 +528,6 @@ export function ListStudent({ status }: ListStudentProps) {
                         <span className="text-xs text-[#1c1d21] ">
                           ID {student.id}
                         </span>
-
-                        {/* <Image src={student.} /> */}
                       </div>
                     </TableCell>
 

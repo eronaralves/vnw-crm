@@ -7,9 +7,10 @@ import { UTCDate } from '@date-fns/utc'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, FormProvider } from 'react-hook-form'
+import { differenceInYears } from 'date-fns'
 
 // Icons
-import { DoorOpen, GraduationCap, Pencil, XCircle, Share } from 'lucide-react'
+import { GraduationCap, Pencil, Share } from 'lucide-react'
 
 // Utils
 import { formatCpf } from '@/utils/format-cpf'
@@ -20,13 +21,14 @@ import type { ProfileStudent } from '@/http/students/get-student'
 
 // Components
 import { Button } from '@/components/button'
+import { TagStatus } from '@/components/tag-status'
 import { Journey } from '@/components/tabs-profile/journey'
 import { PersonalData } from '@/components/tabs-profile/personal-data'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { SocioeconomicData } from '@/components/tabs-profile/socioeconomic-data'
-import { TagStatus } from '@/components/tag-status'
 import { ReasonEvasion } from '@/components/tabs-profile/reason-evasion'
-import { differenceInYears } from 'date-fns'
+import { SocioeconomicData } from '@/components/tabs-profile/socioeconomic-data'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ButtonEvadeStudents } from '@/components/button-evade-students'
+import { ButtonFailStudents } from '@/components/button-fail-students'
 
 interface ContentProfileProps {
   student: ProfileStudent
@@ -137,15 +139,20 @@ export function ContainerTabs({ student }: ContentProfileProps) {
                 >
                   <GraduationCap size={16} />
                 </Button>
-                <Button
-                  title="Reprovar"
-                  className="bg-red-500 hover:bg-red-400"
-                >
-                  <XCircle size={16} />
-                </Button>
-                <Button title="Evadir" className="bg-red-500 hover:bg-red-400">
-                  <DoorOpen size={16} />
-                </Button>
+                <ButtonFailStudents
+                  studentsFaileds={[
+                    {
+                      id_student: student.id,
+                      id_module: student.course.moduleCurrent,
+                    },
+                  ]}
+                  onSuccess={() => router.refresh()}
+                />
+
+                <ButtonEvadeStudents
+                  studentsEvaded={[student.id]}
+                  onSuccess={() => router.refresh()}
+                />
                 <Button
                   title="Transferir"
                   className="border border-zinc-500 bg-transparent text-zinc-500 hover:bg-zinc-500 hover:text-white"

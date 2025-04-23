@@ -2,6 +2,7 @@
 
 import { TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { startTransition } from 'react'
 
 export function TabsFilters() {
   const router = useRouter()
@@ -10,8 +11,11 @@ export function TabsFilters() {
 
   function handleTabSelected(tab: string) {
     params.set('status', tab)
+    params.delete('page')
 
-    router.replace(`?${params.toString()}`)
+    startTransition(() => {
+      router.replace(`?${params.toString()}`)
+    })
   }
 
   return (

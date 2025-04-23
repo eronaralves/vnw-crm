@@ -33,6 +33,7 @@ export type Student = {
   errolmentId: string
   age: number | null
   course: {
+    moduleCurrent: string
     group: string
     headquarter: string | null
     modality: string | null
@@ -100,6 +101,7 @@ export async function getStudents({
         status: student.status,
         course: {
           ...student?.id_module.course,
+          moduleCurrent: student.id_module.id,
         },
       }
     })

@@ -3,7 +3,7 @@ import { Suspense } from 'react'
 // Components
 import { ListStudent } from './list-students'
 import { FormSearch } from '../../../components/form-search'
-import { Tabs, TabsContent } from '@/components/ui/tabs'
+import { Tabs } from '@/components/ui/tabs'
 import { TabsFilters } from './tabs-filter'
 
 interface Students {
@@ -29,14 +29,11 @@ export default async function Students({ searchParams }: Students) {
           </Suspense>
         </div>
 
-        <TabsContent
-          value={status}
-          className="pt-4 flex-1 h-full flex flex-col gap-10 "
-        >
-          <Suspense>
+        <Suspense>
+          <div className="pt-4 flex-1 h-full flex flex-col gap-10 ">
             <ListStudent status={status} />
-          </Suspense>
-        </TabsContent>
+          </div>
+        </Suspense>
       </Tabs>
     </div>
   )
