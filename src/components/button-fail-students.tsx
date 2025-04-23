@@ -36,7 +36,7 @@ export function ButtonFailStudents({
   const [openModal, setOpenModal] = useState(false)
 
   const queryClient = useQueryClient()
-  const { mutate: failStudentMutate } = useMutation({
+  const { mutate: failStudentMutate, isPending } = useMutation({
     mutationFn: failStudents,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['get-students'] })
@@ -81,15 +81,20 @@ export function ButtonFailStudents({
             Após confirmar não poderá reverter isso.
           </DialogDescription>
 
-          <div className="flex justify-end gap-2 mt-6">
+          <div className="flex justify-end gap-2 mt-4">
             <DialogClose asChild>
               <Button
                 title="Cancelar"
                 className="self-end bg-red-500 hover:bg-red-400"
+                disabled={isPending}
               />
             </DialogClose>
 
-            <Button title="Confirmar" onClick={handleFailStudent} />
+            <Button
+              title="Confirmar"
+              onClick={handleFailStudent}
+              isPending={isPending}
+            />
           </div>
         </div>
       </DialogContent>

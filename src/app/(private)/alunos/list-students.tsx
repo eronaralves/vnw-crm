@@ -61,6 +61,11 @@ type Spreadsheet = {
   quantidade: number
 }
 
+type SelectedStudents = {
+  id_student: string
+  id_module: string
+  enrollmentId: string
+}
 interface ListStudentProps {
   status: 'Cursando' | 'Formado' | 'Evadiu' | 'Reprovado'
 }
@@ -70,9 +75,9 @@ export function ListStudent({ status }: ListStudentProps) {
   const [isExporting, setisExporting] = useState(false)
   const [exportedSpreadsheet, setExportedSpreadsheet] =
     useState<null | Spreadsheet>(null)
-  const [selectedStudents, setSelectedStudents] = useState<
-    { id_student: string; id_module: string }[]
-  >([])
+  const [selectedStudents, setSelectedStudents] = useState<SelectedStudents[]>(
+    [],
+  )
 
   const [filters, setFilters] = useState(filtersTableStudents)
   const [ageMin, setAgeMin] = useState('')
@@ -203,27 +208,25 @@ export function ListStudent({ status }: ListStudentProps) {
   })
 
   function handleStudentSelection({
-    studentId,
-    moduleId,
-  }: {
-    studentId: string
-    moduleId: string
-  }) {
+    enrollmentId,
+    id_module,
+    id_student,
+  }: SelectedStudents) {
     const hasStudentSelected = selectedStudents.find(
-      (student) => student.id_student === studentId,
+      (student) => student.id_student === id_student,
     )
 
     if (hasStudentSelected) {
       setSelectedStudents(
         selectedStudents.filter(
-          (studentSelect) => studentSelect.id_student !== studentId,
+          (studentSelect) => studentSelect.id_student !== id_student,
         ),
       )
       setAllChecked(false)
     } else {
       setSelectedStudents([
         ...selectedStudents,
-        { id_student: studentId, id_module: moduleId },
+        { id_student, id_module, enrollmentId },
       ])
       if (selectedStudents.length + 1 === dataStudents?.students?.length) {
         setAllChecked(true)
@@ -278,8 +281,6 @@ export function ListStudent({ status }: ListStudentProps) {
     }
   }
 
-  const studentsEvaded = selectedStudents.map((student) => student.id_student)
-
   return (
     <div className="flex-1 h-full flex flex-col gap-10">
       <div className="flex items-center gap-4 h-8">
@@ -292,12 +293,19 @@ export function ListStudent({ status }: ListStudentProps) {
           </>
         )}
 
+        {selectedStudents.length === 1 && status === 'Cursando' && (
+          <ButtonEvadeStudents
+            studentEvaded={{
+              enrollmentId: selectedStudents[0].enrollmentId,
+              moduleId: selectedStudents[0].id_module,
+              studentId: selectedStudents[0].id_student,
+            }}
+            onSuccess={() => setSelectedStudents([])}
+          />
+        )}
+
         {selectedStudents.length > 0 && status === 'Cursando' && (
           <>
-            <ButtonEvadeStudents
-              studentsEvaded={studentsEvaded}
-              onSuccess={() => setSelectedStudents([])}
-            />
             <ButtonFailStudents
               studentsFaileds={selectedStudents}
               onSuccess={() => setSelectedStudents([])}
@@ -333,6 +341,7 @@ export function ListStudent({ status }: ListStudentProps) {
                               return {
                                 id_student: student.id,
                                 id_module: student.course.moduleCurrent,
+                                enrollmentId: student.errolmentId,
                               }
                             })
                           : [],
@@ -513,8 +522,9 @@ export function ListStudent({ status }: ListStudentProps) {
                         )}
                         onCheckedChange={() =>
                           handleStudentSelection({
-                            moduleId: student.course.moduleCurrent,
-                            studentId: student.id,
+                            id_module: student.course.moduleCurrent,
+                            id_student: student.id,
+                            enrollmentId: student.errolmentId,
                           })
                         }
                       />

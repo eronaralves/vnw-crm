@@ -24,13 +24,13 @@ export function ReasonEvasion({ isEditing }: ReasonEvasionProps) {
             name="reason_give_up"
             control={control}
             render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select onValueChange={field.onChange} value={field.value ?? ''}>
                 <SelectTrigger
                   variant="secondary"
                   disabled={!isEditing}
                   className="flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                 >
-                  <SelectValue placeholder="Selecione um estado civil" />
+                  <SelectValue placeholder="Selecione o motivo da evasão" />
                 </SelectTrigger>
 
                 <SelectContent className="text-gray-900">

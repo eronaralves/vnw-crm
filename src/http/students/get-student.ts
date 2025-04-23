@@ -195,8 +195,9 @@ export async function getStudent(id: string) {
 
     const student = {
       ...data.id_student,
-      reason_give_up: data.reason_give_up,
       status: data.status,
+      errolmentId: data.id,
+      reason_give_up: data.reason_give_up,
       course: {
         ...data.id_student.course,
         modules: data.id_module,

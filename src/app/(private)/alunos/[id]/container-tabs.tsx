@@ -49,7 +49,7 @@ const formProfileSchema = yup.object().shape({
   emergency_phone: yup.string().nullable(),
   emergency_name: yup.string().nullable(),
   emergency_kinship: yup.string().nullable(),
-  reason_give_up: yup.string(),
+  reason_give_up: yup.string().nullable().optional(),
   marital_status: yup.string(),
   skin_color: yup.string(),
   gender: yup.string(),
@@ -110,6 +110,8 @@ export function ContainerTabs({ student }: ContentProfileProps) {
     console.log(data)
   }
 
+  console.log(student.reason_give_up)
+
   return (
     <FormProvider {...methods}>
       <div className="w-full h-full flex flex-col space-y-12 p-4">
@@ -150,7 +152,11 @@ export function ContainerTabs({ student }: ContentProfileProps) {
                 />
 
                 <ButtonEvadeStudents
-                  studentsEvaded={[student.id]}
+                  studentEvaded={{
+                    studentId: student.id,
+                    enrollmentId: student.errolmentId,
+                    moduleId: student.course.moduleCurrent,
+                  }}
                   onSuccess={() => router.refresh()}
                 />
                 <Button
