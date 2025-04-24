@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import NextAuthSessionProvider from '@/providers/next-auth-session-provider'
 import { Toaster } from 'sonner'
 import QueryClientProvider from '@/providers/query-client-provider'
 
@@ -27,12 +26,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.className} bg-[#F5F5FA] antialiased overflow-hidden`}
       >
-        <NextAuthSessionProvider>
-          <QueryClientProvider>
-            <Toaster richColors />
-            {children}
-          </QueryClientProvider>
-        </NextAuthSessionProvider>
+        <QueryClientProvider>
+          <Toaster richColors />
+          {children}
+        </QueryClientProvider>
       </body>
     </html>
   )

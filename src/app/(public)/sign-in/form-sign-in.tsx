@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation'
 import { Eye, EyeClosed, Mail, Loader2 } from 'lucide-react'
 
 import { toast } from 'sonner'
-import { signIn } from 'next-auth/react'
 
 import * as yup from 'yup'
 import { useForm } from 'react-hook-form'
@@ -16,6 +15,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 
 // Components
 import { Input } from '@/components/input'
+import { signIn } from '@/http/auth/sign-in'
 
 const SignInSchema = yup.object().shape({
   email: yup
@@ -45,16 +45,13 @@ export function FormSignIn() {
 
   async function onSubmit(data: SignInType) {
     const { email, password } = data
-    const response = await signIn('credentials', {
+    const response = await signIn({
       email,
       password,
-      redirect: false,
     })
 
-    if (response?.error) {
-      const errorMessage = response.error
-
-      return toast.error(errorMessage, {
+    if (response?.message) {
+      return toast.error(response?.message, {
         position: 'top-center',
       })
     }

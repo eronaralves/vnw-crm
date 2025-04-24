@@ -10,6 +10,7 @@ interface LayoutPrivateRoute {
 export default async function LayoutPrivateRoute({
   children,
 }: LayoutPrivateRoute) {
+
   return (
     <div className="w-full h-screen flex overflow-hidden">
       <SideBar />

@@ -2,6 +2,7 @@
 
 import { env } from '@/env'
 import { AppError } from '@/utils/app-error'
+import { cookies } from 'next/headers'
 
 interface SignInRequest {
   email: string
@@ -23,11 +24,21 @@ export async function signIn({ email, password }: SignInRequest) {
       throw new AppError(data?.detail)
     }
 
+    const cookie = await cookies()
+
+    cookie.set({
+      name: 'session',
+      value: data?.access,
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+    })
+
     return {
       data,
     }
   } catch (error) {
-    console.log(error)
     const isAppError = error instanceof AppError
     const errorMessage = isAppError
       ? error.detail

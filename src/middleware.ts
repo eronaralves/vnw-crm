@@ -1,4 +1,3 @@
-import { getToken } from 'next-auth/jwt'
 import {
   NextResponse,
   type MiddlewareConfig,
@@ -22,10 +21,7 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
   const publicRoute = publicRouter.find((route) => route.path === path)
 
-  const authToken = await getToken({
-    req: request,
-    secret: process.env.AUTH_SECRET,
-  })
+  const authToken = request.cookies.get('session')
 
   if (path === '/') {
     const redirectUrl = request.nextUrl.clone()

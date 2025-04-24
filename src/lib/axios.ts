@@ -1,9 +1,8 @@
 import axios from 'axios'
 import { env } from '@/env'
-import { getServerSession } from 'next-auth'
+import { cookies } from 'next/headers'
 
 // Utils
-import { authOptions } from '@/utils/auth-options'
 import { AppError } from '@/utils/app-error'
 
 export const api = axios.create({
@@ -11,10 +10,11 @@ export const api = axios.create({
 })
 
 api.interceptors.request.use(async (config) => {
-  const session = await getServerSession(authOptions)
+  const cookie = await cookies()
+  const token = cookie.get('session')?.value
 
-  if (session?.accessToken) {
-    config.headers.Authorization = `Bearer ${session.accessToken}`
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
   }
 
   return config
@@ -28,7 +28,8 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
 
-      await fetch(`${env.BASE_URL}/api/auth/logout`)
+      const cookie = await cookies()
+      cookie.delete('session')
 
       return Promise.reject(
         new AppError('Token expirado ou inválido. Faça login novamente.'),
