@@ -27,11 +27,11 @@ export async function signIn({ email, password }: SignInRequest) {
     const cookie = await cookies()
 
     cookie.set({
-      name: 'session',
+      name: '@vnw:session',
       value: data?.access,
       httpOnly: true,
       secure: true,
-      sameSite: 'lax',
+      sameSite: 'strict',
       path: '/',
     })
 

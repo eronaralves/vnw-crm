@@ -55,6 +55,9 @@ import {
 } from '@/components/ui/dialog'
 import { ButtonFailStudents } from '@/components/button-fail-students'
 import { ButtonEvadeStudents } from '@/components/button-evade-students'
+import { useFiltersStudents } from '@/hooks/useFiltersStudents'
+import { parseSearchParamsToObject } from '@/utils/parse-search-params-to-object'
+import type { STATUS_STUDENT } from '@/types/status-student'
 
 type Spreadsheet = {
   link: string
@@ -67,7 +70,7 @@ type SelectedStudents = {
   enrollmentId: string
 }
 interface ListStudentProps {
-  status: 'Cursando' | 'Formado' | 'Evadiu' | 'Reprovado'
+  status: STATUS_STUDENT
 }
 
 export function ListStudent({ status }: ListStudentProps) {
@@ -90,35 +93,24 @@ export function ListStudent({ status }: ListStudentProps) {
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams.toString())
 
-  // url state filters
-  const page = searchParams.get('page') ?? 1
-  const city = searchParams.getAll('city')
-  const work = searchParams.getAll('work') ?? []
-  const search = searchParams.get('search')
-  const state = searchParams.getAll('state')
-  const group = searchParams.getAll('group')
-  const study = searchParams.getAll('study') ?? []
-  const gender = searchParams.getAll('gender')
-  const modality = searchParams.getAll('modality')
-  const sexuality = searchParams.getAll('sexuality')
-  const community = searchParams.getAll('community')
-  const courseName = searchParams.getAll('course_name')
-  const reasonGiveUp = searchParams.getAll('reason_give_up')
-  const programingLanguage = searchParams.getAll('programing_language')
+  const {
+    page,
+    city,
+    work,
+    search,
+    state,
+    group,
+    study,
+    gender,
+    modality,
+    sexuality,
+    community,
+    courseName,
+    reasonGiveUp,
+    programingLanguage,
+  } = useFiltersStudents()
 
-  const filtersInobject: Record<string, string[]> = {}
-
-  searchParams.forEach((value, key) => {
-    if (filtersInobject[key]) {
-      if (Array.isArray(filtersInobject[key])) {
-        ;(filtersInobject[key] as string[]).push(value)
-      } else {
-        filtersInobject[key] = [filtersInobject[key] as string, value]
-      }
-    } else {
-      filtersInobject[key] = [value]
-    }
-  })
+  const filtersSelectedInobject = parseSearchParamsToObject(searchParams)
 
   const {
     data: dataStudents,
@@ -255,7 +247,7 @@ export function ListStudent({ status }: ListStudentProps) {
 
     const response = await exportStudents({
       filters: {
-        ...filtersInobject,
+        ...filtersSelectedInobject,
         status,
       },
     })
@@ -714,7 +706,7 @@ export function ListStudent({ status }: ListStudentProps) {
                 <h3 className="text-xl font-semibold">
                   Filtros selecionados:{' '}
                   <span>
-                    {Object.keys(filtersInobject).filter(
+                    {Object.keys(filtersSelectedInobject).filter(
                       (filter) => filter !== 'page',
                     ).length === 0 && 'Sem filtros'}
                   </span>
@@ -724,7 +716,7 @@ export function ListStudent({ status }: ListStudentProps) {
                   {search && <span>Pesquisa: {search}</span>}
 
                   {filters.map((filter) => {
-                    if (filtersInobject[filter.value]) {
+                    if (filtersSelectedInobject[filter.value]) {
                       return (
                         <span key={filter.name}>
                           {filter.name} :{' '}
@@ -732,7 +724,7 @@ export function ListStudent({ status }: ListStudentProps) {
                             {new Intl.ListFormat('pt-BR', {
                               style: 'long',
                               type: 'conjunction',
-                            }).format(filtersInobject[filter.value])}
+                            }).format(filtersSelectedInobject[filter.value])}
                           </span>
                         </span>
                       )

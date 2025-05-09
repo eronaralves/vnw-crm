@@ -1,14 +1,9 @@
-import { Suspense } from 'react'
-
-// Components
 import { ListCourses } from './list-courses'
 
-export default async function Courses() {
+export default function Courses() {
   return (
-    <div className="flex-1 flex flex-col overflow-auto">
-      <Suspense>
-        <ListCourses />
-      </Suspense>
+    <div className="flex flex-col gap-8 h-screen p-4 ">
+      <ListCourses />
     </div>
   )
 }

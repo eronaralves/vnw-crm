@@ -137,4 +137,8 @@
       #ff611e 100%
     );
   }
+
+  .bg-gradient-secondary {
+    background: transparent linear-gradient(90deg, #FFAC2D 0%, #FF611E 100%);
+  }
 }

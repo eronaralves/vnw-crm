@@ -11,7 +11,7 @@ export const api = axios.create({
 
 api.interceptors.request.use(async (config) => {
   const cookie = await cookies()
-  const token = cookie.get('session')?.value
+  const token = cookie.get('@vnw:session')?.value
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
@@ -29,7 +29,7 @@ api.interceptors.response.use(
       originalRequest._retry = true
 
       const cookie = await cookies()
-      cookie.delete('session')
+      cookie.delete('@vnw:session')
 
       return Promise.reject(
         new AppError('Token expirado ou inválido. Faça login novamente.'),

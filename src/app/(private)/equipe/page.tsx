@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import { ListTeam } from './list-teams'
 
-export default async function Teams() {
+export default function Teams() {
   return (
     <div className="flex-1 flex flex-col overflow-auto">
       <Suspense>

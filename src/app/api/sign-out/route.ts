@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 
 export async function POST() {
   const cookie = await cookies()
-  cookie.delete('session')
+  cookie.delete('@vnw:session')
 
   return NextResponse.json({ success: true })
 }

@@ -21,7 +21,7 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
   const publicRoute = publicRouter.find((route) => route.path === path)
 
-  const authToken = request.cookies.get('session')
+  const authToken = request.cookies.get('@vnw:session')
 
   if (path === '/') {
     const redirectUrl = request.nextUrl.clone()

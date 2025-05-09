@@ -1,14 +1,8 @@
 'use server'
 
 import { api } from '@/lib/axios'
+import type { STATUS_STUDENT } from '@/types/status-student'
 import { AppError } from '@/utils/app-error'
-
-export type STATUS =
-  | 'Cursando'
-  | 'Evadiu'
-  | 'Transferido'
-  | 'Formado'
-  | 'Reprovado'
 
 export type ProfileStudent = {
   id: string
@@ -65,7 +59,7 @@ export type ProfileStudent = {
   skin_color: string
   social_name: string
 
-  status: STATUS
+  status: STATUS_STUDENT
 
   course: {
     id: string

@@ -34,13 +34,16 @@ interface ContentProfileProps {
   student: ProfileStudent
 }
 
-const formProfileSchema = yup.object().shape({
-  fullname: yup.string(),
+export const formProfileSchema = yup.object().shape({
+  fullname: yup.string().required('Digite seu nome completo'),
   social_name: yup.string(),
-  phone: yup.string(),
-  cpf: yup.string(),
-  email: yup.string().email(),
-  birth_date: yup.date().required(),
+  phone: yup.string().required('Digite seu celular'),
+  cpf: yup.string().required('Digite seu CPF'),
+  email: yup
+    .string()
+    .required('Digite seu e-mail')
+    .email('Digite um e-mail válido'),
+  birth_date: yup.date().required('Digite sua data'),
   rg: yup.string(),
   age: yup.number(),
   emitter: yup.string(),
@@ -109,8 +112,6 @@ export function ContainerTabs({ student }: ContentProfileProps) {
   function onSubmit(data: FormStudentProfileType) {
     console.log(data)
   }
-
-  console.log(student.reason_give_up)
 
   return (
     <FormProvider {...methods}>

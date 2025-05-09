@@ -1,5 +1,6 @@
 import { Controller, useFormContext } from 'react-hook-form'
 import { differenceInYears } from 'date-fns'
+import * as yup from 'yup'
 
 // Utils
 import { formatPhone } from '@/utils/format-phone'
@@ -9,7 +10,6 @@ import { formatCpf } from '@/utils/format-cpf'
 import { Input } from '../input'
 import { DatePicker } from '../date-picker'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
-import { FormStudentProfileType } from '@/app/(private)/alunos/[id]/container-tabs'
 import {
   Select,
   SelectContent,
@@ -18,33 +18,76 @@ import {
   SelectValue,
 } from '../ui/select'
 
-interface PersonalDataProps {
-  isEditing: boolean
-}
+export const formPersonalSchema = yup.object({
+  fullname: yup.string().required('Digite seu nome completo'),
+  social_name: yup.string(),
+  phone: yup.string().required('Digite seu celular').length(15, '11 digitos'),
+  cpf: yup.string().required('Digite seu CPF').length(14, '11 digitos'),
+  email: yup
+    .string()
+    .required('Digite seu e-mail')
+    .email('Digite um e-mail válido'),
+  birth_date: yup.date().required('Digite sua data'),
+  rg: yup.string(),
+  age: yup.number(),
+  emitter: yup.string(),
+  mother_name: yup.string(),
+  father_name: yup.string(),
+  emergency_phone: yup.string(),
+  emergency_name: yup.string(),
+  emergency_kinship: yup.string(),
+  marital_status: yup.string(),
+  skin_color: yup.string(),
+  gender: yup.string(),
+  sexuality: yup.string(),
+  student_responsible: yup.object({
+    fullname: yup.string(),
+    relation: yup.string(),
+    cpf: yup.string(),
+    rg: yup.string(),
+    emitter: yup.string(),
+    phone: yup.string(),
+    email: yup.string().email(),
+  }),
+  student_address: yup.object({
+    address: yup.object({
+      postal_code: yup.string(),
+      street: yup.string(),
+      number: yup.string(),
+      adjunct: yup.string(),
+      district: yup.string(),
+      city: yup.string(),
+      state: yup.string().length(2),
+    }),
+    community: yup.string(),
+    notes: yup.string(),
+  }),
+})
 
-export function PersonalData({ isEditing }: PersonalDataProps) {
+export type FormProfileType = yup.InferType<typeof formPersonalSchema>
+
+export function StepPersonalData() {
   const {
     register,
     setValue,
     control,
     watch,
-    formState: { errors },
-  } = useFormContext<FormStudentProfileType>()
+    formState: { errors, isSubmitted },
+  } = useFormContext<FormProfileType>()
   const watchBirthDate = watch('birth_date')
   const age = watchBirthDate
     ? differenceInYears(new Date(), watchBirthDate)
     : null
 
+  const isOfLegalAge =
+    age || age === 0 ? (age < 18 ? 'true' : 'false') : undefined
+
   return (
-    <div className="flex-1 px-6 py-8 bg-white">
+    <div className="flex-1">
       <div className="flex flex-wrap gap-x-4 gap-y-6">
         <div className="w-full max-w-80 flex flex-col gap-1">
           <label className="text-sm font-normal">Nome completo</label>
-          <Input
-            variant="secondary"
-            disabled={!isEditing}
-            {...register('fullname')}
-          />
+          <Input variant="secondary" {...register('fullname')} />
 
           {errors.fullname && (
             <span className="text-xs text-red-500">
@@ -55,22 +98,17 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
 
         <div className="w-full max-w-80 flex flex-col gap-1">
           <label className="text-sm font-normal">Nome social</label>
-          <Input
-            variant="secondary"
-            disabled={!isEditing}
-            {...register('social_name')}
-          />
+          <Input variant="secondary" {...register('social_name')} />
         </div>
 
         <div className="w-full max-w-40 flex flex-col gap-1">
           <label className="text-sm font-normal">Celular</label>
           <Input
             variant="secondary"
-            disabled={!isEditing}
             {...register('phone')}
             onChange={(e) => {
               const formatted = formatPhone(e.target.value) as string
-              setValue('phone', formatted, { shouldValidate: true })
+              setValue('phone', formatted, { shouldValidate: isSubmitted })
             }}
             maxLength={15}
           />
@@ -82,11 +120,7 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
 
         <div className="w-full max-w-64 flex flex-col gap-1">
           <label className="text-sm font-normal">Email</label>
-          <Input
-            variant="secondary"
-            disabled={!isEditing}
-            {...register('email')}
-          />
+          <Input variant="secondary" {...register('email')} />
 
           {errors.email && (
             <span className="text-xs text-red-500">{errors.email.message}</span>
@@ -97,11 +131,10 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
           <label className="text-sm font-normal">CPF</label>
           <Input
             variant="secondary"
-            disabled={!isEditing}
             {...register('cpf')}
             onChange={(e) => {
               const formatted = formatCpf(e.target.value) as string
-              setValue('cpf', formatted, { shouldValidate: true })
+              setValue('cpf', formatted, { shouldValidate: isSubmitted })
             }}
             maxLength={14}
           />
@@ -122,7 +155,6 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
                 pickerDate
                 selected={field.value}
                 onSelect={field.onChange}
-                disabled={!isEditing}
               />
             )}
           />
@@ -134,55 +166,24 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
           )}
         </div>
 
-        <div className="w-full max-w-11 flex flex-col gap-1">
-          <label className="text-sm font-normal">Idade</label>
-          <Input
-            variant="secondary"
-            disabled={!isEditing}
-            {...register('age')}
-            value={age ?? ''}
-          />
-        </div>
-
         <div className="w-full max-w-[152px] flex flex-col gap-1">
           <label className="text-sm font-normal">RG</label>
-          <Input
-            variant="secondary"
-            disabled={!isEditing}
-            {...register('rg')}
-            onChange={(e) => {
-              const formatted = formatCpf(e.target.value) as string
-              setValue('cpf', formatted, { shouldValidate: true })
-            }}
-            maxLength={14}
-          />
+          <Input variant="secondary" {...register('rg')} />
         </div>
 
         <div className="w-full max-w-[152px] flex flex-col gap-1">
           <label className="text-sm font-normal">Orgão emissor</label>
-          <Input
-            variant="secondary"
-            disabled={!isEditing}
-            {...register('emitter')}
-          />
+          <Input variant="secondary" {...register('emitter')} />
         </div>
 
         <div className="w-full max-w-80 flex flex-col gap-1">
           <label className="text-sm font-normal">Nome completo da Mãe</label>
-          <Input
-            variant="secondary"
-            disabled={!isEditing}
-            {...register('mother_name')}
-          />
+          <Input variant="secondary" {...register('mother_name')} />
         </div>
 
         <div className="w-full max-w-80 flex flex-col gap-1">
           <label className="text-sm font-normal">Nome completo do pai</label>
-          <Input
-            variant="secondary"
-            disabled={!isEditing}
-            {...register('father_name')}
-          />
+          <Input variant="secondary" {...register('father_name')} />
         </div>
       </div>
 
@@ -190,12 +191,7 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
         <div className="w-full flex flex-col gap-3">
           <label className="text-lg font-semibold">Tem menos de 18 anos?</label>
 
-          <RadioGroup
-            defaultValue="option-one"
-            className="flex gap-7"
-            disabled={!isEditing}
-            value={age! < 18 ? 'true' : 'false'}
-          >
+          <RadioGroup className="flex gap-7" value={isOfLegalAge}>
             <div className="flex items-center space-x-2">
               <RadioGroupItem
                 value="true"
@@ -225,116 +221,102 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
             </div>
           </RadioGroup>
         </div>
+        {isOfLegalAge !== undefined &&
+          (age! < 18 ? (
+            <>
+              <div className="w-full max-w-80 flex flex-col gap-1">
+                <label className="text-sm font-normal">
+                  Nome completo do responsável
+                </label>
+                <Input
+                  variant="secondary"
+                  {...register('student_responsible.fullname')}
+                />
+              </div>
 
-        {age! < 18 ? (
-          <>
-            <div className="w-full max-w-80 flex flex-col gap-1">
-              <label className="text-sm font-normal">
-                Nome completo do responsável
-              </label>
-              <Input
-                variant="secondary"
-                disabled={!isEditing}
-                {...register('student_responsible.fullname')}
-              />
-            </div>
+              <div className="w-full max-w-80 flex flex-col gap-1">
+                <label className="text-sm font-normal">Parentesco</label>
+                <Input
+                  variant="secondary"
+                  {...register('student_responsible.relation')}
+                />
+              </div>
 
-            <div className="w-full max-w-80 flex flex-col gap-1">
-              <label className="text-sm font-normal">Parentesco</label>
-              <Input
-                variant="secondary"
-                disabled={!isEditing}
-                {...register('student_responsible.relation')}
-              />
-            </div>
+              <div className="w-full max-w-80 flex flex-col gap-1">
+                <label className="text-sm font-normal">
+                  CPF do responsável
+                </label>
+                <Input
+                  variant="secondary"
+                  {...register('student_responsible.cpf')}
+                />
+              </div>
 
-            <div className="w-full max-w-80 flex flex-col gap-1">
-              <label className="text-sm font-normal">CPF do responsável</label>
-              <Input
-                variant="secondary"
-                disabled={!isEditing}
-                {...register('student_responsible.cpf')}
-              />
-            </div>
+              <div className="w-full max-w-80 flex flex-col gap-1">
+                <label className="text-sm font-normal">RG do responsável</label>
+                <Input
+                  variant="secondary"
+                  {...register('student_responsible.rg')}
+                />
+              </div>
 
-            <div className="w-full max-w-80 flex flex-col gap-1">
-              <label className="text-sm font-normal">RG do responsável</label>
-              <Input
-                variant="secondary"
-                disabled={!isEditing}
-                {...register('student_responsible.rg')}
-              />
-            </div>
+              <div className="w-full max-w-80 flex flex-col gap-1">
+                <label className="text-sm font-normal">Orgão emissor</label>
+                <Input
+                  variant="secondary"
+                  {...register('student_responsible.emitter')}
+                />
+              </div>
 
-            <div className="w-full max-w-80 flex flex-col gap-1">
-              <label className="text-sm font-normal">Orgão emissor</label>
-              <Input
-                variant="secondary"
-                disabled={!isEditing}
-                {...register('student_responsible.emitter')}
-              />
-            </div>
+              <div className="w-full max-w-80 flex flex-col gap-1">
+                <label className="text-sm font-normal">
+                  Celular do responsável
+                </label>
+                <Input
+                  variant="secondary"
+                  {...register('student_responsible.phone')}
+                />
+              </div>
 
-            <div className="w-full max-w-80 flex flex-col gap-1">
-              <label className="text-sm font-normal">
-                Celular do responsável
-              </label>
-              <Input
-                variant="secondary"
-                disabled={!isEditing}
-                {...register('student_responsible.phone')}
-              />
-            </div>
+              <div className="w-full max-w-80 flex flex-col gap-1">
+                <label className="text-sm font-normal">
+                  Email do responsável
+                </label>
+                <Input
+                  variant="secondary"
+                  {...register('student_responsible.email')}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="w-full max-w-40 flex flex-col gap-1">
+                <label className="text-sm font-normal">
+                  Contato de emergência
+                </label>
+                <Input
+                  variant="secondary"
+                  {...register('emergency_phone')}
+                  onChange={(e) => {
+                    const formatted = formatPhone(e.target.value) as string
+                    setValue('emergency_phone', formatted, {
+                      shouldValidate: isSubmitted,
+                    })
+                  }}
+                  maxLength={15}
+                />
+              </div>
+              <div className="w-full max-w-40 flex flex-col gap-1">
+                <label className="text-sm font-normal">Nome do contato</label>
+                <Input variant="secondary" {...register('emergency_name')} />
+              </div>
 
-            <div className="w-full max-w-80 flex flex-col gap-1">
-              <label className="text-sm font-normal">
-                Email do responsável
-              </label>
-              <Input
-                variant="secondary"
-                disabled={!isEditing}
-                {...register('student_responsible.email')}
-              />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="w-full max-w-40 flex flex-col gap-1">
-              <label className="text-sm font-normal">
-                Contato de emergência
-              </label>
-              <Input
-                variant="secondary"
-                disabled={!isEditing}
-                {...register('emergency_phone')}
-                onChange={(e) => {
-                  const formatted = formatPhone(e.target.value) as string
-                  setValue('emergency_phone', formatted, {
-                    shouldValidate: true,
-                  })
-                }}
-                maxLength={15}
-              />
-            </div>
-            <div className="w-full max-w-40 flex flex-col gap-1">
-              <label className="text-sm font-normal">Nome do contato</label>
-              <Input
-                variant="secondary"
-                disabled={!isEditing}
-                {...register('emergency_name')}
-              />
-            </div>
-
-            <div className="w-full max-w-40 flex flex-col gap-1">
-              <label className="text-sm font-normal">Relação</label>
-              <Input
-                variant="secondary"
-                disabled={!isEditing}
-                {...register('emergency_kinship')}
-              />
-            </div>
-          </>
-        )}
+              <div className="w-full max-w-40 flex flex-col gap-1">
+                <label className="text-sm font-normal">Relação</label>
+                <Input variant="secondary" {...register('emergency_kinship')} />
+              </div>
+            </>
+          ))}
       </div>
 
       <div className="flex flex-wrap gap-x-4 gap-y-5 mt-6">
@@ -348,7 +330,6 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
             <label className="text-sm font-normal">CEP</label>
             <Input
               variant="secondary"
-              disabled={!isEditing}
               {...register('student_address.address.postal_code')}
             />
           </div>
@@ -357,7 +338,6 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
             <label className="text-sm font-normal">Logradouro</label>
             <Input
               variant="secondary"
-              disabled={!isEditing}
               {...register('student_address.address.street')}
             />
           </div>
@@ -366,7 +346,6 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
             <label className="text-sm font-normal">Número</label>
             <Input
               variant="secondary"
-              disabled={!isEditing}
               {...register('student_address.address.number')}
             />
           </div>
@@ -375,7 +354,6 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
             <label className="text-sm font-normal">Complemento</label>
             <Input
               variant="secondary"
-              disabled={!isEditing}
               {...register('student_address.address.adjunct')}
             />
           </div>
@@ -384,7 +362,6 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
             <label className="text-sm font-normal">Bairro</label>
             <Input
               variant="secondary"
-              disabled={!isEditing}
               {...register('student_address.address.district')}
             />
           </div>
@@ -393,7 +370,6 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
             <label className="text-sm font-normal">Municipio</label>
             <Input
               variant="secondary"
-              disabled={!isEditing}
               {...register('student_address.address.city')}
             />
           </div>
@@ -402,8 +378,8 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
             <label className="text-sm font-normal">UF</label>
             <Input
               variant="secondary"
-              disabled={!isEditing}
               {...register('student_address.address.state')}
+              maxLength={2}
             />
           </div>
 
@@ -411,7 +387,6 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
             <label className="text-sm font-normal">Comunidade</label>
             <Input
               variant="secondary"
-              disabled={!isEditing}
               {...register('student_address.community')}
             />
           </div>
@@ -419,7 +394,6 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
           <div className="w-full flex flex-col gap-1">
             <label className="text-sm font-normal">Observação</label>
             <textarea
-              disabled={!isEditing}
               className="h-[150px] md:h-20 px-3 py-2 text-sm text-gray-900 border border-[#b1b3b5] focus:outline-[#9c9d9e] :text-[#9c9d9e] focus-within:border-[#caccce] disabled:text-[#8181a5] disabled:bg-[#e9ecef] disabled:border-[#dddfe1] disabled::text-[#8181a5]"
               {...register('student_address.notes')}
             />
@@ -443,7 +417,6 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger
                     variant="secondary"
-                    disabled={!isEditing}
                     className="min-w-28 flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                   >
                     <SelectValue placeholder="Selecione um estado civil" />
@@ -474,7 +447,6 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
                 >
                   <SelectTrigger
                     variant="secondary"
-                    disabled={!isEditing}
                     className="min-w-28 flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                   >
                     <SelectValue placeholder="Selecione uma Raça /Cor" />
@@ -506,7 +478,6 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
                 >
                   <SelectTrigger
                     variant="secondary"
-                    disabled={!isEditing}
                     className="min-w-28 flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                   >
                     <SelectValue placeholder="Selecione uma Orientação sexual" />
@@ -538,7 +509,6 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger
                     variant="secondary"
-                    disabled={!isEditing}
                     className="min-w-28 flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                   >
                     <SelectValue placeholder="Selecione um Gênero" />

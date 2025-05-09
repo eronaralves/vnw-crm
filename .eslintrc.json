@@ -4,6 +4,6 @@
   ],
   "rules": {
     "camelcase": "off",
-    "allowEmptyReject": true
+    "@typescript-eslint/no-explicit-any": "off"
   }
 }

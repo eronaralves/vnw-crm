@@ -6,13 +6,11 @@ import { getStudent } from '@/http/students/get-student'
 // Components
 import { ContainerTabs } from './container-tabs'
 
-interface StudentProfile {
-  params: Promise<{ id: string }>
-}
+type Params = Promise<{ id: string }>
 
-export default async function StudentProfile({ params }: StudentProfile) {
-  const { id } = await params
-  const { student } = await getStudent(id)
+export default async function StudentProfile(props: { params: Params }) {
+  const params = await props.params
+  const { student } = await getStudent(params.id)
 
   if (!student) {
     return redirect('/alunos')

@@ -1,6 +1,6 @@
 'use client'
 
-import * as React from 'react'
+import { useState } from 'react'
 import { format, setYear } from 'date-fns'
 import { UTCDate } from '@date-fns/utc'
 import { CalendarIcon } from 'lucide-react'
@@ -41,7 +41,9 @@ export function DatePicker({
   variant = 'primary',
   formatDate = 'dd-MM-yyyy',
 }: DatePickerProps) {
-  const [monthYearDate, setMonthYearDate] = React.useState<Date>(selected)
+  const [monthYearDate, setMonthYearDate] = useState<Date>(
+    selected ?? new Date(),
+  )
   const dateInUtc = new UTCDate(selected)
 
   const currentYear = new Date().getFullYear()
@@ -54,22 +56,29 @@ export function DatePicker({
           variant={'outline'}
           disabled={disabled}
           className={cn(
-            'flex-1 py-2 text-sm pacity-100 text-gray-900 outline-none justify-start text-left font-normal rounded-none border border-[#0f2b92] hover:bg-white',
+            'w-max h-auto text-sm pacity-100 text-gray-900 outline-none justify-start text-left font-normal rounded-none border border-[#0f2b92] hover:bg-white',
             variant === 'secondary' &&
               'border-[#b1b3b5]  focus-within:border-[#caccce]',
             disabled &&
               'border-[#dddfe1] text-[#8181a5] bg-[#e9ecef] outline-none !opacity-100',
           )}
         >
-          {selected ? format(dateInUtc, formatDate) : <span>Data</span>}
-          <CalendarIcon className="ml-auto" />
+          {selected ? (
+            format(dateInUtc, formatDate)
+          ) : (
+            <span className="text-[#8181a5]">Selecione a data</span>
+          )}
+          <CalendarIcon
+            className="ml-auto"
+            color={selected ? '#06080E' : '#8181a5'}
+          />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 " align="start">
         {pickerDate && (
           <div className="flex gap-2 ">
             <Select
-              value={String(monthYearDate.getFullYear())}
+              value={String(monthYearDate?.getFullYear())}
               onValueChange={(year) => {
                 const updated = setYear(monthYearDate, Number(year))
                 setMonthYearDate(updated)

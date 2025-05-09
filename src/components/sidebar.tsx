@@ -14,6 +14,7 @@ export function SideBar() {
         src={Logo}
         alt="Logo do Vai na Web"
         className="w-full h-[71px] object-cover"
+        priority
       />
 
       <div className="h-full flex flex-col">

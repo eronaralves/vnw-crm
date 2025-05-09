@@ -1,6 +1,7 @@
 'use server'
 
 import { api } from '@/lib/axios'
+import type { STATUS_STUDENT } from '@/types/status-student'
 import { AppError } from '@/utils/app-error'
 import qs from 'qs'
 
@@ -17,7 +18,7 @@ export type Filters = {
   programing_language?: string[]
   age_min?: string
   age_max?: string
-  status: 'Cursando' | 'Formado' | 'Evadiu' | 'Reprovado'
+  status: STATUS_STUDENT
   search?: string | null
   reason_give_up?: string[]
   community?: string[]
