@@ -6,8 +6,8 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import type { AnyObjectSchema } from 'yup'
 
-// Http
-import type { STATUS } from '@/http/students/get-student'
+// Types
+import type { STATUS_STUDENT } from '@/types/status-student'
 
 // Components
 import { Button } from '@/components/button'
@@ -80,7 +80,7 @@ export type ProfileNewStudent = {
   skin_color?: string
   social_name?: string
 
-  status?: STATUS
+  status?: STATUS_STUDENT
 
   course?: {
     id?: string

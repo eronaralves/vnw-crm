@@ -1,11 +1,11 @@
 // Lib
 import { cn } from '@/lib/utils'
 
-// Http
-import type { STATUS } from '@/http/students/get-student'
+// Types
+import type { STATUS_STUDENT } from '@/types/status-student'
 
 interface TagStatusProps {
-  status: STATUS
+  status: STATUS_STUDENT
 }
 
 export function TagStatus({ status }: TagStatusProps) {
