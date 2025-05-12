@@ -12,6 +12,8 @@ import type { STATUS_STUDENT } from '@/types/status-student'
 // Components
 import { Button } from '@/components/button'
 import { StepProgressBar } from '@/components/progress-bar'
+
+// Steps
 import {
   formPersonalSchema,
   StepPersonalData,
@@ -20,24 +22,46 @@ import {
   formSocioeconomicSchema,
   StepSocioeconomicData,
 } from '@/components/steps-new-students/step-socioeconomic-data'
-import { StepTechnology } from '@/components/steps-new-students/step-technology'
+import {
+  formTechnologySchema,
+  StepTechnology,
+} from '@/components/steps-new-students/step-technology'
+import {
+  formEmployabilitySchema,
+  StepEmployability,
+} from '@/components/steps-new-students/step-employability'
+import {
+  formAnnexesSchema,
+  StepAnnexes,
+} from '@/components/steps-new-students/step-annexes'
+import {
+  formCourseSchema,
+  StepCourse,
+} from '@/components/steps-new-students/step-course'
+import { registerStudent } from '@/http/students/register-student'
+import { toast } from 'sonner'
+// import { registerDocuments } from '@/http/students/create-documents'
+import { format } from 'date-fns'
 
 enum STEPS {
   PERSONAL = 0,
   SOCIO_ECONOMIC = 1,
   TECHNOLOGY = 2,
+  EMPREGABILITY = 3,
+  ANNEXES = 4,
+  COURSE = 5,
 }
 
 export type ProfileNewStudent = {
   able?: boolean
   age?: number
-  birth_date: Date
+  birth_date: string
   fullname: string
   gender?: string
 
   cpf: string
   created_at?: string
-  documents?: unknown[]
+  documents: File[]
 
   email: string
   emergency_kinship?: string
@@ -60,7 +84,6 @@ export type ProfileNewStudent = {
   interested_time?: string
   course_enrolled?: string
 
-  is_active?: boolean
   knowledge_languages?: string
 
   marital_status?: string
@@ -71,9 +94,6 @@ export type ProfileNewStudent = {
 
   profile_picture?: string
 
-  quiz?: unknown
-  quiz_waits?: boolean
-
   religion?: string
   rg?: string
   sexuality?: string
@@ -82,31 +102,7 @@ export type ProfileNewStudent = {
 
   status?: STATUS_STUDENT
 
-  course?: {
-    id?: string
-    group?: string
-    headquarter?: string
-    modality?: string
-    name?: string
-    programing_language?: string
-    partner?: string
-    status?: string
-    moduleCurrent?: string
-    modules?: {
-      id?: string
-      name?: string
-      frequency?: number
-      desafio?: {
-        status?: string
-        github_username?: string
-        github_repository?: string
-      }
-      feedback?: {
-        message?: string
-        performance?: string
-      }
-    }[]
-  }
+  module_id: string
 
   student_address: {
     address: {
@@ -124,7 +120,6 @@ export type ProfileNewStudent = {
   }
 
   student_tecnology: {
-    id?: string
     previous_experience?: boolean
     have_computer?: boolean
     have_internet?: boolean
@@ -199,29 +194,90 @@ export type ProfileNewStudent = {
 }
 
 export function ContentSteps() {
-  const [step, setStep] = useState(STEPS.PERSONAL)
+  const [step, setStep] = useState(STEPS.ANNEXES)
 
   const schemaByStep: Record<STEPS, AnyObjectSchema> = {
     [STEPS.PERSONAL]: formPersonalSchema,
     [STEPS.SOCIO_ECONOMIC]: formSocioeconomicSchema,
-    [STEPS.TECHNOLOGY]: formSocioeconomicSchema,
+    [STEPS.TECHNOLOGY]: formTechnologySchema,
+    [STEPS.EMPREGABILITY]: formEmployabilitySchema,
+    [STEPS.ANNEXES]: formAnnexesSchema,
+    [STEPS.COURSE]: formCourseSchema,
   }
 
   const methods = useForm({
     resolver: yupResolver(schemaByStep[step]),
   })
 
-  function onSubmit(data: Partial<ProfileNewStudent>) {
-    if (step !== STEPS.TECHNOLOGY) {
+  async function onSubmit(data: Partial<ProfileNewStudent>) {
+    const student = data as ProfileNewStudent
+
+    if (step !== STEPS.COURSE) {
       return setStep(step + 1)
     }
 
-    console.log(data, 'FFF')
+    const studentData = {
+      ...student,
+      module_id: undefined,
+      documents: undefined,
+      phone: student.phone?.replace(/\D/g, ''),
+      birth_date: format(student.birth_date, 'yyyy-MM-dd'),
+      student_empregability: {
+        ...student.student_empregability,
+        start_date: format(
+          student?.student_empregability?.start_date || new Date(),
+          'yyyy-MM-dd',
+        ),
+        end_date: format(
+          student?.student_empregability?.end_date || new Date(),
+          'yyyy-MM-dd',
+        ),
+      },
+    }
+
+    delete studentData.documents
+    delete studentData.module_id
+
+    const responseRegister = await registerStudent({
+      moduleId: student.module_id,
+      formData: studentData,
+    })
+
+    if (responseRegister?.message) {
+      return toast.error(responseRegister.message, {
+        duration: 3000,
+        position: 'top-center',
+      })
+    }
+
+    // if (student.documents && student.documents?.length > 0) {
+    //   for (let i = 0; i < student?.documents?.length; i++) {
+    //     const formData = new FormData()
+    //     formData.append('document', student.documents[i])
+    //     formData.append('students', responseRegister.student.id)
+
+    //     const responseDocuments = await registerDocuments(formData)
+
+    //     if (responseDocuments?.message) {
+    //       toast.error(responseRegister.message, {
+    //         duration: 3000,
+    //         position: 'top-center',
+    //       })
+    //     }
+    //   }
+    // }
+
+    toast.success('Aluno cadastrado com sucesso!', {
+      duration: 3000,
+      position: 'top-center',
+    })
+    methods.reset()
+    setStep(STEPS.PERSONAL)
   }
 
   return (
     <FormProvider {...methods}>
-      <div className="h-full flex flex-col gap-8 ">
+      <div className="h-full flex flex-col gap-8 overflow-hidden">
         <StepProgressBar
           step={step}
           setStep={setStep}
@@ -231,17 +287,20 @@ export function ContentSteps() {
             'Tecnologia',
             'Empregabilidade',
             'Upload de Anexos',
-            'Cadastro',
+            'Curso',
           ]}
         />
 
         <form
           onSubmit={methods.handleSubmit(onSubmit)}
-          className="flex-1 flex flex-col px-6 py-8 rounded-3xl bg-white"
+          className="flex-1 flex flex-col gap-4 px-6 py-8 pb-4 rounded-3xl bg-white overflow-auto"
         >
           {step === STEPS.PERSONAL && <StepPersonalData />}
           {step === STEPS.SOCIO_ECONOMIC && <StepSocioeconomicData />}
           {step === STEPS.TECHNOLOGY && <StepTechnology />}
+          {step === STEPS.EMPREGABILITY && <StepEmployability />}
+          {step === STEPS.ANNEXES && <StepAnnexes />}
+          {step === STEPS.COURSE && <StepCourse />}
 
           <div className="w-full flex justify-end gap-3">
             <Button

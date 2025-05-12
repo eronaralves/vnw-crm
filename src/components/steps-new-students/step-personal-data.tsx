@@ -40,15 +40,17 @@ export const formPersonalSchema = yup.object({
   skin_color: yup.string(),
   gender: yup.string(),
   sexuality: yup.string(),
-  student_responsible: yup.object({
-    fullname: yup.string(),
-    relation: yup.string(),
-    cpf: yup.string(),
-    rg: yup.string(),
-    emitter: yup.string(),
-    phone: yup.string(),
-    email: yup.string().email(),
-  }),
+  student_responsible: yup
+    .object({
+      fullname: yup.string(),
+      relation: yup.string(),
+      cpf: yup.string(),
+      rg: yup.string(),
+      emitter: yup.string(),
+      phone: yup.string(),
+      email: yup.string().email(),
+    })
+    .nullable(),
   student_address: yup.object({
     address: yup.object({
       postal_code: yup.string(),
@@ -57,7 +59,7 @@ export const formPersonalSchema = yup.object({
       adjunct: yup.string(),
       district: yup.string(),
       city: yup.string(),
-      state: yup.string().length(2),
+      state: yup.string(),
     }),
     community: yup.string(),
     notes: yup.string(),
@@ -66,7 +68,11 @@ export const formPersonalSchema = yup.object({
 
 export type FormProfileType = yup.InferType<typeof formPersonalSchema>
 
-export function StepPersonalData() {
+interface StepPersonalDataProps {
+  isEditing?: boolean
+}
+
+export function StepPersonalData({ isEditing = true }: StepPersonalDataProps) {
   const {
     register,
     setValue,
@@ -83,11 +89,15 @@ export function StepPersonalData() {
     age || age === 0 ? (age < 18 ? 'true' : 'false') : undefined
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 bg-white overflow-auto">
       <div className="flex flex-wrap gap-x-4 gap-y-6">
         <div className="w-full max-w-80 flex flex-col gap-1">
           <label className="text-sm font-normal">Nome completo</label>
-          <Input variant="secondary" {...register('fullname')} />
+          <Input
+            variant="secondary"
+            disabled={!isEditing}
+            {...register('fullname')}
+          />
 
           {errors.fullname && (
             <span className="text-xs text-red-500">
@@ -98,13 +108,18 @@ export function StepPersonalData() {
 
         <div className="w-full max-w-80 flex flex-col gap-1">
           <label className="text-sm font-normal">Nome social</label>
-          <Input variant="secondary" {...register('social_name')} />
+          <Input
+            variant="secondary"
+            disabled={!isEditing}
+            {...register('social_name')}
+          />
         </div>
 
         <div className="w-full max-w-40 flex flex-col gap-1">
           <label className="text-sm font-normal">Celular</label>
           <Input
             variant="secondary"
+            disabled={!isEditing}
             {...register('phone')}
             onChange={(e) => {
               const formatted = formatPhone(e.target.value) as string
@@ -120,7 +135,11 @@ export function StepPersonalData() {
 
         <div className="w-full max-w-64 flex flex-col gap-1">
           <label className="text-sm font-normal">Email</label>
-          <Input variant="secondary" {...register('email')} />
+          <Input
+            variant="secondary"
+            disabled={!isEditing}
+            {...register('email')}
+          />
 
           {errors.email && (
             <span className="text-xs text-red-500">{errors.email.message}</span>
@@ -131,6 +150,7 @@ export function StepPersonalData() {
           <label className="text-sm font-normal">CPF</label>
           <Input
             variant="secondary"
+            disabled={!isEditing}
             {...register('cpf')}
             onChange={(e) => {
               const formatted = formatCpf(e.target.value) as string
@@ -152,7 +172,8 @@ export function StepPersonalData() {
             render={({ field }) => (
               <DatePicker
                 variant="secondary"
-                pickerDate
+                disabled={!isEditing}
+                isPickerYearDate
                 selected={field.value}
                 onSelect={field.onChange}
               />
@@ -168,22 +189,38 @@ export function StepPersonalData() {
 
         <div className="w-full max-w-[152px] flex flex-col gap-1">
           <label className="text-sm font-normal">RG</label>
-          <Input variant="secondary" {...register('rg')} />
+          <Input
+            variant="secondary"
+            disabled={!isEditing}
+            {...register('rg')}
+          />
         </div>
 
         <div className="w-full max-w-[152px] flex flex-col gap-1">
           <label className="text-sm font-normal">Orgão emissor</label>
-          <Input variant="secondary" {...register('emitter')} />
+          <Input
+            variant="secondary"
+            disabled={!isEditing}
+            {...register('emitter')}
+          />
         </div>
 
         <div className="w-full max-w-80 flex flex-col gap-1">
           <label className="text-sm font-normal">Nome completo da Mãe</label>
-          <Input variant="secondary" {...register('mother_name')} />
+          <Input
+            variant="secondary"
+            disabled={!isEditing}
+            {...register('mother_name')}
+          />
         </div>
 
         <div className="w-full max-w-80 flex flex-col gap-1">
           <label className="text-sm font-normal">Nome completo do pai</label>
-          <Input variant="secondary" {...register('father_name')} />
+          <Input
+            variant="secondary"
+            disabled={!isEditing}
+            {...register('father_name')}
+          />
         </div>
       </div>
 
@@ -230,6 +267,7 @@ export function StepPersonalData() {
                 </label>
                 <Input
                   variant="secondary"
+                  disabled={!isEditing}
                   {...register('student_responsible.fullname')}
                 />
               </div>
@@ -238,6 +276,7 @@ export function StepPersonalData() {
                 <label className="text-sm font-normal">Parentesco</label>
                 <Input
                   variant="secondary"
+                  disabled={!isEditing}
                   {...register('student_responsible.relation')}
                 />
               </div>
@@ -248,6 +287,7 @@ export function StepPersonalData() {
                 </label>
                 <Input
                   variant="secondary"
+                  disabled={!isEditing}
                   {...register('student_responsible.cpf')}
                 />
               </div>
@@ -256,6 +296,7 @@ export function StepPersonalData() {
                 <label className="text-sm font-normal">RG do responsável</label>
                 <Input
                   variant="secondary"
+                  disabled={!isEditing}
                   {...register('student_responsible.rg')}
                 />
               </div>
@@ -264,6 +305,7 @@ export function StepPersonalData() {
                 <label className="text-sm font-normal">Orgão emissor</label>
                 <Input
                   variant="secondary"
+                  disabled={!isEditing}
                   {...register('student_responsible.emitter')}
                 />
               </div>
@@ -274,6 +316,7 @@ export function StepPersonalData() {
                 </label>
                 <Input
                   variant="secondary"
+                  disabled={!isEditing}
                   {...register('student_responsible.phone')}
                 />
               </div>
@@ -284,6 +327,7 @@ export function StepPersonalData() {
                 </label>
                 <Input
                   variant="secondary"
+                  disabled={!isEditing}
                   {...register('student_responsible.email')}
                 />
               </div>
@@ -296,6 +340,7 @@ export function StepPersonalData() {
                 </label>
                 <Input
                   variant="secondary"
+                  disabled={!isEditing}
                   {...register('emergency_phone')}
                   onChange={(e) => {
                     const formatted = formatPhone(e.target.value) as string
@@ -308,12 +353,20 @@ export function StepPersonalData() {
               </div>
               <div className="w-full max-w-40 flex flex-col gap-1">
                 <label className="text-sm font-normal">Nome do contato</label>
-                <Input variant="secondary" {...register('emergency_name')} />
+                <Input
+                  variant="secondary"
+                  disabled={!isEditing}
+                  {...register('emergency_name')}
+                />
               </div>
 
               <div className="w-full max-w-40 flex flex-col gap-1">
                 <label className="text-sm font-normal">Relação</label>
-                <Input variant="secondary" {...register('emergency_kinship')} />
+                <Input
+                  variant="secondary"
+                  disabled={!isEditing}
+                  {...register('emergency_kinship')}
+                />
               </div>
             </>
           ))}
@@ -330,6 +383,7 @@ export function StepPersonalData() {
             <label className="text-sm font-normal">CEP</label>
             <Input
               variant="secondary"
+              disabled={!isEditing}
               {...register('student_address.address.postal_code')}
             />
           </div>
@@ -338,6 +392,7 @@ export function StepPersonalData() {
             <label className="text-sm font-normal">Logradouro</label>
             <Input
               variant="secondary"
+              disabled={!isEditing}
               {...register('student_address.address.street')}
             />
           </div>
@@ -346,6 +401,7 @@ export function StepPersonalData() {
             <label className="text-sm font-normal">Número</label>
             <Input
               variant="secondary"
+              disabled={!isEditing}
               {...register('student_address.address.number')}
             />
           </div>
@@ -354,6 +410,7 @@ export function StepPersonalData() {
             <label className="text-sm font-normal">Complemento</label>
             <Input
               variant="secondary"
+              disabled={!isEditing}
               {...register('student_address.address.adjunct')}
             />
           </div>
@@ -362,6 +419,7 @@ export function StepPersonalData() {
             <label className="text-sm font-normal">Bairro</label>
             <Input
               variant="secondary"
+              disabled={!isEditing}
               {...register('student_address.address.district')}
             />
           </div>
@@ -370,6 +428,7 @@ export function StepPersonalData() {
             <label className="text-sm font-normal">Municipio</label>
             <Input
               variant="secondary"
+              disabled={!isEditing}
               {...register('student_address.address.city')}
             />
           </div>
@@ -378,6 +437,7 @@ export function StepPersonalData() {
             <label className="text-sm font-normal">UF</label>
             <Input
               variant="secondary"
+              disabled={!isEditing}
               {...register('student_address.address.state')}
               maxLength={2}
             />
@@ -387,6 +447,7 @@ export function StepPersonalData() {
             <label className="text-sm font-normal">Comunidade</label>
             <Input
               variant="secondary"
+              disabled={!isEditing}
               {...register('student_address.community')}
             />
           </div>
@@ -395,6 +456,7 @@ export function StepPersonalData() {
             <label className="text-sm font-normal">Observação</label>
             <textarea
               className="h-[150px] md:h-20 px-3 py-2 text-sm text-gray-900 border border-[#b1b3b5] focus:outline-[#9c9d9e] :text-[#9c9d9e] focus-within:border-[#caccce] disabled:text-[#8181a5] disabled:bg-[#e9ecef] disabled:border-[#dddfe1] disabled::text-[#8181a5]"
+              disabled={!isEditing}
               {...register('student_address.notes')}
             />
           </div>
@@ -417,7 +479,8 @@ export function StepPersonalData() {
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger
                     variant="secondary"
-                    className="min-w-28 flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
+                    disabled={!isEditing}
+                    className="min-w-28 flex-1"
                   >
                     <SelectValue placeholder="Selecione um estado civil" />
                   </SelectTrigger>
@@ -447,7 +510,8 @@ export function StepPersonalData() {
                 >
                   <SelectTrigger
                     variant="secondary"
-                    className="min-w-28 flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
+                    disabled={!isEditing}
+                    className="min-w-28 flex-1"
                   >
                     <SelectValue placeholder="Selecione uma Raça /Cor" />
                   </SelectTrigger>
@@ -478,7 +542,8 @@ export function StepPersonalData() {
                 >
                   <SelectTrigger
                     variant="secondary"
-                    className="min-w-28 flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
+                    disabled={!isEditing}
+                    className="min-w-28 flex-1"
                   >
                     <SelectValue placeholder="Selecione uma Orientação sexual" />
                   </SelectTrigger>
@@ -509,7 +574,8 @@ export function StepPersonalData() {
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger
                     variant="secondary"
-                    className="min-w-28 flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
+                    disabled={!isEditing}
+                    className="min-w-28 flex-1"
                   >
                     <SelectValue placeholder="Selecione um Gênero" />
                   </SelectTrigger>

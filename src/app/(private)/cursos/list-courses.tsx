@@ -49,14 +49,14 @@ export function ListCourses() {
   })
 
   return (
-    <div className="flex flex-col gap-8 h-screen p-4 ">
+    <div className="flex-1 flex flex-col gap-8 min-h-screen p-4 ">
       <div className="w-full flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button title="Adicionar" />
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden flex flex-col gap-2">
+      <div className="overflow-hidden flex flex-col gap-2">
         <div className="overflow-auto">
           <Table className="min-w-full">
             <TableHeader className=" bg-[#f5f5fa]">

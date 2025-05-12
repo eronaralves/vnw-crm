@@ -4,7 +4,10 @@ import { api } from '@/lib/axios'
 import { AppError } from '@/utils/app-error'
 
 export type Course = {
-  course_modules: Array<unknown>
+  course_modules: {
+    id: string
+    name: string
+  }[]
   created_at: string
   facilitator: {
     fullname: string

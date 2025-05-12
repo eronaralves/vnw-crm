@@ -9,7 +9,7 @@ export type ProfileStudent = {
   errolmentId: string
   able: boolean
   age: number
-  birth_date: string
+  birth_date: Date
   fullname: string
   gender: string
   reason_give_up: string
@@ -142,8 +142,8 @@ export type ProfileStudent = {
     linkedin: string | null
     recruitment_channel: string | null
     last_enterprise_name: string | null
-    start_date: string | null
-    end_date: string | null
+    start_date: Date
+    end_date: Date
     created_at: string
   }
 

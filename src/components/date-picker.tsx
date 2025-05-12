@@ -24,11 +24,11 @@ import { cn } from '@/lib/utils'
 
 interface DatePickerProps {
   onSelect: (date: Date | undefined) => void
-  selected: Date
+  selected: Date | undefined
   minDate?: Date
   disabled?: boolean
   formatDate?: string
-  pickerDate?: boolean
+  isPickerYearDate?: boolean
   variant?: 'primary' | 'secondary'
 }
 
@@ -37,14 +37,14 @@ export function DatePicker({
   selected,
   minDate,
   disabled = false,
-  pickerDate = false,
+  isPickerYearDate = false,
   variant = 'primary',
   formatDate = 'dd-MM-yyyy',
 }: DatePickerProps) {
   const [monthYearDate, setMonthYearDate] = useState<Date>(
     selected ?? new Date(),
   )
-  const dateInUtc = new UTCDate(selected)
+  const dateInUtc = new UTCDate(selected ?? new Date())
 
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 101 }, (_, i) => currentYear - i)
@@ -75,7 +75,7 @@ export function DatePicker({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 " align="start">
-        {pickerDate && (
+        {isPickerYearDate && (
           <div className="flex gap-2 ">
             <Select
               value={String(monthYearDate?.getFullYear())}

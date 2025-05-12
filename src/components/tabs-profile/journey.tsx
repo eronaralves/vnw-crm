@@ -36,7 +36,7 @@ export function Journey({ modules }: JourneyProps) {
   }
 
   return (
-    <div className="h-full flex-1 px-6 py-8 bg-white">
+    <div className="flex-1 overflow-auto bg-white">
       <Table>
         <TableHeader>
           <TableRow>

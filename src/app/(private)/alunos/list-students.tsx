@@ -58,6 +58,7 @@ import { ButtonEvadeStudents } from '@/components/button-evade-students'
 import { useFiltersStudents } from '@/hooks/useFiltersStudents'
 import { parseSearchParamsToObject } from '@/utils/parse-search-params-to-object'
 import type { STATUS_STUDENT } from '@/types/status-student'
+import Link from 'next/link'
 
 type Spreadsheet = {
   link: string
@@ -137,8 +138,8 @@ export function ListStudent({ status }: ListStudentProps) {
       debounceAgeMax,
       programingLanguage,
     ],
-    queryFn: async () =>
-      await getStudents({
+    queryFn: () =>
+      getStudents({
         offset: (Number(page) - 1) * LIMIT_PER_PAGE,
         filters: {
           course_name: courseName,
@@ -160,12 +161,6 @@ export function ListStudent({ status }: ListStudentProps) {
           reason_give_up: reasonGiveUp,
           community,
         },
-      }).then((res) => {
-        if (res.message) {
-          toast.error(res.message, { duration: 3000, position: 'top-center' })
-        }
-
-        return res
       }),
 
     refetchOnWindowFocus: true,
@@ -281,7 +276,9 @@ export function ListStudent({ status }: ListStudentProps) {
             <Button title="Importar">
               <FileDown size={17} color="#fff" />
             </Button>
-            <Button title="Adicionar" />
+            <Link href="/alunos/novo-aluno">
+              <Button title="Adicionar" />
+            </Link>
           </>
         )}
 
@@ -543,6 +540,7 @@ export function ListStudent({ status }: ListStudentProps) {
                         </span>
                       </div>
                     </TableCell>
+
                     <TableCell className="text-center p-5 whitespace-nowrap">
                       <span className="text-xs text-[#1c1d21] ">
                         {student.age}
@@ -553,21 +551,25 @@ export function ListStudent({ status }: ListStudentProps) {
                         )} */}
                       </span>
                     </TableCell>
+
                     <TableCell className="p-5 whitespace-nowrap">
                       <span className="text-xs text-[#1c1d21] ">
                         {student.course.name}
                       </span>
                     </TableCell>
+
                     <TableCell className="p-5 whitespace-nowrap">
                       <span className="text-xs text-[#1c1d21] ">
                         {student.course.group}
                       </span>
                     </TableCell>
+
                     <TableCell className="p-5 whitespace-nowrap">
                       <span className="text-xs text-[#1c1d21] ">
                         {student.course.modality ?? 'Não informado'}
                       </span>
                     </TableCell>
+
                     <TableCell className="p-5 whitespace-nowrap">
                       <span className="text-xs text-[#1c1d21] ">
                         {student.course.programing_language ?? 'Não informado'}

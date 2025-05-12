@@ -119,7 +119,7 @@ export function PersonalData({ isEditing }: PersonalDataProps) {
             render={({ field }) => (
               <DatePicker
                 variant="secondary"
-                pickerDate
+                isPickerYearDate
                 selected={field.value}
                 onSelect={field.onChange}
                 disabled={!isEditing}

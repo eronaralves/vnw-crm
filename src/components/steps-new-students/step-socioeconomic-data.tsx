@@ -20,7 +20,7 @@ export const formSocioeconomicSchema = yup.object({
     main_income: yup.string(),
     income_range: yup.string(),
     government_benefit: yup.string(),
-    chronic_diseases: yup.string(),
+    chronic_diseases: yup.boolean(),
     live_with_pwd: yup.boolean(),
   }),
 })
@@ -28,12 +28,17 @@ export const formSocioeconomicSchema = yup.object({
 export type FormSocioeconomicType = yup.InferType<
   typeof formSocioeconomicSchema
 >
+interface StepSocioeconomicDataProps {
+  isEditing?: boolean
+}
 
-export function StepSocioeconomicData() {
+export function StepSocioeconomicData({
+  isEditing = true,
+}: StepSocioeconomicDataProps) {
   const { register, control } = useFormContext<FormSocioeconomicType>()
 
   return (
-    <div className="flex-1 ">
+    <div className="flex-1 overflow-auto">
       <div className="flex flex-wrap gap-x-4 gap-y-6">
         <div className="w-full flex flex-col gap-1">
           <label className="text-sm font-normal">
@@ -42,6 +47,7 @@ export function StepSocioeconomicData() {
           <div className="max-w-16">
             <Input
               variant="secondary"
+              disabled={!isEditing}
               type="nunber"
               {...register('student_socioeconomic_data.housemates')}
             />
@@ -61,6 +67,7 @@ export function StepSocioeconomicData() {
               <Select onValueChange={field.onChange} value={field.value}>
                 <SelectTrigger
                   variant="secondary"
+                  disabled={!isEditing}
                   className="flex-1 w-full py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                 >
                   <SelectValue placeholder="Selecione o tipo de moradia" />
@@ -93,6 +100,7 @@ export function StepSocioeconomicData() {
               <Select onValueChange={field.onChange} value={field.value}>
                 <SelectTrigger
                   variant="secondary"
+                  disabled={!isEditing}
                   className="flex-1 w-full py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                 >
                   <SelectValue placeholder="Selecione a condição da casa" />
@@ -123,6 +131,7 @@ export function StepSocioeconomicData() {
               <Select onValueChange={field.onChange} value={field.value}>
                 <SelectTrigger
                   variant="secondary"
+                  disabled={!isEditing}
                   className="flex-1 w-full py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                 >
                   <SelectValue placeholder="Selecione o résponsavel financeiro" />
@@ -160,6 +169,7 @@ export function StepSocioeconomicData() {
               <Select onValueChange={field.onChange} value={field.value}>
                 <SelectTrigger
                   variant="secondary"
+                  disabled={!isEditing}
                   className="flex-1 py-2 px-3 text-sm  rounded-none disabled:border-[#dddfe1] disabled:bg-[#e9ecef]"
                 >
                   <SelectValue placeholder="Selecione a renda" />
@@ -190,6 +200,7 @@ export function StepSocioeconomicData() {
           </label>
           <Input
             variant="secondary"
+            disabled={!isEditing}
             type="nunber"
             {...register('student_socioeconomic_data.government_benefit')}
           />
@@ -208,7 +219,8 @@ export function StepSocioeconomicData() {
               <RadioGroup
                 className="flex gap-7"
                 onValueChange={field.onChange}
-                value={field.value ? String(field.value) : 'false'}
+                value={String(field.value)}
+                disabled={!isEditing}
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem
@@ -256,7 +268,8 @@ export function StepSocioeconomicData() {
                 defaultValue="option-one"
                 className="flex gap-7"
                 onValueChange={field.onChange}
-                value={field.value ? String(field.value) : 'false'}
+                value={String(field.value)}
+                disabled={!isEditing}
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem

@@ -26,10 +26,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.className} bg-[#F5F5FA] antialiased overflow-hidden`}
       >
-        <QueryClientProvider>
-          <Toaster richColors />
-          {children}
-        </QueryClientProvider>
+        <Toaster richColors />
+        <QueryClientProvider>{children}</QueryClientProvider>
       </body>
     </html>
   )
