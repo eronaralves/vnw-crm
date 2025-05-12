@@ -25,23 +25,20 @@ import { differenceInYears } from 'date-fns'
 import {
   formPersonalSchema,
   StepPersonalData,
-} from '@/components/steps-new-students/step-personal-data'
+} from '@/components/steps/step-personal-data'
 import {
   formSocioeconomicSchema,
   StepSocioeconomicData,
-} from '@/components/steps-new-students/step-socioeconomic-data'
+} from '@/components/steps/step-socioeconomic-data'
 import {
   formTechnologySchema,
   StepTechnology,
-} from '@/components/steps-new-students/step-technology'
+} from '@/components/steps/step-technology'
 import {
   formEmpregabilitySchema,
   StepEmpregability,
-} from '@/components/steps-new-students/step-employability'
-import {
-  formAnnexesSchema,
-  StepAnnexes,
-} from '@/components/steps-new-students/step-annexes'
+} from '@/components/steps/step-employability'
+import { formAnnexesSchema, StepAnnexes } from '@/components/steps/step-annexes'
 
 enum TABS {
   PERSONAL = 'personal',

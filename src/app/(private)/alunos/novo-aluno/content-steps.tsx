@@ -17,27 +17,21 @@ import { StepProgressBar } from '@/components/progress-bar'
 import {
   formPersonalSchema,
   StepPersonalData,
-} from '@/components/steps-new-students/step-personal-data'
+} from '@/components/steps/step-personal-data'
 import {
   formSocioeconomicSchema,
   StepSocioeconomicData,
-} from '@/components/steps-new-students/step-socioeconomic-data'
+} from '@/components/steps/step-socioeconomic-data'
 import {
   formTechnologySchema,
   StepTechnology,
-} from '@/components/steps-new-students/step-technology'
+} from '@/components/steps/step-technology'
 import {
-  formEmployabilitySchema,
-  StepEmployability,
-} from '@/components/steps-new-students/step-employability'
-import {
-  formAnnexesSchema,
-  StepAnnexes,
-} from '@/components/steps-new-students/step-annexes'
-import {
-  formCourseSchema,
-  StepCourse,
-} from '@/components/steps-new-students/step-course'
+  formEmpregabilitySchema,
+  StepEmpregability,
+} from '@/components/steps/step-employability'
+import { formAnnexesSchema, StepAnnexes } from '@/components/steps/step-annexes'
+import { formCourseSchema, StepCourse } from '@/components/steps/step-course'
 import { registerStudent } from '@/http/students/register-student'
 import { toast } from 'sonner'
 // import { registerDocuments } from '@/http/students/create-documents'
@@ -200,7 +194,7 @@ export function ContentSteps() {
     [STEPS.PERSONAL]: formPersonalSchema,
     [STEPS.SOCIO_ECONOMIC]: formSocioeconomicSchema,
     [STEPS.TECHNOLOGY]: formTechnologySchema,
-    [STEPS.EMPREGABILITY]: formEmployabilitySchema,
+    [STEPS.EMPREGABILITY]: formEmpregabilitySchema,
     [STEPS.ANNEXES]: formAnnexesSchema,
     [STEPS.COURSE]: formCourseSchema,
   }
@@ -298,7 +292,7 @@ export function ContentSteps() {
           {step === STEPS.PERSONAL && <StepPersonalData />}
           {step === STEPS.SOCIO_ECONOMIC && <StepSocioeconomicData />}
           {step === STEPS.TECHNOLOGY && <StepTechnology />}
-          {step === STEPS.EMPREGABILITY && <StepEmployability />}
+          {step === STEPS.EMPREGABILITY && <StepEmpregability />}
           {step === STEPS.ANNEXES && <StepAnnexes />}
           {step === STEPS.COURSE && <StepCourse />}
 

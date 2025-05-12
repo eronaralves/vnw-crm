@@ -22,31 +22,28 @@ import type { ProfileStudent } from '@/http/students/get-student'
 // Components
 import { Button } from '@/components/button'
 import { TagStatus } from '@/components/tag-status'
-import { StepJourney } from '@/components/steps-new-students/step-journey'
-import { StepReasonEvasion } from '@/components/steps-new-students/step-reason-evasion'
+import { StepJourney } from '@/components/steps/step-journey'
+import { StepReasonEvasion } from '@/components/steps/step-reason-evasion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ButtonEvadeStudents } from '@/components/button-evade-students'
 import { ButtonFailStudents } from '@/components/button-fail-students'
 import {
   formTechnologySchema,
   StepTechnology,
-} from '@/components/steps-new-students/step-technology'
+} from '@/components/steps/step-technology'
 import {
   formPersonalSchema,
   StepPersonalData,
-} from '@/components/steps-new-students/step-personal-data'
+} from '@/components/steps/step-personal-data'
 import {
   formEmpregabilitySchema,
   StepEmpregability,
-} from '@/components/steps-new-students/step-employability'
-import {
-  formAnnexesSchema,
-  StepAnnexes,
-} from '@/components/steps-new-students/step-annexes'
+} from '@/components/steps/step-employability'
+import { formAnnexesSchema, StepAnnexes } from '@/components/steps/step-annexes'
 import {
   formSocioeconomicSchema,
   StepSocioeconomicData,
-} from '@/components/steps-new-students/step-socioeconomic-data'
+} from '@/components/steps/step-socioeconomic-data'
 
 interface ContentProfileProps {
   student: ProfileStudent
