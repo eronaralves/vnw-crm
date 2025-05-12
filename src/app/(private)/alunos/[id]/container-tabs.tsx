@@ -22,8 +22,8 @@ import type { ProfileStudent } from '@/http/students/get-student'
 // Components
 import { Button } from '@/components/button'
 import { TagStatus } from '@/components/tag-status'
-import { Journey } from '@/components/tabs-profile/journey'
-import { ReasonEvasion } from '@/components/tabs-profile/reason-evasion'
+import { StepJourney } from '@/components/steps-new-students/step-journey'
+import { StepReasonEvasion } from '@/components/steps-new-students/step-reason-evasion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ButtonEvadeStudents } from '@/components/button-evade-students'
 import { ButtonFailStudents } from '@/components/button-fail-students'
@@ -86,11 +86,6 @@ export function ContainerTabs({ student }: ContentProfileProps) {
       phone: formatPhone(student.phone),
       cpf: formatCpf(student.cpf),
       birth_date: new UTCDate(student.birth_date),
-      documents: [
-        {
-          name: 'TESTE',
-        },
-      ],
       age: differenceInYears(new Date(), new UTCDate(student.birth_date)),
       student_empregability: {
         ...student.student_empregability,
@@ -102,13 +97,13 @@ export function ContainerTabs({ student }: ContentProfileProps) {
 
   const router = useRouter()
 
+  async function onChangeTab(value: TABS) {
+    setTabCurrent(value as TABS)
+  }
+
   function onSubmit(data: ProfileStudent) {
     console.log(data)
     setIsEditing(false)
-  }
-
-  async function onChangeTab(value: TABS) {
-    setTabCurrent(value as TABS)
   }
 
   return (
@@ -231,7 +226,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
               value={TABS.JOURNEY}
               className="flex-1 overflow-auto p-6 bg-white"
             >
-              <Journey modules={student.course.modules} />
+              <StepJourney modules={student.course.modules} />
             </TabsContent>
 
             {student.status === 'Evadiu' && (
@@ -239,9 +234,10 @@ export function ContainerTabs({ student }: ContentProfileProps) {
                 value={TABS.REASON_EVASION}
                 className="flex-1 overflow-auto p-6 bg-white"
               >
-                <ReasonEvasion isEditing={isEditing} />
+                <StepReasonEvasion isEditing={isEditing} />
               </TabsContent>
             )}
+
             <TabsContent
               value={TABS.PERSONAL}
               className="flex-1 overflow-auto p-6 bg-white"
@@ -277,7 +273,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
 
         <div>
           <hr className="w-full min-h-[8px] bg-gradient-primary" />
-          <div className="flex justify-end gap-3 px-4 py-4">
+          <div className="flex justify-end gap-3 px-4 pt-4">
             <Button
               type="button"
               title="Voltar"
@@ -287,6 +283,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
 
             <Button
               type="button"
+              disabled={!isEditing}
               onClick={methods.handleSubmit(onSubmit)}
               title="Salvar"
             />

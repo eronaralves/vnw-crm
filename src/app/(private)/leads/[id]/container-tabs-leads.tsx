@@ -20,75 +20,45 @@ import type { LeadProfile } from '@/http/leads/get-lead'
 
 // Components
 import { Button } from '@/components/button'
-import { PersonalData } from '@/components/tabs-profile/personal-data'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { SocioeconomicData } from '@/components/tabs-profile/socioeconomic-data'
 import { differenceInYears } from 'date-fns'
+import {
+  formPersonalSchema,
+  StepPersonalData,
+} from '@/components/steps-new-students/step-personal-data'
+import {
+  formSocioeconomicSchema,
+  StepSocioeconomicData,
+} from '@/components/steps-new-students/step-socioeconomic-data'
+import { formTechnologySchema } from '@/components/steps-new-students/step-technology'
+import { formEmployabilitySchema } from '@/components/steps-new-students/step-employability'
+import { formAnnexesSchema } from '@/components/steps-new-students/step-annexes'
 
+enum TABS {
+  PERSONAL = 'personal',
+  SOCIO_ECONOMIC = 'socio-economic',
+  TECHNOLOGY = 'technology',
+  EMPREGABILITY = 'empregability',
+  ANNEXES = 'annexes',
+}
 interface ContentProfileProps {
   lead: LeadProfile
 }
 
-const formProfileSchema = yup.object().shape({
-  fullname: yup.string(),
-  social_name: yup.string(),
-  phone: yup.string(),
-  cpf: yup.string(),
-  email: yup.string().email(),
-  birth_date: yup.date().required(),
-  rg: yup.string(),
-  age: yup.number(),
-  emitter: yup.string(),
-  mother_name: yup.string(),
-  father_name: yup.string(),
-  emergency_phone: yup.string().nullable(),
-  emergency_name: yup.string().nullable(),
-  emergency_kinship: yup.string().nullable(),
-  marital_status: yup.string(),
-  skin_color: yup.string(),
-  gender: yup.string(),
-  sexuality: yup.string(),
-  student_responsible: yup.object({
-    fullname: yup.string(),
-    relation: yup.string(),
-    cpf: yup.string(),
-    rg: yup.string(),
-    emitter: yup.string(),
-    phone: yup.string(),
-    email: yup.string().email(),
-  }),
-  student_address: yup.object({
-    address: yup.object({
-      postal_code: yup.string().nullable(),
-      street: yup.string().nullable(),
-      number: yup.string().nullable(),
-      adjunct: yup.string().nullable(),
-      district: yup.string().nullable(),
-      city: yup.string().nullable(),
-      state: yup.string().nullable(),
-    }),
-    community: yup.string().nullable(),
-    notes: yup.string().nullable(),
-  }),
-  student_socioeconomic_data: yup.object({
-    housemates: yup.string(),
-    home_type: yup.string(),
-    home_condition: yup.string(),
-    main_income: yup.string(),
-    income_range: yup.string(),
-    government_benefit: yup.string(),
-    chronic_diseases: yup.string(),
-    live_with_pwd: yup.boolean(),
-  }),
-})
-
-export type FormProfileType = yup.InferType<typeof formProfileSchema>
-
 export function ContainerTabsLeads({ lead }: ContentProfileProps) {
+  const [tabCurrent, setTabCurrent] = useState(TABS.PERSONAL)
   const [isEditing, setIsEditing] = useState(false)
 
+  const schemaByStep: Record<TABS, yup.AnyObjectSchema> = {
+    [TABS.PERSONAL]: formPersonalSchema,
+    [TABS.SOCIO_ECONOMIC]: formSocioeconomicSchema,
+    [TABS.TECHNOLOGY]: formTechnologySchema,
+    [TABS.EMPREGABILITY]: formEmployabilitySchema,
+    [TABS.ANNEXES]: formAnnexesSchema,
+  }
+
   const methods = useForm({
-    resolver: yupResolver(formProfileSchema),
+    resolver: yupResolver(schemaByStep[tabCurrent]),
     defaultValues: {
       ...lead,
       phone: formatPhone(lead.phone),
@@ -100,14 +70,18 @@ export function ContainerTabsLeads({ lead }: ContentProfileProps) {
 
   const router = useRouter()
 
-  function onSubmit(data: FormProfileType) {
+  async function onChangeTab(value: TABS) {
+    setTabCurrent(value as TABS)
+  }
+
+  function onSubmit(data: LeadProfile) {
     console.log(data)
   }
 
   return (
     <FormProvider {...methods}>
-      <div className="w-full h-full flex flex-col space-y-12 p-4">
-        <div className="flex items-center gap-8 flex-wrap mt-2">
+      <div className="h-full flex flex-col p-4">
+        <div className="flex items-center gap-8 flex-wrap mt-2 mb-4">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
             <div>
               <h1 className="text-2xl font-bold">{lead.fullname}</h1>
@@ -127,68 +101,74 @@ export function ContainerTabsLeads({ lead }: ContentProfileProps) {
 
         <form
           onSubmit={methods.handleSubmit(onSubmit)}
-          className="h-full flex flex-col"
+          className="flex-1 flex flex-col space-y-6 overflow-hidden"
         >
-          <Tabs defaultValue="personal-data" className="flex-1 gap-0">
+          <Tabs
+            value={tabCurrent}
+            onValueChange={(value) => onChangeTab(value as TABS)}
+            className="flex-1 overflow-hidden gap-0"
+          >
             <TabsList className="w-full min-h-max flex justify-start overflow-x-auto gap-1 border-b border-[#dee2e6]">
               <TabsTrigger
-                value="personal-data"
+                value={TABS.PERSONAL}
                 className="data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
               >
                 Dados Pessoais
               </TabsTrigger>
               <TabsTrigger
-                value="socioeconomic"
+                value={TABS.SOCIO_ECONOMIC}
                 className="data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
               >
                 Dados socioeconômicos
               </TabsTrigger>
               <TabsTrigger
-                value="technology"
+                value={TABS.TECHNOLOGY}
                 className="data-[state=active]:bg-[#173A92] bg-[#a7b1d7] min-w-[170px] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
               >
                 Tecnologia
               </TabsTrigger>
               <TabsTrigger
-                value="empregability"
+                value={TABS.EMPREGABILITY}
                 className="data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
               >
                 Empregabilidade
               </TabsTrigger>
               <TabsTrigger
-                value="attachments"
+                value={TABS.ANNEXES}
                 className="data-[state=active]:bg-[#173A92] bg-[#a7b1d7] min-w-[170px] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
               >
                 Anexos
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="personal-data" asChild>
-              <div className="h-full flex-1 flex flex-col">
-                <PersonalData isEditing={isEditing} />
-              </div>
+            <TabsContent
+              value={TABS.PERSONAL}
+              className="flex-1 overflow-auto p-6 bg-white"
+            >
+              <StepPersonalData isEditing={isEditing} />
             </TabsContent>
 
-            <TabsContent value="socioeconomic" asChild>
-              <div className="h-full flex-1 flex flex-col">
-                <SocioeconomicData isEditing={isEditing} />
-              </div>
+            <TabsContent
+              value={TABS.SOCIO_ECONOMIC}
+              className="flex-1 overflow-auto p-6 bg-white"
+            >
+              <StepSocioeconomicData isEditing={isEditing} />
             </TabsContent>
           </Tabs>
-
-          <div className="w-full flex flex-col gap-2 bg-white pb-4 px-4">
-            <hr className="w-full min-h-[8px] bg-gradient-primary" />
-            <div className="flex justify-end gap-3 ml-auto">
-              <Button
-                type="button"
-                title="Voltar"
-                className="bg-[#5e81f418] hover:!bg-[#00000018] !text-[#0f2b92]"
-                onClick={() => router.back()}
-              />
-              {/* <Button title="Salvar" /> */}
-            </div>
-          </div>
         </form>
+
+        <div>
+          <hr className="w-full min-h-[8px] bg-gradient-primary" />
+          <div className="flex justify-end gap-3 px-4 pt-4">
+            <Button
+              type="button"
+              title="Voltar"
+              className="bg-[#5e81f418] hover:!bg-[#00000018] !text-[#0f2b92]"
+              onClick={() => router.back()}
+            />
+            <Button title="Salvar" />
+          </div>
+        </div>
       </div>
     </FormProvider>
   )

@@ -1,4 +1,8 @@
 import { Controller, useFormContext } from 'react-hook-form'
+
+import * as yup from 'yup'
+
+// Components
 import {
   Select,
   SelectContent,
@@ -6,20 +10,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select'
-import type { FormStudentProfileType } from '@/app/(private)/alunos/[id]/container-tabs'
 
-interface ReasonEvasionProps {
+export const formReasonEvasionSchema = yup.object({
+  reason_give_up: yup.string().required('Selecione a razão.'),
+})
+
+export type FormReasonEvasionType = yup.InferType<
+  typeof formReasonEvasionSchema
+>
+
+interface StepReasonEvasionProps {
   isEditing: boolean
 }
 
-export function ReasonEvasion({ isEditing }: ReasonEvasionProps) {
-  const { control } = useFormContext<FormStudentProfileType>()
+export function StepReasonEvasion({ isEditing }: StepReasonEvasionProps) {
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<FormReasonEvasionType>()
 
   return (
-    <div className="h-full flex-1 px-6 py-8 bg-white">
+    <div className="h-full flex-1 bg-white">
       <div className="flex flex-wrap gap-x-4 gap-y-6">
         <div className="w-full max-w-80 flex flex-col gap-1">
           <label className="text-sm font-normal">Motivo da Evasão</label>
+
           <Controller
             name="reason_give_up"
             control={control}
@@ -47,6 +62,12 @@ export function ReasonEvasion({ isEditing }: ReasonEvasionProps) {
               </Select>
             )}
           />
+
+          {errors.reason_give_up && (
+            <span className="text-xs text-red-500">
+              {errors.reason_give_up.message}
+            </span>
+          )}
         </div>
       </div>
     </div>

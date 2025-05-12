@@ -28,7 +28,7 @@ interface JourneyProps {
   }[]
 }
 
-export function Journey({ modules }: JourneyProps) {
+export function StepJourney({ modules }: JourneyProps) {
   function handleSendToGithub(urlGithub?: string) {
     if (urlGithub) {
       window.open(urlGithub, '_blank')
