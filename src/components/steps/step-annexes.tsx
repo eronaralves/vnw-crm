@@ -13,8 +13,12 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useFormContext } from 'react-hook-form'
 
+type FileUpload = File & {
+  document?: string
+}
+
 export const formAnnexesSchema = yup.object({
-  documents: yup.array().of(yup.mixed<File>()),
+  documents: yup.array().of(yup.mixed<FileUpload>()),
 })
 
 export type FormAnnexesType = yup.InferType<typeof formAnnexesSchema>
@@ -25,13 +29,13 @@ interface StepAnnexesProps {
 
 export function StepAnnexes({ isEditing = true }: StepAnnexesProps) {
   const { setValue, watch } = useFormContext<FormAnnexesType>()
-  const watchDocuments = watch('documents') as File[]
+  const watchDocuments = watch('documents') as FileUpload[]
 
-  const [files, setFiles] = useState<File[]>([])
-  const [profileImage, setProfileImage] = useState<File | null>(null)
+  const [files, setFiles] = useState<FileUpload[]>([])
+  const [profileImage, setProfileImage] = useState<FileUpload | null>(null)
 
   const onDropFiles = useCallback(
-    (accepted: File[]) => {
+    (accepted: FileUpload[]) => {
       const filesUpload = [...files, ...accepted]
 
       setValue('documents', filesUpload, { shouldValidate: true })
@@ -142,7 +146,19 @@ export function StepAnnexes({ isEditing = true }: StepAnnexesProps) {
                   key={index}
                   className="w-full max-w-[380px] flex items-center justify-between border p-2 rounded-md bg-muted text-sm"
                 >
-                  <span className="truncate">{file.name}</span>
+                  <a
+                    href={
+                      file.document ? file.document : URL.createObjectURL(file)
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="truncate hover:underline"
+                  >
+                    {file.document
+                      ? file.document.split('documents/')[1]
+                      : file.name}
+                  </a>
+
                   <Button
                     size="icon"
                     type="button"

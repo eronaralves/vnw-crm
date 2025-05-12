@@ -64,6 +64,7 @@ export function ContainerTabsLeads({ lead }: ContentProfileProps) {
   }
 
   const methods = useForm({
+    mode: 'onChange',
     resolver: yupResolver(schemaByStep[tabCurrent]),
     defaultValues: {
       ...lead,
