@@ -30,9 +30,18 @@ import {
   formSocioeconomicSchema,
   StepSocioeconomicData,
 } from '@/components/steps-new-students/step-socioeconomic-data'
-import { formTechnologySchema } from '@/components/steps-new-students/step-technology'
-import { formEmployabilitySchema } from '@/components/steps-new-students/step-employability'
-import { formAnnexesSchema } from '@/components/steps-new-students/step-annexes'
+import {
+  formTechnologySchema,
+  StepTechnology,
+} from '@/components/steps-new-students/step-technology'
+import {
+  formEmpregabilitySchema,
+  StepEmpregability,
+} from '@/components/steps-new-students/step-employability'
+import {
+  formAnnexesSchema,
+  StepAnnexes,
+} from '@/components/steps-new-students/step-annexes'
 
 enum TABS {
   PERSONAL = 'personal',
@@ -53,7 +62,7 @@ export function ContainerTabsLeads({ lead }: ContentProfileProps) {
     [TABS.PERSONAL]: formPersonalSchema,
     [TABS.SOCIO_ECONOMIC]: formSocioeconomicSchema,
     [TABS.TECHNOLOGY]: formTechnologySchema,
-    [TABS.EMPREGABILITY]: formEmployabilitySchema,
+    [TABS.EMPREGABILITY]: formEmpregabilitySchema,
     [TABS.ANNEXES]: formAnnexesSchema,
   }
 
@@ -76,6 +85,7 @@ export function ContainerTabsLeads({ lead }: ContentProfileProps) {
 
   function onSubmit(data: LeadProfile) {
     console.log(data)
+    setIsEditing(false)
   }
 
   return (
@@ -90,7 +100,7 @@ export function ContainerTabsLeads({ lead }: ContentProfileProps) {
 
           <div className="flex flex-wrap gap-x-2 gap-y-4">
             <Button
-              title="Editar"
+              title={isEditing ? 'Resetar' : 'Editar'}
               onClick={() => setIsEditing(!isEditing)}
               className="flex items-center gap-1"
             >
@@ -153,6 +163,27 @@ export function ContainerTabsLeads({ lead }: ContentProfileProps) {
               className="flex-1 overflow-auto p-6 bg-white"
             >
               <StepSocioeconomicData isEditing={isEditing} />
+            </TabsContent>
+
+            <TabsContent
+              value={TABS.TECHNOLOGY}
+              className="flex-1 overflow-auto p-6 bg-white"
+            >
+              <StepTechnology isEditing={isEditing} />
+            </TabsContent>
+
+            <TabsContent
+              value={TABS.EMPREGABILITY}
+              className="flex-1 overflow-auto p-6 bg-white"
+            >
+              <StepEmpregability isEditing={isEditing} />
+            </TabsContent>
+
+            <TabsContent
+              value={TABS.ANNEXES}
+              className="flex-1 overflow-auto p-6 bg-white"
+            >
+              <StepAnnexes isEditing={isEditing} />
             </TabsContent>
           </Tabs>
         </form>

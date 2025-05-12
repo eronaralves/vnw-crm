@@ -15,7 +15,7 @@ import {
 import { DatePicker } from '../date-picker'
 
 // Schema
-export const formEmployabilitySchema = yup.object({
+export const formEmpregabilitySchema = yup.object({
   student_empregability: yup.object({
     work: yup.boolean().required('Selecione uma opção.'),
     work_role: yup.string().when('work', {
@@ -155,21 +155,21 @@ export const formEmployabilitySchema = yup.object({
   }),
 })
 
-type FormEmployabilityType = yup.InferType<typeof formEmployabilitySchema>
+type FormEmpregabilityType = yup.InferType<typeof formEmpregabilitySchema>
 
-interface StepEmployabilityProps {
+interface StepEmpregabilityProps {
   isEditing?: boolean
 }
 
-export function StepEmployability({
+export function StepEmpregability({
   isEditing = true,
-}: StepEmployabilityProps) {
+}: StepEmpregabilityProps) {
   const {
     register,
     control,
     watch,
     formState: { errors },
-  } = useFormContext<FormEmployabilityType>()
+  } = useFormContext<FormEmpregabilityType>()
 
   const watchIsWork = watch('student_empregability.work')
   const watchIsStudy = watch('student_empregability.study')

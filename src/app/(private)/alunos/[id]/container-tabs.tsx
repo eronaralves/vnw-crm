@@ -36,8 +36,8 @@ import {
   StepPersonalData,
 } from '@/components/steps-new-students/step-personal-data'
 import {
-  formEmployabilitySchema,
-  StepEmployability,
+  formEmpregabilitySchema,
+  StepEmpregability,
 } from '@/components/steps-new-students/step-employability'
 import {
   formAnnexesSchema,
@@ -74,7 +74,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
     [TABS.PERSONAL]: formPersonalSchema,
     [TABS.SOCIO_ECONOMIC]: formSocioeconomicSchema,
     [TABS.TECHNOLOGY]: formTechnologySchema,
-    [TABS.EMPREGABILITY]: formEmployabilitySchema,
+    [TABS.EMPREGABILITY]: formEmpregabilitySchema,
     [TABS.ANNEXES]: formAnnexesSchema,
   }
 
@@ -260,7 +260,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
               value={TABS.EMPREGABILITY}
               className="flex-1 overflow-auto p-6 bg-white"
             >
-              <StepEmployability isEditing={isEditing} />
+              <StepEmpregability isEditing={isEditing} />
             </TabsContent>
             <TabsContent
               value={TABS.ANNEXES}
