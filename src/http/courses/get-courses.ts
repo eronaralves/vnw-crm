@@ -69,8 +69,6 @@ export async function getCourses({
       ? error.detail
       : 'Error ao listar cursos, tente novamente.'
 
-    return {
-      message: errorMessage,
-    }
+    throw errorMessage
   }
 }

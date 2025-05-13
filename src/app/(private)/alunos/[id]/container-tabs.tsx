@@ -86,8 +86,12 @@ export function ContainerTabs({ student }: ContentProfileProps) {
       age: differenceInYears(new Date(), new UTCDate(student.birth_date)),
       student_empregability: {
         ...student.student_empregability,
-        start_date: new UTCDate(student.student_empregability.start_date),
-        end_date: new UTCDate(student.student_empregability.end_date),
+        start_date: student.student_empregability.start_date
+          ? new UTCDate(student.student_empregability.start_date)
+          : undefined,
+        end_date: student.student_empregability.end_date
+          ? new UTCDate(student.student_empregability.end_date)
+          : undefined,
       },
     },
   })

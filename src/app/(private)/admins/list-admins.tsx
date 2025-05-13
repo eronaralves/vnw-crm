@@ -2,7 +2,6 @@
 
 import { useSearchParams } from 'next/navigation'
 
-import { toast } from 'sonner'
 import { useQuery } from '@tanstack/react-query'
 
 // Icons
@@ -21,8 +20,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/button'
-import { Pagination } from '@/components/pagination'
+import { LIMIT_PER_PAGE, Pagination } from '@/components/pagination'
 import { ModalEditAdmin } from './modal-edit-admin'
+import { AlertError } from '@/components/alert-error'
 
 export function ListAdmins() {
   const searchParams = useSearchParams()
@@ -32,27 +32,30 @@ export function ListAdmins() {
     data: dataAdmin,
     isLoading,
     isFetching,
+    error,
   } = useQuery({
     queryKey: ['get-admins', page],
     queryFn: async () =>
-      getAdmins({}).then((res) => {
-        if (res.message) {
-          toast.error(res.message, { duration: 3000, position: 'top-center' })
-        }
-
-        return res
+      getAdmins({
+        offset: (Number(page) - 1) * LIMIT_PER_PAGE,
       }),
     refetchOnWindowFocus: true,
     staleTime: 1000 * 60 * 60, // 1hour
     placeholderData: (data) => data,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(attempt * 1000, 5000),
   })
 
   return (
     <div className="flex flex-col gap-8 h-screen p-4 ">
-      <div className="w-full flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button title="Adicionar" />
+      <div className="flex flex-col gap-6">
+        <div className="w-full flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button title="Adicionar" />
+          </div>
         </div>
+
+        <AlertError errorMessage={error?.message} />
       </div>
 
       <div className="flex-1 overflow-hidden flex flex-col gap-2">

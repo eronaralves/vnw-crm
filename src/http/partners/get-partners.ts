@@ -31,8 +31,6 @@ export async function getPartners() {
       ? error.detail
       : 'Error ao listar parceiros, tente novamente.'
 
-    return {
-      message: errorMessage,
-    }
+    throw errorMessage
   }
 }

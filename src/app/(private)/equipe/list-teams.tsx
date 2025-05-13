@@ -3,7 +3,6 @@
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 
-import { toast } from 'sonner'
 import { useQuery } from '@tanstack/react-query'
 
 // Icons
@@ -30,6 +29,7 @@ import {
 } from '@/components/ui/table'
 import { Pagination } from '@/components/pagination'
 import { ModalEditTeam } from './modal-edit-team'
+import { AlertError } from '@/components/alert-error'
 
 export function ListTeam() {
   const searchParams = useSearchParams()
@@ -39,30 +39,31 @@ export function ListTeam() {
     data: dataTeam,
     isLoading,
     isFetching,
+    error,
   } = useQuery({
     queryKey: ['get-teams', page],
     queryFn: async () =>
       getTeams({
         limit: 10,
         offset: (Number(page) - 1) * 10,
-      }).then((res) => {
-        if (res.message) {
-          toast.error(res.message, { duration: 3000, position: 'top-center' })
-        }
-
-        return res
       }),
     refetchOnWindowFocus: true,
     staleTime: 1000 * 60 * 60, // 1hour
     placeholderData: (data) => data,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(attempt * 1000, 5000),
   })
 
   return (
     <div className="flex flex-col gap-10 h-screen p-4 ">
-      <div className="w-full flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button title="Adicionar" />
+      <div className="flex flex-col gap-6">
+        <div className="w-full flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button title="Adicionar" />
+          </div>
         </div>
+
+        <AlertError errorMessage={error?.message} />
       </div>
 
       <div className="flex-1 overflow-hidden flex flex-col gap-2">

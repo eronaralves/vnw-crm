@@ -13,7 +13,6 @@ import { format } from 'date-fns'
 import type { STATUS_STUDENT } from '@/types/status-student'
 
 // Http
-import { registerStudent } from '@/http/students/register-student'
 // import { registerDocuments } from '@/http/students/create-documents'
 
 // Components
@@ -38,7 +37,6 @@ import {
   StepEmpregability,
 } from '@/components/steps/step-employability'
 import { formAnnexesSchema, StepAnnexes } from '@/components/steps/step-annexes'
-import { formCourseSchema, StepCourse } from '@/components/steps/step-course'
 
 enum STEPS {
   PERSONAL = 0,
@@ -46,10 +44,9 @@ enum STEPS {
   TECHNOLOGY = 2,
   EMPREGABILITY = 3,
   ANNEXES = 4,
-  COURSE = 5,
 }
 
-export type ProfileNewStudent = {
+export type ProfileNewLead = {
   able?: boolean
   age?: number
   birth_date: string
@@ -98,8 +95,6 @@ export type ProfileNewStudent = {
   social_name?: string
 
   status?: STATUS_STUDENT
-
-  module_id: string
 
   student_address: {
     address: {
@@ -199,17 +194,16 @@ export function ContentSteps() {
     [STEPS.TECHNOLOGY]: formTechnologySchema,
     [STEPS.EMPREGABILITY]: formEmpregabilitySchema,
     [STEPS.ANNEXES]: formAnnexesSchema,
-    [STEPS.COURSE]: formCourseSchema,
   }
 
   const methods = useForm({
     resolver: yupResolver(schemaByStep[step]),
   })
 
-  async function onSubmit(data: Partial<ProfileNewStudent>) {
-    const student = data as ProfileNewStudent
+  async function onSubmit(data: Partial<ProfileNewLead>) {
+    const student = data as ProfileNewLead
 
-    if (step !== STEPS.COURSE) {
+    if (step !== STEPS.ANNEXES) {
       return setStep(step + 1)
     }
 
@@ -233,19 +227,18 @@ export function ContentSteps() {
     }
 
     delete studentData.documents
-    delete studentData.module_id
 
-    const responseRegister = await registerStudent({
-      moduleId: student.module_id,
-      formData: studentData,
-    })
+    // const responseRegister = await registerStudent({
+    //   moduleId: student.module_id,
+    //   formData: studentData,
+    // })
 
-    if (responseRegister?.message) {
-      return toast.error(responseRegister.message, {
-        duration: 3000,
-        position: 'top-center',
-      })
-    }
+    // if (responseRegister?.message) {
+    //   return toast.error(responseRegister.message, {
+    //     duration: 3000,
+    //     position: 'top-center',
+    //   })
+    // }
 
     // if (student.documents && student.documents?.length > 0) {
     //   for (let i = 0; i < student?.documents?.length; i++) {
@@ -297,7 +290,6 @@ export function ContentSteps() {
           {step === STEPS.TECHNOLOGY && <StepTechnology />}
           {step === STEPS.EMPREGABILITY && <StepEmpregability />}
           {step === STEPS.ANNEXES && <StepAnnexes />}
-          {step === STEPS.COURSE && <StepCourse />}
 
           <div className="w-full flex justify-end gap-3">
             <Button

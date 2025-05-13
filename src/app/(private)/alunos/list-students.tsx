@@ -1,9 +1,12 @@
 'use client'
 
+import Link from 'next/link'
 import { useState, Fragment } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
+
+import type { STATUS_STUDENT } from '@/types/status-student'
 
 // Http
 import { getStudents } from '@/http/students/get-students'
@@ -12,10 +15,12 @@ import { getOptionsFilters } from '@/http/students/get-options-filters'
 
 // Hooks
 import { useDebounce } from '@/hooks/useDebouce'
+import { useFiltersStudents } from '@/hooks/useFiltersStudents'
 
 // Utils
 import { formatPhone } from '@/utils/format-phone'
 import { filtersTableStudents } from '@/utils/filters'
+import { parseSearchParamsToObject } from '@/utils/parse-search-params-to-object'
 
 // Icons
 import {
@@ -55,10 +60,7 @@ import {
 } from '@/components/ui/dialog'
 import { ButtonFailStudents } from '@/components/button-fail-students'
 import { ButtonEvadeStudents } from '@/components/button-evade-students'
-import { useFiltersStudents } from '@/hooks/useFiltersStudents'
-import { parseSearchParamsToObject } from '@/utils/parse-search-params-to-object'
-import type { STATUS_STUDENT } from '@/types/status-student'
-import Link from 'next/link'
+import { AlertError } from '@/components/alert-error'
 
 type Spreadsheet = {
   link: string
@@ -117,6 +119,7 @@ export function ListStudent({ status }: ListStudentProps) {
     data: dataStudents,
     isLoading,
     isFetching,
+    error,
   } = useQuery({
     queryKey: [
       'get-students',
@@ -166,6 +169,8 @@ export function ListStudent({ status }: ListStudentProps) {
     refetchOnWindowFocus: true,
     staleTime: 1000 * 60 * 2,
     placeholderData: (data) => data,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(attempt * 1000, 5000),
   })
 
   useQuery({
@@ -270,48 +275,52 @@ export function ListStudent({ status }: ListStudentProps) {
 
   return (
     <div className="flex-1 h-full flex flex-col gap-10">
-      <div className="flex items-center gap-4 h-8">
-        {status === 'Cursando' && (
-          <>
-            <Button title="Importar">
-              <FileDown size={17} color="#fff" />
-            </Button>
-            <Link href="/alunos/novo-aluno">
-              <Button title="Adicionar" />
-            </Link>
-          </>
-        )}
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center gap-4 h-8">
+          {status === 'Cursando' && (
+            <>
+              <Button title="Importar">
+                <FileDown size={17} color="#fff" />
+              </Button>
+              <Link href="/alunos/novo-aluno">
+                <Button title="Adicionar" />
+              </Link>
+            </>
+          )}
 
-        {selectedStudents.length === 1 && status === 'Cursando' && (
-          <ButtonEvadeStudents
-            studentEvaded={{
-              enrollmentId: selectedStudents[0].enrollmentId,
-              moduleId: selectedStudents[0].id_module,
-              studentId: selectedStudents[0].id_student,
-            }}
-            onSuccess={() => setSelectedStudents([])}
-          />
-        )}
-
-        {selectedStudents.length > 0 && status === 'Cursando' && (
-          <>
-            <ButtonFailStudents
-              studentsFaileds={selectedStudents}
+          {selectedStudents.length === 1 && status === 'Cursando' && (
+            <ButtonEvadeStudents
+              studentEvaded={{
+                enrollmentId: selectedStudents[0].enrollmentId,
+                moduleId: selectedStudents[0].id_module,
+                studentId: selectedStudents[0].id_student,
+              }}
               onSuccess={() => setSelectedStudents([])}
             />
-            <Button
-              title="Formar"
-              className="bg-emerald-600 hover:bg-emerald-500"
-            />
-          </>
-        )}
+          )}
 
-        {selectedStudents.length > 0 && status === 'Formado' && (
-          <Button
-            title="Rematricula"
-            className="bg-orange-400 hover:bg-orange-400/80"
-          />
-        )}
+          {selectedStudents.length > 0 && status === 'Cursando' && (
+            <>
+              <ButtonFailStudents
+                studentsFaileds={selectedStudents}
+                onSuccess={() => setSelectedStudents([])}
+              />
+              <Button
+                title="Formar"
+                className="bg-emerald-600 hover:bg-emerald-500"
+              />
+            </>
+          )}
+
+          {selectedStudents.length > 0 && status === 'Formado' && (
+            <Button
+              title="Rematricula"
+              className="bg-orange-400 hover:bg-orange-400/80"
+            />
+          )}
+        </div>
+
+        <AlertError errorMessage={error?.message} />
       </div>
 
       <div className="w-full flex-1 h-full flex flex-col relative">

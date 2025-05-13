@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useState, Fragment } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
@@ -13,9 +14,13 @@ import { getOptionsFilters } from '@/http/leads/get-options-filters'
 // Hooks
 import { useDebounce } from '@/hooks/useDebouce'
 
+// Hooks
+import { useFiltersLeads } from '@/hooks/useFiltersLeads'
+
 // Utils
 import { formatPhone } from '@/utils/format-phone'
 import { filtersTableLeads } from '@/utils/filters'
+import { parseSearchParamsToObject } from '@/utils/parse-search-params-to-object'
 
 // Icons
 import {
@@ -53,8 +58,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { FormSearch } from '../../../components/form-search'
-import { useFiltersLeads } from '@/hooks/useFiltersLeads'
-import { parseSearchParamsToObject } from '@/utils/parse-search-params-to-object'
+import { AlertError } from '@/components/alert-error'
 
 type Spreadsheet = {
   link: string
@@ -97,6 +101,7 @@ export function ListLeads() {
     data: dataLeads,
     isLoading,
     isFetching,
+    error,
   } = useQuery({
     queryKey: [
       'get-leads',
@@ -129,16 +134,12 @@ export function ListLeads() {
           skin_color_in: skinColorIn,
           search,
         },
-      }).then((res) => {
-        if (res.message) {
-          toast.error(res.message, { duration: 3000, position: 'top-center' })
-        }
-
-        return res
       }),
     refetchOnWindowFocus: true,
     staleTime: 1000 * 60 * 2,
     placeholderData: (data) => data,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(attempt * 1000, 5000),
   })
 
   useQuery({
@@ -215,15 +216,21 @@ export function ListLeads() {
 
   return (
     <div className="w-full h-full gap-10 flex flex-col">
-      <div className="w-full flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button title="Importar">
-            <FileDown size={17} color="#fff" />
-          </Button>
-          <Button title="Adicionar" />
+      <div className="flex flex-col gap-6">
+        <div className="w-full flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button title="Importar">
+              <FileDown size={17} color="#fff" />
+            </Button>
+            <Link href="/leads/novo-lead">
+              <Button title="Adicionar" />
+            </Link>
+          </div>
+
+          <FormSearch />
         </div>
 
-        <FormSearch />
+        <AlertError errorMessage={error?.message} />
       </div>
 
       <div className="w-full flex-1 h-full flex flex-col relative">
@@ -362,105 +369,102 @@ export function ListLeads() {
           </TableHeader>
 
           <TableBody>
-            {dataLeads?.leads?.length !== 0
-              ? dataLeads?.leads?.map((lead) => (
-                  <TableRow
-                    key={lead.id}
-                    className={`${isFetching ? 'opacity-40' : ''}`}
-                    onClick={(e) => {
-                      const target = e.target as HTMLElement
+            {dataLeads?.leads?.length !== 0 ? (
+              dataLeads?.leads?.map((lead) => (
+                <TableRow
+                  key={lead.id}
+                  className={`${isFetching ? 'opacity-40' : ''}`}
+                  onClick={(e) => {
+                    const target = e.target as HTMLElement
 
-                      if (target.closest('[data-ignore-row-click]')) return
+                    if (target.closest('[data-ignore-row-click]')) return
 
-                      router.push(`/leads/${lead.id}`)
-                    }}
-                  >
-                    <TableCell className="p-5 pl-[60px] whitespace-nowrap">
-                      <div className="flex flex-col gap-2">
-                        <strong className="text-sm font-bold text-[#1c1d21]">
-                          {lead.fullname}
-                        </strong>
-                        <span className="text-xs text-[#1c1d21] ">
-                          ID {lead.id}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <div className="flex flex-col gap-2">
-                        <span className="text-xs text-[#1c1d21] ">
-                          {lead.email}
-                        </span>
-                        <span className="text-xs text-[#1c1d21] ">
-                          {formatPhone(lead?.phone)}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center p-5 whitespace-nowrap">
+                    router.push(`/leads/${lead.id}`)
+                  }}
+                >
+                  <TableCell className="p-5 pl-[60px] whitespace-nowrap">
+                    <div className="flex flex-col gap-2">
+                      <strong className="text-sm font-bold text-[#1c1d21]">
+                        {lead.fullname}
+                      </strong>
                       <span className="text-xs text-[#1c1d21] ">
-                        {lead.age}
+                        ID {lead.id}
                       </span>
-                    </TableCell>
-
-                    <TableCell className="p-5 whitespace-nowrap">
+                    </div>
+                  </TableCell>
+                  <TableCell className="p-5 whitespace-nowrap">
+                    <div className="flex flex-col gap-2">
                       <span className="text-xs text-[#1c1d21] ">
-                        {lead?.interested_course ?? 'Não informado'}
+                        {lead.email}
                       </span>
-                    </TableCell>
-
-                    <TableCell className="p-5 whitespace-nowrap">
                       <span className="text-xs text-[#1c1d21] ">
-                        {lead.sexuality ?? 'Não informado'}
+                        {formatPhone(lead?.phone)}
                       </span>
-                    </TableCell>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center p-5 whitespace-nowrap">
+                    <span className="text-xs text-[#1c1d21] ">{lead.age}</span>
+                  </TableCell>
 
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {lead.gender ?? 'Não informado'}
-                      </span>
-                    </TableCell>
+                  <TableCell className="p-5 whitespace-nowrap">
+                    <span className="text-xs text-[#1c1d21] ">
+                      {lead?.interested_course ?? 'Não informado'}
+                    </span>
+                  </TableCell>
 
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {lead.skin_color ?? 'Não informado'}
-                      </span>
-                    </TableCell>
+                  <TableCell className="p-5 whitespace-nowrap">
+                    <span className="text-xs text-[#1c1d21] ">
+                      {lead.sexuality ?? 'Não informado'}
+                    </span>
+                  </TableCell>
 
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {lead.student_socioeconomic_data?.income_range ??
-                          'Não informado'}
-                      </span>
-                    </TableCell>
+                  <TableCell className="p-5 whitespace-nowrap">
+                    <span className="text-xs text-[#1c1d21] ">
+                      {lead.gender ?? 'Não informado'}
+                    </span>
+                  </TableCell>
 
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {lead.student_address?.community
-                          ? lead.student_address?.community
-                          : 'Não informado'}
-                      </span>
-                    </TableCell>
+                  <TableCell className="p-5 whitespace-nowrap">
+                    <span className="text-xs text-[#1c1d21] ">
+                      {lead.skin_color ?? 'Não informado'}
+                    </span>
+                  </TableCell>
 
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {lead.student_address?.address?.city ?? 'Não informado'}
-                      </span>
-                    </TableCell>
+                  <TableCell className="p-5 whitespace-nowrap">
+                    <span className="text-xs text-[#1c1d21] ">
+                      {lead.student_socioeconomic_data?.income_range ??
+                        'Não informado'}
+                    </span>
+                  </TableCell>
 
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {lead.student_address?.address?.state ??
-                          'Não informado'}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                ))
-              : !isLoading && (
-                  <TableRow>
-                    <TableCell colSpan={2} className="px-5 py-10 text-gray-500">
-                      <div>Nenhum aluno encontrado.</div>
-                    </TableCell>
-                  </TableRow>
-                )}
+                  <TableCell className="p-5 whitespace-nowrap">
+                    <span className="text-xs text-[#1c1d21] ">
+                      {lead.student_address?.community
+                        ? lead.student_address?.community
+                        : 'Não informado'}
+                    </span>
+                  </TableCell>
+
+                  <TableCell className="p-5 whitespace-nowrap">
+                    <span className="text-xs text-[#1c1d21] ">
+                      {lead.student_address?.address?.city ?? 'Não informado'}
+                    </span>
+                  </TableCell>
+
+                  <TableCell className="p-5 whitespace-nowrap">
+                    <span className="text-xs text-[#1c1d21] ">
+                      {lead.student_address?.address?.state ?? 'Não informado'}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : !isLoading ? (
+              <TableRow>
+                <TableCell colSpan={2} className="px-5 py-10 text-gray-500">
+                  <div>Nenhum aluno encontrado.</div>
+                </TableCell>
+              </TableRow>
+            ) : null}
 
             {isLoading && (
               <TableRow>

@@ -1,6 +1,5 @@
 'use client'
 
-import { toast } from 'sonner'
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
 
@@ -22,6 +21,7 @@ import {
 } from '@/components/ui/table'
 import { LIMIT_PER_PAGE, Pagination } from '@/components/pagination'
 import { ModalEditCourse } from './modal-edit-course'
+import { AlertError } from '@/components/alert-error'
 
 export function ListCourses() {
   const searchParams = useSearchParams()
@@ -31,21 +31,18 @@ export function ListCourses() {
     data: dataCourses,
     isLoading,
     isFetching,
+    error,
   } = useQuery({
     queryKey: ['get-courses', page],
     queryFn: async () =>
       getCourses({
         offset: (Number(page) - 1) * LIMIT_PER_PAGE,
-      }).then((res) => {
-        if (res.message) {
-          toast.error(res.message, { duration: 3000, position: 'top-center' })
-        }
-
-        return res
       }),
     refetchOnWindowFocus: true,
     staleTime: 1000 * 60 * 2,
     placeholderData: (data) => data,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(attempt * 1000, 5000),
   })
 
   return (
@@ -55,6 +52,8 @@ export function ListCourses() {
           <Button title="Adicionar" />
         </div>
       </div>
+
+      <AlertError errorMessage={error?.message} />
 
       <div className="overflow-hidden flex flex-col gap-2">
         <div className="overflow-auto">
