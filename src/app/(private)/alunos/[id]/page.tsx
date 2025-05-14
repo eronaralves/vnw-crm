@@ -16,6 +16,8 @@ export default async function StudentProfile(props: { params: Params }) {
     return redirect('/alunos')
   }
 
+  console.log(student, 'FFF')
+
   return (
     <div className="flex-1 h-full flex flex-col overflow-auto">
       <ContainerTabs student={student} />

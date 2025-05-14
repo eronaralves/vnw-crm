@@ -30,6 +30,7 @@ interface DatePickerProps {
   formatDate?: string
   isPickerYearDate?: boolean
   variant?: 'primary' | 'secondary'
+  className?: string
 }
 
 export function DatePicker({
@@ -40,6 +41,7 @@ export function DatePicker({
   isPickerYearDate = false,
   variant = 'primary',
   formatDate = 'dd-MM-yyyy',
+  className,
 }: DatePickerProps) {
   const [monthYearDate, setMonthYearDate] = useState<Date>(
     selected ?? new Date(),
@@ -61,6 +63,7 @@ export function DatePicker({
               'border-[#b1b3b5]  focus-within:border-[#caccce]',
             disabled &&
               'border-[#dddfe1] text-[#8181a5] bg-[#e9ecef] outline-none !opacity-100',
+            className,
           )}
         >
           {selected ? (
@@ -74,6 +77,7 @@ export function DatePicker({
           />
         </Button>
       </PopoverTrigger>
+
       <PopoverContent className="w-auto p-0 " align="start">
         {isPickerYearDate && (
           <div className="flex gap-2 ">
