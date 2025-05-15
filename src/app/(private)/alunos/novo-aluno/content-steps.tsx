@@ -191,7 +191,7 @@ export type ProfileNewStudent = {
 }
 
 export function ContentSteps() {
-  const [step, setStep] = useState(STEPS.PERSONAL)
+  const [step, setStep] = useState(STEPS.EMPREGABILITY)
 
   const schemaByStep: Record<STEPS, AnyObjectSchema> = {
     [STEPS.PERSONAL]: formPersonalSchema,
