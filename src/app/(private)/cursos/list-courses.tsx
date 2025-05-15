@@ -1,10 +1,12 @@
 'use client'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import Link from 'next/link'
+
+import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
 
 // Icons
-import { Loader2, PlusCircle, Trash } from 'lucide-react'
+import { Loader2, PlusCircle } from 'lucide-react'
 
 // Http
 import { getCourses } from '@/http/courses/get-courses'
@@ -22,12 +24,9 @@ import {
 import { LIMIT_PER_PAGE, Pagination } from '@/components/pagination'
 import { ModalEditCourse } from './modal-edit-course'
 import { AlertError } from '@/components/alert-error'
-import Link from 'next/link'
-import { deleteCourse } from '@/http/courses/delete-course'
-import { toast } from 'sonner'
+import { ButtonDelete } from './button-delete'
 
 export function ListCourses() {
-  const queryClient = useQueryClient()
   const searchParams = useSearchParams()
   const page = searchParams.get('page') ?? 1
 
@@ -48,25 +47,6 @@ export function ListCourses() {
     retry: 3,
     retryDelay: (attempt) => Math.min(attempt * 1000, 5000),
   })
-
-  const { mutate, isPending } = useMutation({
-    mutationFn: deleteCourse,
-    onSuccess: () => {
-      toast.success('Curso deletado com sucesso!', {
-        duration: 3000,
-        position: 'top-center',
-      })
-
-      queryClient.invalidateQueries({ queryKey: ['get-courses', page] })
-    },
-    onError: (error) => {
-      toast.error(error.message, { duration: 3000, position: 'top-center' })
-    },
-  })
-
-  function handleDeleteCourse(courseId: string) {
-    mutate(courseId)
-  }
 
   return (
     <div className="flex-1 flex flex-col gap-8 min-h-screen p-4 ">
@@ -224,14 +204,7 @@ export function ListCourses() {
                             <span className="text-xs">Modulos</span>
                           </button>
                           <ModalEditCourse course={course} />
-                          <button
-                            disabled={isPending}
-                            onClick={() => handleDeleteCourse(course.id)}
-                            className="flex flex-col items-center gap-1 cursor-pointer text-[#0f2b92]"
-                          >
-                            <Trash size={20} />
-                            <span className="text-xs">Deletar</span>
-                          </button>
+                          <ButtonDelete courseId={course.id} />
                         </div>
                       </TableCell>
                     </TableRow>
