@@ -24,7 +24,6 @@ export function StepProgressBar({
   return (
     <div className="w-full flex flex-col items-center gap-4 px-6">
       <div className="relative w-full flex items-center">
-        {/* Linha de fundo */}
         <div className="absolute top-6 left-0 w-full h-2.5 bg-[#5e81f419] rounded-full z-0 overflow-hidden">
           <div
             className="h-full bg-gradient-primary transition-all duration-500"
@@ -32,7 +31,6 @@ export function StepProgressBar({
           />
         </div>
 
-        {/* Etapas */}
         <div className="w-full flex justify-between relative z-10">
           {stepsLabel.map((label, index) => {
             const isCompleted = index < step
