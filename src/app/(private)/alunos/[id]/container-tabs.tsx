@@ -10,7 +10,7 @@ import { useForm, FormProvider } from 'react-hook-form'
 import { differenceInYears } from 'date-fns'
 
 // Icons
-import { GraduationCap, Pencil, Share } from 'lucide-react'
+import { Pencil, Share } from 'lucide-react'
 
 // Utils
 import { formatCpf } from '@/utils/format-cpf'
@@ -44,6 +44,7 @@ import {
   formSocioeconomicSchema,
   StepSocioeconomicData,
 } from '@/components/steps/step-socioeconomic-data'
+import { ButtonGraduatedStudents } from '@/components/button-graduated'
 
 interface ContentProfileProps {
   student: ProfileStudent
@@ -133,12 +134,15 @@ export function ContainerTabs({ student }: ContentProfileProps) {
             </Button>
             {student.status === 'Cursando' && (
               <>
-                <Button
-                  title="Formar"
-                  className="bg-emerald-600 hover:bg-emerald-500"
-                >
-                  <GraduationCap size={16} />
-                </Button>
+                <ButtonGraduatedStudents
+                  graduatedStudents={[
+                    {
+                      id_student: student.errolmentId,
+                    },
+                  ]}
+                  onSuccess={() => router.refresh()}
+                />
+
                 <ButtonFailStudents
                   studentsFaileds={[
                     {
@@ -148,6 +152,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
                   ]}
                   onSuccess={() => router.refresh()}
                 />
+
                 <ButtonEvadeStudents
                   studentEvaded={{
                     studentId: student.id,

@@ -61,6 +61,7 @@ import {
 import { ButtonFailStudents } from '@/components/button-fail-students'
 import { ButtonEvadeStudents } from '@/components/button-evade-students'
 import { AlertError } from '@/components/alert-error'
+import { ButtonGraduatedStudents } from '@/components/button-graduated'
 
 type Spreadsheet = {
   link: string
@@ -305,9 +306,10 @@ export function ListStudent({ status }: ListStudentProps) {
                 studentsFaileds={selectedStudents}
                 onSuccess={() => setSelectedStudents([])}
               />
-              <Button
-                title="Formar"
-                className="bg-emerald-600 hover:bg-emerald-500"
+
+              <ButtonGraduatedStudents
+                graduatedStudents={selectedStudents}
+                onSuccess={() => setSelectedStudents([])}
               />
             </>
           )}
