@@ -1,6 +1,6 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
 
 // Icons
@@ -22,8 +22,12 @@ import {
 import { LIMIT_PER_PAGE, Pagination } from '@/components/pagination'
 import { ModalEditCourse } from './modal-edit-course'
 import { AlertError } from '@/components/alert-error'
+import Link from 'next/link'
+import { deleteCourse } from '@/http/courses/delete-course'
+import { toast } from 'sonner'
 
 export function ListCourses() {
+  const queryClient = useQueryClient()
   const searchParams = useSearchParams()
   const page = searchParams.get('page') ?? 1
 
@@ -45,11 +49,32 @@ export function ListCourses() {
     retryDelay: (attempt) => Math.min(attempt * 1000, 5000),
   })
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: deleteCourse,
+    onSuccess: () => {
+      toast.success('Curso deletado com sucesso!', {
+        duration: 3000,
+        position: 'top-center',
+      })
+
+      queryClient.invalidateQueries({ queryKey: ['get-courses', page] })
+    },
+    onError: (error) => {
+      toast.error(error.message, { duration: 3000, position: 'top-center' })
+    },
+  })
+
+  function handleDeleteCourse(courseId: string) {
+    mutate(courseId)
+  }
+
   return (
     <div className="flex-1 flex flex-col gap-8 min-h-screen p-4 ">
       <div className="w-full flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button title="Adicionar" />
+          <Link href="/cursos/novo-curso">
+            <Button title="Adicionar" />
+          </Link>
         </div>
       </div>
 
@@ -200,8 +225,9 @@ export function ListCourses() {
                           </button>
                           <ModalEditCourse course={course} />
                           <button
-                            disabled
-                            className="flex flex-col items-center gap-1 cursor-pointer text-gray-400 disabled:cursor-not-allowed"
+                            disabled={isPending}
+                            onClick={() => handleDeleteCourse(course.id)}
+                            className="flex flex-col items-center gap-1 cursor-pointer text-[#0f2b92]"
                           >
                             <Trash size={20} />
                             <span className="text-xs">Deletar</span>

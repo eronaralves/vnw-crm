@@ -8,12 +8,17 @@ import Logo from '@/assets/images/logo.svg'
 import { FormSignIn } from './form-sign-in'
 import { ContainerLayoutAuth } from '@/components/container-layout-auth'
 
-export default async function SignIn() {
+export default function SignIn() {
   return (
     <ContainerLayoutAuth background={BackgroundLogin}>
       <div className="flex-1 flex flex-col justify-center items-center px-4 md:px-8 py-8">
         <div className="w-full max-w-[500px] flex flex-col justify-center">
-          <Image src={Logo} alt="Logo Vai na Web" className="mx-auto mb-15" />
+          <Image
+            src={Logo}
+            alt="Logo Vai na Web"
+            className="mx-auto mb-15"
+            priority
+          />
 
           <h1 className="text-xl lg:text-3xl font-bold mb-4">
             Bem-vindo ao nosso CRM. Entre para ver as atualizações mais

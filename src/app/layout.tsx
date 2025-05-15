@@ -22,12 +22,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-br">
+    <html lang="pt-BR">
       <body
         className={`${geistSans.className} bg-[#F5F5FA] antialiased overflow-hidden`}
       >
-        <Toaster richColors />
-        <QueryClientProvider>{children}</QueryClientProvider>
+        <QueryClientProvider>
+          <Toaster richColors />
+          {children}
+        </QueryClientProvider>
       </body>
     </html>
   )

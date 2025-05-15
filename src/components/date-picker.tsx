@@ -31,6 +31,7 @@ interface DatePickerProps {
   isPickerYearDate?: boolean
   variant?: 'primary' | 'secondary'
   className?: string
+  placeholder?: string
 }
 
 export function DatePicker({
@@ -42,6 +43,7 @@ export function DatePicker({
   variant = 'primary',
   formatDate = 'dd-MM-yyyy',
   className,
+  placeholder = 'Selecione a data',
 }: DatePickerProps) {
   const [monthYearDate, setMonthYearDate] = useState<Date>(
     selected ?? new Date(),
@@ -58,7 +60,7 @@ export function DatePicker({
           variant={'outline'}
           disabled={disabled}
           className={cn(
-            'w-max h-auto text-sm pacity-100 text-gray-900 outline-none justify-start text-left font-normal rounded-none border border-[#0f2b92] hover:bg-white',
+            'w-max flex-1 h-auto bg-transparent text-sm pacity-100 text-gray-900 outline-none justify-start text-left font-normal rounded-none border border-[#0f2b92] ',
             variant === 'secondary' &&
               'border-[#b1b3b5]  focus-within:border-[#caccce]',
             disabled &&
@@ -69,7 +71,7 @@ export function DatePicker({
           {selected ? (
             format(dateInUtc, formatDate)
           ) : (
-            <span className="text-[#8181a5]">Selecione a data</span>
+            <span className="text-[#8181a5]">{placeholder}</span>
           )}
           <CalendarIcon
             className="ml-auto"

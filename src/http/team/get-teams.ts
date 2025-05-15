@@ -22,7 +22,7 @@ interface GetTeamsRequest {
   limit?: number
 }
 
-export async function getTeams({ limit, offset }: GetTeamsRequest) {
+export async function getTeams({ limit = 100, offset }: GetTeamsRequest) {
   try {
     const response = await api.get('/employee', {
       params: {

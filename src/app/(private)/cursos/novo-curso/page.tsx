@@ -1,16 +1,16 @@
 import { FormCourse } from './form-course'
 import { Suspense } from 'react'
 
-export default function NewCourse() {
+export default async function NewCourse() {
   return (
-    <div className="h-screen flex flex-col overflow-auto p-4">
-      <div>
-        <h1>Criar Novo Curso</h1>
-      </div>
+    <div className="w-full max-w-7xl xl:mx-auto flex flex-col gap-8 h-screen overflow-hidden">
+      <div className="h-full flex flex-col gap-5 p-4 pt-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Novo Curso</h1>
 
-      <Suspense>
-        <FormCourse />
-      </Suspense>
+        <Suspense>
+          <FormCourse />
+        </Suspense>
+      </div>
     </div>
   )
 }
