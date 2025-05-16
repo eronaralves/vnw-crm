@@ -50,6 +50,7 @@ export function ButtonGraduatedStudents({
       )
 
       setOpenModal(false)
+      onSuccess()
     },
     onError: (error) => {
       toast.error(error.message, {
@@ -66,13 +67,9 @@ export function ButtonGraduatedStudents({
       }
     })
 
-    console.log()
-
     graduetedStudentsMutate({
       graduatedStudents: graduatedStudentsData,
     })
-
-    onSuccess()
   }
 
   return (

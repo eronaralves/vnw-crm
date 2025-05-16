@@ -137,7 +137,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
                 <ButtonGraduatedStudents
                   graduatedStudents={[
                     {
-                      id_student: student.errolmentId,
+                      enrollmentId: student.errolmentId,
                     },
                   ]}
                   onSuccess={() => router.refresh()}

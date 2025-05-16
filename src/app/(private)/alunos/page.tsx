@@ -9,12 +9,11 @@ import { FormSearch } from '../../../components/form-search'
 import { Tabs } from '@/components/ui/tabs'
 import { TabsFilters } from './tabs-filter'
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
+type SearchParams = Promise<{ status: STATUS_STUDENT }>
 
 export default async function Students(props: { searchParams: SearchParams }) {
   const searchParams = await props.searchParams
-  const status: STATUS_STUDENT =
-    (searchParams.status as STATUS_STUDENT) ?? 'Cursando'
+  const status = searchParams.status ?? 'Cursando'
 
   return (
     <div className="flex-1 h-full flex flex-col p-4 overflow-auto">

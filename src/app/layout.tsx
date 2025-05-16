@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'sonner'
-import QueryClientProvider from '@/providers/query-client-provider'
+import { ReactQueryProvider } from '@/providers/query-client-provider'
 
 const geistSans = Inter({
   subsets: ['latin'],
@@ -26,10 +26,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.className} bg-[#F5F5FA] antialiased overflow-hidden`}
       >
-        <QueryClientProvider>
+        <ReactQueryProvider>
           <Toaster richColors />
           {children}
-        </QueryClientProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   )
