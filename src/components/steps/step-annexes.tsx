@@ -1,21 +1,32 @@
 'use client'
 
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useDropzone } from 'react-dropzone'
-
 import * as yup from 'yup'
 
+import { useFormContext } from 'react-hook-form'
+import { toast } from 'sonner'
+
 // Icons
-import { Upload, Trash2, ImagePlus } from 'lucide-react'
+import { Upload, Trash2, ImagePlus, Loader2 } from 'lucide-react'
+
+// Utils
+import { AppError } from '@/utils/app-error'
+
+// Http
+import { deleteDocument } from '@/http/documents/delete-document'
+import { registerDocuments } from '@/http/documents/register-documents'
 
 // Components
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { useFormContext } from 'react-hook-form'
 
-type FileUpload = File & {
-  document?: string
-}
+type FileUpload =
+  | File
+  | {
+      id: string
+      document: string
+    }
 
 export const formAnnexesSchema = yup.object({
   documents: yup.array().of(yup.mixed<FileUpload>()),
@@ -24,36 +35,99 @@ export const formAnnexesSchema = yup.object({
 export type FormAnnexesType = yup.InferType<typeof formAnnexesSchema>
 
 interface StepAnnexesProps {
+  studentId?: string
   isEditing?: boolean
 }
 
-export function StepAnnexes({ isEditing = true }: StepAnnexesProps) {
-  const { setValue, watch } = useFormContext<FormAnnexesType>()
+export function StepAnnexes({ studentId, isEditing = true }: StepAnnexesProps) {
+  const { watch } = useFormContext<FormAnnexesType>()
   const watchDocuments = watch('documents') as FileUpload[]
 
-  const [files, setFiles] = useState<FileUpload[]>([])
-  const [profileImage, setProfileImage] = useState<FileUpload | null>(null)
+  const [files, setFiles] = useState<FileUpload[]>(watchDocuments)
+  const [profileImage, setProfileImage] = useState<File | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [removingFileIds, setRemovingFileIds] = useState<string[]>([])
 
   const onDropFiles = useCallback(
-    (accepted: FileUpload[]) => {
-      const filesUpload = [...files, ...accepted]
+    async (accepted: File[]) => {
+      if (studentId) {
+        setIsUploading(true)
+        setUploadProgress(0)
 
-      setValue('documents', filesUpload, { shouldValidate: true })
+        for (let i = 0; i < accepted.length; i++) {
+          const fileAccepted = accepted[i]
+          try {
+            const formData = new FormData()
+            formData.append('document', fileAccepted)
+            formData.append('students', studentId)
+
+            const { file } = await registerDocuments(formData)
+
+            setFiles((prev) => [
+              ...prev,
+              { id: file.id, document: file.document },
+            ])
+
+            setUploadProgress(Math.round(((i + 1) / accepted.length) * 100))
+          } catch (error) {
+            toast.error(`Erro ao enviar ${fileAccepted.name}`, {
+              duration: 3000,
+              position: 'top-center',
+            })
+          }
+        }
+
+        setIsUploading(false)
+      } else {
+        setFiles((prev) => [...prev, ...accepted])
+      }
     },
-    [files, setValue],
+    [studentId],
   )
 
   const refInputProfileImage = useRef<HTMLInputElement | null>(null)
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: onDropFiles,
     multiple: true,
-    disabled: !isEditing,
+    disabled: !isEditing || isUploading,
   })
 
-  function handleRemoveFile(index: number) {
-    const removeFile = files.filter((_, i) => i !== index)
+  async function handleRemoveFile(fileIdOrName: string) {
+    const file = files.find((f) =>
+      f instanceof File ? f.name === fileIdOrName : f.id === fileIdOrName,
+    )!
 
-    setValue('documents', removeFile, { shouldValidate: true })
+    if (!(file instanceof File)) {
+      setRemovingFileIds((prev) => [...prev, fileIdOrName])
+
+      try {
+        await deleteDocument({ fileId: file.id })
+        setFiles((prev) =>
+          prev.filter((f) =>
+            f instanceof File ? f.name !== fileIdOrName : f.id !== fileIdOrName,
+          ),
+        )
+      } catch (error) {
+        const isAppError = error instanceof AppError
+        const errorMessage = isAppError
+          ? error.detail
+          : 'Erro ao deletar documento, tente novamente!'
+
+        toast.error(errorMessage, {
+          duration: 3000,
+          position: 'top-center',
+        })
+      } finally {
+        setRemovingFileIds((prev) => prev.filter((id) => id !== fileIdOrName))
+      }
+    } else {
+      setFiles((prev) =>
+        prev.filter((f) =>
+          f instanceof File ? f.name !== fileIdOrName : f.id !== fileIdOrName,
+        ),
+      )
+    }
   }
 
   function handleProfileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -70,18 +144,14 @@ export function StepAnnexes({ isEditing = true }: StepAnnexesProps) {
     setProfileImage(null)
   }
 
-  useEffect(() => {
-    setFiles(watchDocuments ?? [])
-  }, [watchDocuments])
-
   return (
-    <div className="w-full h-full flex-1 flex flex-wrap sm:flex-nowrap gap-6 overflow-hidden ">
+    <div className="w-full h-full flex-1 flex flex-wrap sm:flex-nowrap gap-6 overflow-hidden">
       <div className="w-full max-w-[400px] flex flex-col space-y-4">
         <div className="w-full">
           <div className="flex flex-col gap-2">
             <span
               onClick={() => isEditing && refInputProfileImage.current?.click()}
-              className="text-sm font-medium"
+              className="text-sm font-medium cursor-pointer"
             >
               Foto de perfil
             </span>
@@ -137,7 +207,7 @@ export function StepAnnexes({ isEditing = true }: StepAnnexesProps) {
 
           {files?.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              Nenhum arquivo selecionasdo
+              Nenhum arquivo selecionado
             </p>
           ) : (
             <ul className="flex-1 h-full space-y-2">
@@ -148,26 +218,40 @@ export function StepAnnexes({ isEditing = true }: StepAnnexesProps) {
                 >
                   <a
                     href={
-                      file.document ? file.document : URL.createObjectURL(file)
+                      file instanceof File
+                        ? URL.createObjectURL(file)
+                        : file.document
                     }
                     target="_blank"
                     rel="noopener noreferrer"
                     className="truncate hover:underline"
                   >
-                    {file.document
-                      ? file.document.split('documents/')[1]
-                      : file.name}
+                    {file instanceof File
+                      ? file.name
+                      : file.document
+                          ?.split('documents/')[1]
+                          .replace(/_[^_]+\.(\w+)$/, '.$1')}
                   </a>
 
                   <Button
                     size="icon"
                     type="button"
                     variant="ghost"
-                    onClick={() => handleRemoveFile(index)}
+                    onClick={() =>
+                      handleRemoveFile(
+                        file instanceof File ? file.name : file.id,
+                      )
+                    }
                     className="cursor-pointer"
                     disabled={!isEditing}
                   >
-                    <Trash2 className="w-4 h-4 text-destructive" />
+                    {removingFileIds.includes(
+                      file instanceof File ? file.name : file.id,
+                    ) ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="w-4 h-4 text-destructive" />
+                    )}
                   </Button>
                 </li>
               ))}
@@ -191,6 +275,20 @@ export function StepAnnexes({ isEditing = true }: StepAnnexesProps) {
             </p>
           </div>
         </Card>
+
+        {isUploading && (
+          <div className="w-full max-w-lg mt-4">
+            <div className="relative w-full h-2 bg-gray-200 rounded">
+              <div
+                className="absolute top-0 left-0 h-2 bg-blue-500 rounded transition-all duration-300"
+                style={{ width: `${uploadProgress}%` }}
+              ></div>
+            </div>
+            <p className="text-sm text-gray-600 mt-1 text-center">
+              {uploadProgress}%
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )

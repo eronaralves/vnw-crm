@@ -104,7 +104,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
 
-  const { mutateAsync: editStudentMutate, isPending } = useMutation({
+  const { mutate: editStudentMutate, isPending } = useMutation({
     mutationFn: editStudent,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['get-students'] })
@@ -239,19 +239,13 @@ export function ContainerTabs({ student }: ContentProfileProps) {
         programming_languages:
           data.student_tecnology.programming_languages ?? null,
       },
-      under_age: data.age < 18,
+      under_age: age < 18,
     }
 
-    console.log(studentDataToEdit)
-
-    const results = await Promise.allSettled([
-      editStudentMutate({
-        studentId: student.id,
-        formData: studentDataToEdit,
-      }),
-    ])
-
-    console.log(results)
+    editStudentMutate({
+      studentId: student.id,
+      formData: studentDataToEdit,
+    })
   }
 
   return (
@@ -275,7 +269,6 @@ export function ContainerTabs({ student }: ContentProfileProps) {
               type="button"
               title={isEditing ? 'Resetar' : 'Editar'}
               onClick={() => {
-                methods.reset()
                 setIsEditing(!isEditing)
               }}
               className="flex items-center gap-1"
@@ -419,7 +412,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
               value={TABS.ANNEXES}
               className="flex-1 overflow-auto p-6 bg-white"
             >
-              <StepAnnexes isEditing={isEditing} />
+              <StepAnnexes studentId={student.id} isEditing={isEditing} />
             </TabsContent>
           </Tabs>
         </div>

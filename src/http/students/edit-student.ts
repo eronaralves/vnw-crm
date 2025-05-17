@@ -105,7 +105,7 @@ interface EditStudentRequest {
 
 export async function editStudent({ studentId, formData }: EditStudentRequest) {
   try {
-    await api.patch(`/studendsadsts/${studentId}/`, formData)
+    await api.patch(`/students/${studentId}/`, formData)
   } catch (error) {
     const isAppError = error instanceof AppError
     const errorMessage = isAppError

@@ -54,8 +54,6 @@ export function ListTeam() {
     retryDelay: (attempt) => Math.min(attempt * 1000, 5000),
   })
 
-  console.log(dataTeam?.data)
-
   return (
     <div className="flex flex-col gap-10 h-screen p-4 ">
       <div className="flex flex-col gap-6">
