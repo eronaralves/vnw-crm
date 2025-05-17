@@ -70,7 +70,6 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
     watch,
     control,
     setValue,
-    reset,
     formState: { errors, isSubmitted },
   } = useForm<EditTeamType>({
     resolver: zodResolver(editCourseSchema),
@@ -110,7 +109,6 @@ export function ModalEditTeam({ team }: ModalEditCourseProps) {
   })
   function onOpenChange(open: boolean) {
     setOpenModal(open)
-    reset()
   }
 
   function onChangePicture(event: ChangeEvent<HTMLInputElement>) {

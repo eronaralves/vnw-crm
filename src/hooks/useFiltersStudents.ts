@@ -3,7 +3,7 @@ import { useSearchParams } from 'next/navigation'
 export function useFiltersStudents() {
   const searchParams = useSearchParams()
 
-  const page = searchParams.get('page') ?? 1
+  const page = searchParams.get('page') ?? '1'
   const city = searchParams.getAll('city')
   const work = searchParams.getAll('work') ?? []
   const search = searchParams.get('search')

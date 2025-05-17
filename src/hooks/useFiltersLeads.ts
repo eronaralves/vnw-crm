@@ -3,7 +3,7 @@ import { useSearchParams } from 'next/navigation'
 export function useFiltersLeads() {
   const searchParams = useSearchParams()
 
-  const page = searchParams.get('page') ?? 1
+  const page = searchParams.get('page') ?? '1'
   const cityIn = searchParams.getAll('city_in')
   const search = searchParams.get('search')
   const stateIn = searchParams.getAll('state_in')

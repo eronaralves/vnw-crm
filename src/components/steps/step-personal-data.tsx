@@ -40,17 +40,16 @@ export const formPersonalSchema = yup.object({
   skin_color: yup.string(),
   gender: yup.string(),
   sexuality: yup.string(),
-  student_responsible: yup
-    .object({
-      fullname: yup.string(),
-      relation: yup.string(),
-      cpf: yup.string(),
-      rg: yup.string(),
-      emitter: yup.string(),
-      phone: yup.string(),
-      email: yup.string().email(),
-    })
-    .nullable(),
+  student_responsible: yup.object({
+    fullname: yup.string().nullable(),
+    relation: yup.string().nullable(),
+    cpf: yup.string().nullable(),
+    rg: yup.string().nullable(),
+    emitter: yup.string().nullable(),
+    phone: yup.string().nullable(),
+    email: yup.string().email().nullable(),
+  }),
+  // .nullable(),
   student_address: yup.object({
     address: yup.object({
       postal_code: yup.string(),
@@ -63,6 +62,9 @@ export const formPersonalSchema = yup.object({
     }),
     community: yup.string(),
     notes: yup.string(),
+  }),
+  student_empregability: yup.object({
+    linkedin: yup.string().url('Digite uma url válida'),
   }),
 })
 
@@ -221,6 +223,21 @@ export function StepPersonalData({ isEditing = true }: StepPersonalDataProps) {
             disabled={!isEditing}
             {...register('father_name')}
           />
+        </div>
+
+        <div className="w-full max-w-80 flex flex-col gap-1">
+          <label className="text-sm font-normal">Linkedin</label>
+          <Input
+            variant="secondary"
+            disabled={!isEditing}
+            {...register('student_empregability.linkedin')}
+          />
+
+          {errors.student_empregability?.linkedin && (
+            <span className="text-xs text-red-500">
+              {errors.student_empregability.linkedin.message}
+            </span>
+          )}
         </div>
       </div>
 

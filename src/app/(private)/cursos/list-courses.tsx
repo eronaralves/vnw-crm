@@ -28,7 +28,7 @@ import { ButtonDelete } from './button-delete'
 
 export function ListCourses() {
   const searchParams = useSearchParams()
-  const page = searchParams.get('page') ?? 1
+  const page = searchParams.get('page') ?? '1'
 
   const {
     data: dataCourses,

@@ -155,7 +155,9 @@ export const formEmpregabilitySchema = yup.object({
   }),
 })
 
-type FormEmpregabilityType = yup.InferType<typeof formEmpregabilitySchema>
+export type FormEmpregabilityType = yup.InferType<
+  typeof formEmpregabilitySchema
+>
 
 interface StepEmpregabilityProps {
   isEditing?: boolean
@@ -524,7 +526,7 @@ export function StepEmpregability({
                   )}
                 </div>
 
-                <div className="w-full flex flex-wrap gap-x-4 gap-y-6">
+                <div className="w-full flex items-start flex-wrap gap-x-4 gap-y-6">
                   <div className="flex flex-col gap-1">
                     <label className="text-sm">É uma empresa parceira?</label>
 

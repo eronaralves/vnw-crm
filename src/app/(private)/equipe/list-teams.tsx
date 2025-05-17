@@ -33,7 +33,7 @@ import { AlertError } from '@/components/alert-error'
 
 export function ListTeam() {
   const searchParams = useSearchParams()
-  const page = searchParams.get('page') ?? 1
+  const page = searchParams.get('page') ?? '1'
 
   const {
     data: dataTeam,
@@ -53,6 +53,8 @@ export function ListTeam() {
     retry: 3,
     retryDelay: (attempt) => Math.min(attempt * 1000, 5000),
   })
+
+  console.log(dataTeam?.data)
 
   return (
     <div className="flex flex-col gap-10 h-screen p-4 ">

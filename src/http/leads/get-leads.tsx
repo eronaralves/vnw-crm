@@ -18,7 +18,7 @@ export type Filters = {
   search?: string | null
 }
 
-interface GetStudentsRequest {
+interface GetLeadsRequest {
   offset?: number
   limit?: number
   filters?: Filters
@@ -64,7 +64,7 @@ export async function getLeads({
   offset = 0,
   limit = 7,
   filters,
-}: GetStudentsRequest) {
+}: GetLeadsRequest) {
   try {
     const response = await api.get('/students/leads/filter/', {
       params: {

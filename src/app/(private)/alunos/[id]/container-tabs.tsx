@@ -7,7 +7,7 @@ import { UTCDate } from '@date-fns/utc'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, FormProvider } from 'react-hook-form'
-import { differenceInYears } from 'date-fns'
+import { differenceInYears, format } from 'date-fns'
 
 // Icons
 import { Pencil, Share } from 'lucide-react'
@@ -45,6 +45,10 @@ import {
   StepSocioeconomicData,
 } from '@/components/steps/step-socioeconomic-data'
 import { ButtonGraduatedStudents } from '@/components/button-graduated'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { editStudent, type StudentToEdit } from '@/http/students/edit-student'
+import { toast } from 'sonner'
+import { dateDiff } from '@/utils/date-diff'
 
 interface ContentProfileProps {
   student: ProfileStudent
@@ -98,19 +102,164 @@ export function ContainerTabs({ student }: ContentProfileProps) {
   })
 
   const router = useRouter()
+  const queryClient = useQueryClient()
+
+  const { mutateAsync: editStudentMutate, isPending } = useMutation({
+    mutationFn: editStudent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['get-students'] })
+
+      toast.success('Dados editado com sucesso, tente novamente!', {
+        duration: 3000,
+        position: 'top-center',
+      })
+
+      router.refresh()
+      setIsEditing(false)
+    },
+    onError: (error) => {
+      toast.error(error.message, { duration: 3000, position: 'top-center' })
+      setIsEditing(false)
+    },
+  })
 
   async function onChangeTab(value: TABS) {
     setTabCurrent(value as TABS)
   }
 
-  function onSubmit(data: ProfileStudent) {
-    console.log(data)
-    setIsEditing(false)
+  async function onSubmit(data: ProfileStudent) {
+    const age = dateDiff({
+      from: new UTCDate(data.birth_date),
+      to: new UTCDate(),
+    })
+
+    const studentDataToEdit: StudentToEdit = {
+      age,
+      birth_date: format(new UTCDate(data.birth_date), 'yyyy-MM-dd'),
+      cpf: data.cpf,
+      email: data.email,
+      emergency_kinship: data.emergency_kinship,
+      emergency_name: data.emergency_name,
+      emergency_phone: data.emergency_phone,
+      emitter: data.emitter,
+      father_name: data.father_name,
+      fullname: data.fullname,
+      gender: data.gender,
+      hometown: data.hometown ?? null,
+      hometown_state: data.hometown_state ?? null,
+      interested_modality: data.interested_modality ?? undefined,
+      marital_status: data.marital_status,
+      modality: data.modality ?? null,
+      mother_name: data.mother_name,
+      phone: data.phone,
+      reason_give_up: data.reason_give_up ?? null,
+      religion: data.religion ?? null,
+      rg: data.rg,
+      sexuality: data.sexuality,
+      skin_color: data.skin_color,
+      social_name: data.social_name,
+      student_address: {
+        ...data.student_address,
+        address: {
+          postal_code: data.student_address.address.postal_code ?? '',
+          street: data.student_address.address.street,
+          number: data.student_address.address.number,
+          adjunct: data.student_address.address.adjunct,
+          district: data.student_address.address.district,
+          city: data.student_address.address.city,
+          state: data.student_address.address.state,
+        },
+        community: data.student_address.community ?? '',
+        notes: data.student_address.notes ?? '',
+      },
+      student_empregability: {
+        ...data.student_empregability,
+        start_date: format(data.student_empregability.start_date, 'yyyy-MM-dd'),
+        end_date: data.student_empregability.end_date
+          ? format(data.student_empregability.end_date, 'yyyy-MM-dd')
+          : null,
+
+        currently_studying: data.student_empregability.currently_studying,
+        enterprise_name: data.student_empregability.enterprise_name ?? '',
+        intend_study: data.student_empregability.intend_study ?? undefined,
+        last_grade: data.student_empregability.last_grade ?? '',
+        last_work_modality:
+          data.student_empregability.last_work_modality ?? null,
+        last_work_role: data.student_empregability.last_work_role,
+        last_year_job: data.student_empregability.last_year_job ?? null,
+        level_language: data.student_empregability.level_language,
+        linkedin: data.student_empregability.linkedin,
+        motive_intend_study:
+          data.student_empregability.motive_intend_study ?? '',
+        other_language: data.student_empregability.other_language,
+        partner_empress: data.student_empregability.partner_empress,
+        study: data.student_empregability.study,
+        study_modality: data.student_empregability.study_modality ?? null,
+        wich_language: data.student_empregability.wich_language,
+        work: data.student_empregability.work,
+        work_modality: data.student_empregability.work_modality,
+        work_role: data.student_empregability.work_role,
+        work_type: data.student_empregability.work_type,
+        years_worked: data.student_empregability.years_worked ?? null,
+      },
+      student_responsible: {
+        cpf: data.student_responsible.cpf ?? null,
+        email: data.student_responsible.email ?? null,
+        emitter: data.student_responsible.emitter ?? null,
+        fullname: data.student_responsible.fullname ?? null,
+        phone: data.student_responsible.phone ?? null,
+        relation: data.student_responsible.relation ?? null,
+        rg: data.student_responsible.rg ?? null,
+      },
+      student_socioeconomic_data: {
+        ...data.student_socioeconomic_data,
+        chronic_diseases:
+          String(data.student_socioeconomic_data.chronic_diseases) ?? null,
+        family_income: data.student_socioeconomic_data.family_income,
+        government_benefit:
+          data.student_socioeconomic_data.government_benefit ?? null,
+        have_children: data.student_socioeconomic_data.have_children,
+        home_condition: data.student_socioeconomic_data.home_condition,
+        home_type: data.student_socioeconomic_data.home_type,
+        housemates: data.student_socioeconomic_data.housemates
+          ? parseInt(data.student_socioeconomic_data.housemates)
+          : null,
+        income_range: data.student_socioeconomic_data.income_range,
+        live_with_pwd: data.student_socioeconomic_data.live_with_pwd,
+        main_income: data.student_socioeconomic_data.main_income,
+      },
+      student_tecnology: {
+        ...data.student_tecnology,
+        computer_type: data.student_tecnology.computer_type,
+        have_computer: data.student_tecnology.have_computer,
+        have_internet: data.student_tecnology.have_internet,
+        internet_speed: data.student_tecnology.internet_speed ?? null,
+        internet_type: data.student_tecnology.internet_type ?? null,
+        previous_experience: data.student_tecnology.previous_experience,
+        programming_languages:
+          data.student_tecnology.programming_languages ?? null,
+      },
+      under_age: data.age < 18,
+    }
+
+    console.log(studentDataToEdit)
+
+    const results = await Promise.allSettled([
+      editStudentMutate({
+        studentId: student.id,
+        formData: studentDataToEdit,
+      }),
+    ])
+
+    console.log(results)
   }
 
   return (
     <FormProvider {...methods}>
-      <div className="h-full flex flex-col p-4">
+      <form
+        onSubmit={methods.handleSubmit(onSubmit)}
+        className="h-full flex flex-col p-4"
+      >
         <div className="flex items-center gap-8 flex-wrap mt-2 mb-4">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
             <div>
@@ -123,6 +272,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
 
           <div className="flex flex-wrap gap-x-2 gap-y-4">
             <Button
+              type="button"
               title={isEditing ? 'Resetar' : 'Editar'}
               onClick={() => {
                 methods.reset()
@@ -172,10 +322,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
           </div>
         </div>
 
-        <form
-          onSubmit={methods.handleSubmit(onSubmit)}
-          className="flex-1 flex flex-col space-y-6 overflow-hidden"
-        >
+        <div className="flex-1 flex flex-col space-y-6 overflow-hidden">
           <Tabs
             value={tabCurrent}
             onValueChange={(value) => onChangeTab(value as TABS)}
@@ -275,7 +422,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
               <StepAnnexes isEditing={isEditing} />
             </TabsContent>
           </Tabs>
-        </form>
+        </div>
 
         <div>
           <hr className="w-full min-h-[8px] bg-gradient-primary" />
@@ -288,14 +435,14 @@ export function ContainerTabs({ student }: ContentProfileProps) {
             />
 
             <Button
-              type="button"
-              disabled={!isEditing}
-              onClick={methods.handleSubmit(onSubmit)}
+              type="submit"
+              disabled={!isEditing || isPending}
+              isPending={isPending}
               title="Salvar"
             />
           </div>
         </div>
-      </div>
+      </form>
     </FormProvider>
   )
 }

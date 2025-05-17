@@ -204,7 +204,7 @@ export function StepTechnology({ isEditing = true }: StepTechnologyProps) {
                         Compartilhado
                       </SelectItem>
                       <SelectItem value="Emprestado">Emprestado</SelectItem>
-                      <SelectItem value="trabalho">Do trabalho</SelectItem>
+                      <SelectItem value="Do trabalho">Do trabalho</SelectItem>
                     </SelectContent>
                   </Select>
                 )}

@@ -39,6 +39,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { DatePicker } from '@/components/date-picker'
+import { useSearchParams } from 'next/navigation'
 
 interface ModalEditCourseProps {
   course: Course
@@ -69,6 +70,9 @@ type EditCourseType = z.infer<typeof editCourseSchema>
 export function ModalEditCourse({ course }: ModalEditCourseProps) {
   const [openModal, setOpenModal] = useState(false)
 
+  const searchParams = useSearchParams()
+  const page = searchParams.get('page') ?? '1'
+
   const {
     register,
     handleSubmit,
@@ -88,13 +92,13 @@ export function ModalEditCourse({ course }: ModalEditCourseProps) {
   })
 
   const { data: dataPartners, isLoading: loadingPartners } = useQuery({
-    queryKey: ['get-partners'],
+    queryKey: ['get-partners', page],
     queryFn: async () => getPartners(),
     enabled: openModal,
   })
 
   const { data: teams, isLoading: loadingTeams } = useQuery({
-    queryKey: ['get-teams'],
+    queryKey: ['get-teams', page],
     queryFn: async () => getTeams({}),
     enabled: openModal,
   })

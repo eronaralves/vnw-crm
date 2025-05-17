@@ -168,7 +168,8 @@ export function ListStudent({ status }: ListStudentProps) {
       }),
 
     refetchOnWindowFocus: true,
-    staleTime: 1000 * 60 * 2,
+    refetchInterval: 1000 * 30, // 30s
+    staleTime: 1000 * 30, // 30s
     placeholderData: (data) => data,
     retry: 3,
     retryDelay: (attempt) => Math.min(attempt * 1000, 5000),

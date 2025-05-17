@@ -25,7 +25,7 @@ import { AlertError } from '@/components/alert-error'
 
 export function ListPartners() {
   const searchParams = useSearchParams()
-  const page = searchParams.get('page') ?? 1
+  const page = searchParams.get('page') ?? '1'
 
   const {
     data: dataPartner,

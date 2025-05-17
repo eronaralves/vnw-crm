@@ -26,7 +26,7 @@ import { AlertError } from '@/components/alert-error'
 
 export function ListAdmins() {
   const searchParams = useSearchParams()
-  const page = searchParams.get('page') ?? 1
+  const page = searchParams.get('page') ?? '1'
 
   const {
     data: dataAdmin,

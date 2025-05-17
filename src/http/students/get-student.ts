@@ -16,12 +16,12 @@ export type ProfileStudent = {
 
   cpf: string
   created_at: string
-  documents: unknown[]
+  documents: File[]
 
   email: string
-  emergency_kinship: string | null
-  emergency_name: string | null
-  emergency_phone: string | null
+  emergency_kinship: string
+  emergency_name: string
+  emergency_phone: string
 
   emitter: string
   father_name: string
@@ -89,7 +89,7 @@ export type ProfileStudent = {
 
   student_address: {
     address: {
-      postal_code: string | null
+      postal_code: string
       street: string
       number: string
       adjunct: string
@@ -97,9 +97,9 @@ export type ProfileStudent = {
       district: string
       state: string
     }
-    community: string | null
+    community: string
     id: string
-    notes: string | null
+    notes: string
   }
 
   student_tecnology: {
@@ -127,21 +127,21 @@ export type ProfileStudent = {
     years_worked: string
     study: boolean
     study_modality: string
-    currently_studying: string | null
+    currently_studying: string
     other_language: boolean
     wich_language: string
     level_language: string
-    last_grade: string | null
-    motive_stop_study: string | null
+    last_grade: string
+    motive_stop_study: string
     intend_study: boolean
-    motive_intend_study: string | null
+    motive_intend_study: string
     interest_area: string
-    enterprise_name: string | null
+    enterprise_name: string
     partner_empress: boolean
     situation: string | null
-    linkedin: string | null
-    recruitment_channel: string | null
-    last_enterprise_name: string | null
+    linkedin: string
+    recruitment_channel: string
+    last_enterprise_name: string
     start_date: Date
     end_date: Date
     created_at: string

@@ -20,7 +20,7 @@ export const formSocioeconomicSchema = yup.object({
     main_income: yup.string(),
     income_range: yup.string(),
     government_benefit: yup.string(),
-    chronic_diseases: yup.boolean(),
+    chronic_diseases: yup.string(),
     live_with_pwd: yup.boolean(),
   }),
 })
@@ -159,9 +159,7 @@ export function StepSocioeconomicData({
         </div>
 
         <div className="w-full sm:w-52 flex flex-col gap-1">
-          <label className="text-sm font-normal">
-            Qual a renda familiar mensal?
-          </label>
+          <label className="text-sm font-normal">Qual a renda mensal?</label>
           <Controller
             name="student_socioeconomic_data.income_range"
             control={control}
