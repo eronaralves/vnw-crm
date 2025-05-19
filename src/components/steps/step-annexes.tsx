@@ -20,6 +20,7 @@ import { registerDocuments } from '@/http/documents/register-documents'
 // Components
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 
 type FileUpload =
   | File
@@ -30,6 +31,7 @@ type FileUpload =
 
 export const formAnnexesSchema = yup.object({
   documents: yup.array().of(yup.mixed<FileUpload>()),
+  profile_picture: yup.string(),
 })
 
 export type FormAnnexesType = yup.InferType<typeof formAnnexesSchema>
@@ -42,9 +44,12 @@ interface StepAnnexesProps {
 export function StepAnnexes({ studentId, isEditing = true }: StepAnnexesProps) {
   const { watch, setValue } = useFormContext<FormAnnexesType>()
   const watchDocuments = watch('documents') as FileUpload[]
+  const watchProfilePicture = watch('profile_picture') ?? null
 
   const [files, setFiles] = useState<FileUpload[]>(watchDocuments ?? [])
-  const [profileImage, setProfileImage] = useState<File | null>(null)
+  const [profileImage, setProfileImage] = useState<File | string | null>(
+    watchProfilePicture,
+  )
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [removingFileIds, setRemovingFileIds] = useState<string[]>([])
@@ -183,6 +188,8 @@ export function StepAnnexes({ studentId, isEditing = true }: StepAnnexesProps) {
     setProfileImage(null)
   }
 
+  console.log(profileImage instanceof File)
+
   return (
     <div className="w-full h-full flex-1 flex flex-wrap sm:flex-nowrap gap-6 overflow-hidden">
       <div className="w-full max-w-[400px] flex flex-col space-y-4">
@@ -198,12 +205,19 @@ export function StepAnnexes({ studentId, isEditing = true }: StepAnnexesProps) {
             <div className="relative w-24 h-24 group">
               {profileImage ? (
                 <>
-                  <img
-                    src={URL.createObjectURL(profileImage)}
-                    alt="Preview"
+                  <Image
+                    src={
+                      profileImage instanceof File
+                        ? URL.createObjectURL(profileImage)
+                        : profileImage
+                    }
+                    alt="Foto de perfil"
                     onClick={() =>
                       isEditing && refInputProfileImage.current?.click()
                     }
+                    width={96}
+                    height={96}
+                    priority
                     className="w-24 h-24 rounded-full object-cover border cursor-pointer"
                   />
 
