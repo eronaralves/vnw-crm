@@ -38,6 +38,6 @@ export async function getAdmins({ limit, offset }: GetAdminsRquest) {
       ? error.detail
       : 'Error ao listar administradores, tente novamente.'
 
-    throw errorMessage
+    throw new Error(errorMessage)
   }
 }

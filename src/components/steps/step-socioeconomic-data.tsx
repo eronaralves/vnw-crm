@@ -14,14 +14,14 @@ import {
 
 export const formSocioeconomicSchema = yup.object({
   student_socioeconomic_data: yup.object({
-    housemates: yup.string(),
-    home_type: yup.string(),
-    home_condition: yup.string(),
-    main_income: yup.string(),
-    income_range: yup.string(),
-    government_benefit: yup.string(),
-    chronic_diseases: yup.string(),
-    live_with_pwd: yup.boolean(),
+    housemates: yup.string().nullable(),
+    home_type: yup.string().nullable(),
+    home_condition: yup.string().nullable().optional(),
+    main_income: yup.string().nullable().nullable(),
+    income_range: yup.string().nullable(),
+    government_benefit: yup.string().nullable(),
+    chronic_diseases: yup.string().nullable(),
+    live_with_pwd: yup.boolean().nullable(),
   }),
 })
 
@@ -60,11 +60,15 @@ export function StepSocioeconomicData({
           <label className="text-sm font-normal">
             Qual <strong>tipo</strong> de moradia que você reside?
           </label>
+
           <Controller
             name="student_socioeconomic_data.home_type"
             control={control}
             render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                value={String(field.value)}
+              >
                 <SelectTrigger
                   variant="secondary"
                   disabled={!isEditing}
@@ -97,7 +101,10 @@ export function StepSocioeconomicData({
             name="student_socioeconomic_data.home_condition"
             control={control}
             render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                value={String(field.value)}
+              >
                 <SelectTrigger
                   variant="secondary"
                   disabled={!isEditing}
@@ -128,7 +135,10 @@ export function StepSocioeconomicData({
             name="student_socioeconomic_data.main_income"
             control={control}
             render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                value={String(field.value)}
+              >
                 <SelectTrigger
                   variant="secondary"
                   disabled={!isEditing}
@@ -164,7 +174,10 @@ export function StepSocioeconomicData({
             name="student_socioeconomic_data.income_range"
             control={control}
             render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                value={String(field.value)}
+              >
                 <SelectTrigger
                   variant="secondary"
                   disabled={!isEditing}

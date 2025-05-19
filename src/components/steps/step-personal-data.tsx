@@ -20,7 +20,7 @@ import {
 
 export const formPersonalSchema = yup.object({
   fullname: yup.string().required('Digite seu nome completo'),
-  social_name: yup.string(),
+  social_name: yup.string().nullable(),
   phone: yup.string().required('Digite seu celular').length(15, '11 digitos'),
   cpf: yup.string().required('Digite seu CPF').length(14, '11 digitos'),
   email: yup
@@ -28,43 +28,43 @@ export const formPersonalSchema = yup.object({
     .required('Digite seu e-mail')
     .email('Digite um e-mail válido'),
   birth_date: yup.date().required('Digite sua data'),
-  rg: yup.string(),
-  age: yup.number(),
-  emitter: yup.string(),
-  mother_name: yup.string(),
-  father_name: yup.string(),
-  emergency_phone: yup.string(),
-  emergency_name: yup.string(),
-  emergency_kinship: yup.string(),
-  marital_status: yup.string(),
-  skin_color: yup.string(),
-  gender: yup.string(),
-  sexuality: yup.string(),
-  student_responsible: yup.object({
-    fullname: yup.string().nullable(),
-    relation: yup.string().nullable(),
-    cpf: yup.string().nullable(),
-    rg: yup.string().nullable(),
-    emitter: yup.string().nullable(),
-    phone: yup.string().nullable(),
-    email: yup.string().email().nullable(),
-  }),
-  // .nullable(),
+  rg: yup.string().nullable(),
+  age: yup.number().nullable(),
+  emitter: yup.string().nullable(),
+  mother_name: yup.string().nullable(),
+  father_name: yup.string().nullable(),
+  emergency_phone: yup.string().nullable(),
+  emergency_name: yup.string().nullable(),
+  emergency_kinship: yup.string().nullable(),
+  marital_status: yup.string().nullable(),
+  skin_color: yup.string().nullable(),
+  gender: yup.string().nullable(),
+  sexuality: yup.string().nullable(),
+  linkedin: yup.string().url('Digite uma url válida').nullable(),
+  student_responsible: yup
+    .object({
+      fullname: yup.string().nullable(),
+      relation: yup.string().nullable(),
+      cpf: yup.string().nullable(),
+      rg: yup.string().nullable(),
+      emitter: yup.string().nullable(),
+      phone: yup.string().nullable(),
+      email: yup.string().email().nullable(),
+    })
+    .nullable()
+    .optional(),
   student_address: yup.object({
     address: yup.object({
-      postal_code: yup.string(),
-      street: yup.string(),
-      number: yup.string(),
-      adjunct: yup.string(),
-      district: yup.string(),
-      city: yup.string(),
-      state: yup.string(),
+      postal_code: yup.string().nullable(),
+      street: yup.string().nullable(),
+      number: yup.string().nullable(),
+      adjunct: yup.string().nullable(),
+      district: yup.string().nullable(),
+      city: yup.string().nullable(),
+      state: yup.string().nullable(),
     }),
-    community: yup.string(),
-    notes: yup.string(),
-  }),
-  student_empregability: yup.object({
-    linkedin: yup.string().url('Digite uma url válida'),
+    community: yup.string().nullable(),
+    notes: yup.string().nullable(),
   }),
 })
 
@@ -92,7 +92,7 @@ export function StepPersonalData({ isEditing = true }: StepPersonalDataProps) {
 
   return (
     <div className="flex-1 bg-white overflow-auto">
-      <div className="flex flex-wrap gap-x-4 gap-y-6">
+      <div className="flex flex-wrap items-start gap-x-4 gap-y-6">
         <div className="w-full max-w-80 flex flex-col gap-1">
           <label className="text-sm font-normal">Nome completo</label>
           <Input
@@ -168,6 +168,7 @@ export function StepPersonalData({ isEditing = true }: StepPersonalDataProps) {
 
         <div className="w-max flex flex-col gap-1">
           <label className="text-sm font-normal">Data de Nasc.</label>
+
           <Controller
             name="birth_date"
             control={control}
@@ -230,18 +231,18 @@ export function StepPersonalData({ isEditing = true }: StepPersonalDataProps) {
           <Input
             variant="secondary"
             disabled={!isEditing}
-            {...register('student_empregability.linkedin')}
+            {...register('linkedin')}
           />
 
-          {errors.student_empregability?.linkedin && (
+          {errors?.linkedin && (
             <span className="text-xs text-red-500">
-              {errors.student_empregability.linkedin.message}
+              {errors.linkedin.message}
             </span>
           )}
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-x-4 gap-y-6 mt-6">
+      <div className="flex flex-wrap items-start  gap-x-4 gap-y-6 mt-6">
         <div className="w-full flex flex-col gap-3">
           <label className="text-lg font-semibold">Tem menos de 18 anos?</label>
 
@@ -389,7 +390,7 @@ export function StepPersonalData({ isEditing = true }: StepPersonalDataProps) {
           ))}
       </div>
 
-      <div className="flex flex-wrap gap-x-4 gap-y-5 mt-6">
+      <div className="flex flex-wrap items-start gap-x-4 gap-y-5 mt-6">
         <div className="w-full flex items-center gap-4">
           <h3 className="text-lg font-semibold">Endereço Residencial</h3>
           <hr className="flex-1 h-1" />
@@ -493,7 +494,10 @@ export function StepPersonalData({ isEditing = true }: StepPersonalDataProps) {
               name="marital_status"
               control={control}
               render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  value={String(field.value)}
+                >
                   <SelectTrigger
                     variant="secondary"
                     disabled={!isEditing}
@@ -588,7 +592,10 @@ export function StepPersonalData({ isEditing = true }: StepPersonalDataProps) {
               name="gender"
               control={control}
               render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  value={String(field.value)}
+                >
                   <SelectTrigger
                     variant="secondary"
                     disabled={!isEditing}

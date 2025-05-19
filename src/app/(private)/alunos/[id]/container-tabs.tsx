@@ -6,24 +6,35 @@ import { UTCDate } from '@date-fns/utc'
 
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm, FormProvider } from 'react-hook-form'
+import { useForm, FormProvider, type Resolver } from 'react-hook-form'
 import { differenceInYears, format } from 'date-fns'
 
+import { toast } from 'sonner'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
 // Icons
-import { Pencil, Share } from 'lucide-react'
+import { AlertCircle, Pencil, Share } from 'lucide-react'
 
 // Utils
+import { dateDiff } from '@/utils/date-diff'
 import { formatCpf } from '@/utils/format-cpf'
 import { formatPhone } from '@/utils/format-phone'
 
 // Http
+import {
+  editProfileData,
+  type StudentToEdit,
+} from '@/http/students/edit-profile-data'
 import type { ProfileStudent } from '@/http/students/get-student'
 
 // Components
 import { Button } from '@/components/button'
 import { TagStatus } from '@/components/tag-status'
 import { StepJourney } from '@/components/steps/step-journey'
-import { StepReasonEvasion } from '@/components/steps/step-reason-evasion'
+import {
+  formReasonEvasionSchema,
+  StepReasonEvasion,
+} from '@/components/steps/step-reason-evasion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ButtonEvadeStudents } from '@/components/button-evade-students'
 import { ButtonFailStudents } from '@/components/button-fail-students'
@@ -45,10 +56,6 @@ import {
   StepSocioeconomicData,
 } from '@/components/steps/step-socioeconomic-data'
 import { ButtonGraduatedStudents } from '@/components/button-graduated'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { editStudent, type StudentToEdit } from '@/http/students/edit-student'
-import { toast } from 'sonner'
-import { dateDiff } from '@/utils/date-diff'
 
 interface ContentProfileProps {
   student: ProfileStudent
@@ -68,34 +75,35 @@ export function ContainerTabs({ student }: ContentProfileProps) {
   const [tabCurrent, setTabCurrent] = useState(TABS.JOURNEY)
   const [isEditing, setIsEditing] = useState(false)
 
-  const emptySchema = yup.object().shape({})
+  const fullSchema = formPersonalSchema
+    .concat(formSocioeconomicSchema)
+    .concat(formTechnologySchema)
+    .concat(formEmpregabilitySchema)
+    .concat(formAnnexesSchema)
+    .concat(formReasonEvasionSchema)
 
-  const schemaByStep: Record<TABS, yup.AnyObjectSchema> = {
-    [TABS.JOURNEY]: emptySchema,
-    [TABS.REASON_EVASION]: emptySchema,
-    [TABS.PERSONAL]: formPersonalSchema,
-    [TABS.SOCIO_ECONOMIC]: formSocioeconomicSchema,
-    [TABS.TECHNOLOGY]: formTechnologySchema,
-    [TABS.EMPREGABILITY]: formEmpregabilitySchema,
-    [TABS.ANNEXES]: formAnnexesSchema,
-  }
+  type FormData = yup.InferType<typeof fullSchema>
 
-  const methods = useForm<ProfileStudent>({
+  const methods = useForm<FormData>({
     mode: 'onChange',
-    resolver: yupResolver(schemaByStep[tabCurrent]),
+    resolver: yupResolver(fullSchema, {
+      context: {
+        isEvaded: student.status === 'Evadiu',
+      },
+    }) as Resolver<FormData>,
     defaultValues: {
       ...student,
       phone: formatPhone(student.phone),
       cpf: formatCpf(student.cpf),
       birth_date: new UTCDate(student.birth_date),
-      age: differenceInYears(new Date(), new UTCDate(student.birth_date)),
+      age: differenceInYears(new Date(), new UTCDate(student?.birth_date)),
       student_empregability: {
-        ...student.student_empregability,
-        start_date: student.student_empregability.start_date
-          ? new UTCDate(student.student_empregability.start_date)
+        ...student?.student_empregability,
+        start_date: student.student_empregability?.start_date
+          ? new UTCDate(student.student_empregability?.start_date)
           : undefined,
-        end_date: student.student_empregability.end_date
-          ? new UTCDate(student.student_empregability.end_date)
+        end_date: student.student_empregability?.end_date
+          ? new UTCDate(student.student_empregability?.end_date)
           : undefined,
       },
     },
@@ -105,7 +113,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
   const queryClient = useQueryClient()
 
   const { mutate: editStudentMutate, isPending } = useMutation({
-    mutationFn: editStudent,
+    mutationFn: editProfileData,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['get-students'] })
 
@@ -127,33 +135,33 @@ export function ContainerTabs({ student }: ContentProfileProps) {
     setTabCurrent(value as TABS)
   }
 
-  async function onSubmit(data: ProfileStudent) {
+  async function onSubmit(data: FormData) {
     const age = dateDiff({
       from: new UTCDate(data.birth_date),
       to: new UTCDate(),
     })
 
     const studentDataToEdit: StudentToEdit = {
-      age,
+      phone: data.phone.replace(/[()\-\s]/g, ''),
       birth_date: format(new UTCDate(data.birth_date), 'yyyy-MM-dd'),
+      age,
       cpf: data.cpf,
       email: data.email,
       emergency_kinship: data.emergency_kinship,
       emergency_name: data.emergency_name,
       emergency_phone: data.emergency_phone,
       emitter: data.emitter,
-      father_name: data.father_name,
+      father_name: data.father_name ?? '',
       fullname: data.fullname,
       gender: data.gender,
-      hometown: data.hometown ?? null,
-      hometown_state: data.hometown_state ?? null,
-      interested_modality: data.interested_modality ?? undefined,
+      hometown: null,
+      hometown_state: null,
+      interested_modality: '',
       marital_status: data.marital_status,
-      modality: data.modality ?? null,
-      mother_name: data.mother_name,
-      phone: data.phone,
-      reason_give_up: data.reason_give_up ?? null,
-      religion: data.religion ?? null,
+      modality: '',
+      mother_name: data.mother_name ?? '',
+      reason_give_up: data?.reason_give_up ?? null,
+      religion: null,
       rg: data.rg,
       sexuality: data.sexuality,
       skin_color: data.skin_color,
@@ -172,13 +180,22 @@ export function ContainerTabs({ student }: ContentProfileProps) {
         community: data.student_address.community ?? '',
         notes: data.student_address.notes ?? '',
       },
+      student_responsible: {
+        cpf: data?.student_responsible?.cpf ?? null,
+        email: data?.student_responsible?.email ?? null,
+        emitter: data?.student_responsible?.emitter ?? null,
+        fullname: data?.student_responsible?.fullname ?? null,
+        phone:
+          data?.student_responsible?.phone?.replace(/[()\-\s]/g, '') ?? null,
+        relation: data?.student_responsible?.relation ?? null,
+        rg: data?.student_responsible?.rg ?? null,
+      },
       student_empregability: {
         ...data.student_empregability,
         start_date: format(data.student_empregability.start_date, 'yyyy-MM-dd'),
         end_date: data.student_empregability.end_date
           ? format(data.student_empregability.end_date, 'yyyy-MM-dd')
           : null,
-
         currently_studying: data.student_empregability.currently_studying,
         enterprise_name: data.student_empregability.enterprise_name ?? '',
         intend_study: data.student_empregability.intend_study ?? undefined,
@@ -186,9 +203,9 @@ export function ContainerTabs({ student }: ContentProfileProps) {
         last_work_modality:
           data.student_empregability.last_work_modality ?? null,
         last_work_role: data.student_empregability.last_work_role,
-        last_year_job: data.student_empregability.last_year_job ?? null,
+        last_year_job: null,
         level_language: data.student_empregability.level_language,
-        linkedin: data.student_empregability.linkedin,
+        linkedin: data.linkedin,
         motive_intend_study:
           data.student_empregability.motive_intend_study ?? '',
         other_language: data.student_empregability.other_language,
@@ -202,40 +219,19 @@ export function ContainerTabs({ student }: ContentProfileProps) {
         work_type: data.student_empregability.work_type,
         years_worked: data.student_empregability.years_worked ?? null,
       },
-      student_responsible: {
-        cpf: data.student_responsible.cpf ?? null,
-        email: data.student_responsible.email ?? null,
-        emitter: data.student_responsible.emitter ?? null,
-        fullname: data.student_responsible.fullname ?? null,
-        phone: data.student_responsible.phone ?? null,
-        relation: data.student_responsible.relation ?? null,
-        rg: data.student_responsible.rg ?? null,
-      },
       student_socioeconomic_data: {
         ...data.student_socioeconomic_data,
-        chronic_diseases:
-          String(data.student_socioeconomic_data.chronic_diseases) ?? null,
-        family_income: data.student_socioeconomic_data.family_income,
-        government_benefit:
-          data.student_socioeconomic_data.government_benefit ?? null,
-        have_children: data.student_socioeconomic_data.have_children,
-        home_condition: data.student_socioeconomic_data.home_condition,
-        home_type: data.student_socioeconomic_data.home_type,
-        housemates: data.student_socioeconomic_data.housemates
-          ? parseInt(data.student_socioeconomic_data.housemates)
-          : null,
-        income_range: data.student_socioeconomic_data.income_range,
-        live_with_pwd: data.student_socioeconomic_data.live_with_pwd,
-        main_income: data.student_socioeconomic_data.main_income,
+        family_income: '',
+        have_children: false,
       },
       student_tecnology: {
         ...data.student_tecnology,
         computer_type: data.student_tecnology.computer_type,
         have_computer: data.student_tecnology.have_computer,
         have_internet: data.student_tecnology.have_internet,
-        internet_speed: data.student_tecnology.internet_speed ?? null,
-        internet_type: data.student_tecnology.internet_type ?? null,
-        previous_experience: data.student_tecnology.previous_experience,
+        internet_speed: null,
+        internet_type: null,
+        previous_experience: false,
         programming_languages:
           data.student_tecnology.programming_languages ?? null,
       },
@@ -246,6 +242,35 @@ export function ContainerTabs({ student }: ContentProfileProps) {
       studentId: student.id,
       formData: studentDataToEdit,
     })
+  }
+
+  function hasTabErrors(tab: TABS): boolean {
+    const errorPaths = Object.keys(methods.formState.errors)
+
+    switch (tab) {
+      case TABS.PERSONAL:
+        return errorPaths.some(
+          (path) =>
+            path.startsWith('fullname') ||
+            path.startsWith('cpf') ||
+            path.startsWith('birth_date') ||
+            path.startsWith('linkedin'),
+        )
+      case TABS.SOCIO_ECONOMIC:
+        return errorPaths.some((path) =>
+          path.startsWith('student_socioeconomic_data'),
+        )
+      case TABS.TECHNOLOGY:
+        return errorPaths.some((path) => path.startsWith('student_tecnology'))
+      case TABS.EMPREGABILITY:
+        return errorPaths.some((path) =>
+          path.startsWith('student_empregability'),
+        )
+      case TABS.ANNEXES:
+        return errorPaths.some((path) => path.startsWith('student_annexes'))
+      default:
+        return false
+    }
   }
 
   return (
@@ -324,45 +349,69 @@ export function ContainerTabs({ student }: ContentProfileProps) {
             <TabsList className="w-full min-h-max flex justify-start overflow-x-auto gap-1 border-b border-[#dee2e6]">
               <TabsTrigger
                 value={TABS.JOURNEY}
-                className="data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
+                className="relative data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
               >
                 Jornada do aluno
               </TabsTrigger>
               {student.status === 'Evadiu' && (
                 <TabsTrigger
                   value={TABS.REASON_EVASION}
-                  className="data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
+                  className="relative data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
                 >
                   Motivo da Evasão
                 </TabsTrigger>
               )}
               <TabsTrigger
                 value={TABS.PERSONAL}
-                className="data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
+                className="relative data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
               >
                 Dados Pessoais
+                {hasTabErrors(TABS.PERSONAL) && (
+                  <AlertCircle
+                    className="absolute -right-1 -top-1 w-4 h-4 bg-orange-500 rounded-full shadow-sm"
+                    size={16}
+                  />
+                )}
               </TabsTrigger>
               <TabsTrigger
                 value={TABS.SOCIO_ECONOMIC}
-                className="data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
+                className="relative data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
               >
                 Dados socioeconômicos
+                {hasTabErrors(TABS.SOCIO_ECONOMIC) && (
+                  <AlertCircle
+                    className="absolute -right-1 -top-1 w-4 h-4 bg-orange-500 rounded-full shadow-sm"
+                    size={16}
+                  />
+                )}
               </TabsTrigger>
               <TabsTrigger
                 value={TABS.TECHNOLOGY}
-                className="data-[state=active]:bg-[#173A92] bg-[#a7b1d7] min-w-[170px] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
+                className="relative data-[state=active]:bg-[#173A92] bg-[#a7b1d7] min-w-[170px] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
               >
                 Tecnologia
+                {hasTabErrors(TABS.TECHNOLOGY) && (
+                  <AlertCircle
+                    className="absolute -right-1 -top-1 w-4 h-4 bg-orange-500 rounded-full shadow-sm"
+                    size={16}
+                  />
+                )}
               </TabsTrigger>
               <TabsTrigger
                 value={TABS.EMPREGABILITY}
-                className="data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
+                className="relative data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
               >
                 Empregabilidade
+                {hasTabErrors(TABS.EMPREGABILITY) && (
+                  <AlertCircle
+                    className="absolute -right-1 -top-1 w-4 h-4 bg-orange-500 rounded-full shadow-sm"
+                    size={16}
+                  />
+                )}
               </TabsTrigger>
               <TabsTrigger
                 value={TABS.ANNEXES}
-                className="data-[state=active]:bg-[#173A92] bg-[#a7b1d7] min-w-[170px] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
+                className="relative data-[state=active]:bg-[#173A92] bg-[#a7b1d7] min-w-[170px] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
               >
                 Anexos
               </TabsTrigger>

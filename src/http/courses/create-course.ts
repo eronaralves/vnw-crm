@@ -34,6 +34,6 @@ export async function createCourse(course: CreateCourseRequest) {
       ? error.detail
       : 'Error ao criar curso,tente novamente!'
 
-    throw errorMessage
+    throw new Error(errorMessage)
   }
 }

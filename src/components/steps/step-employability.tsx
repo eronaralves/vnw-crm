@@ -59,7 +59,7 @@ export const formEmpregabilitySchema = yup.object({
     //     }),
     // }),
     partner_empress: yup.boolean().required('Selecione uma opção'),
-    enterprise_name: yup.string(),
+    enterprise_name: yup.string().nullable(),
     last_work_role: yup.string().when('work', {
       is: false,
       then: (schema) => schema.required('Digite o cargo.'),
@@ -76,6 +76,7 @@ export const formEmpregabilitySchema = yup.object({
           return null
         }),
     }),
+
     last_work_type: yup.string().when('work', {
       is: false,
       then: (schema) => schema.required('Selecione o emprego/trabalho.'),
@@ -93,7 +94,7 @@ export const formEmpregabilitySchema = yup.object({
           return null
         }),
     }),
-    years_worked: yup.string(),
+    years_worked: yup.string().nullable().optional(),
     study: yup.boolean().required('Selecione uma opção.'),
     study_modality: yup.string().when('study', {
       is: true,

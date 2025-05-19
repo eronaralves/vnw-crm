@@ -23,7 +23,7 @@ export function Button({
     <button
       className={clsx(
         'min-w-20 h-max flex items-center justify-center gap-2 px-4 py-2 font-bold text-base duration-500 ease-in-out rounded-md cursor-pointer disabled:cursor-not-allowed',
-        variant === 'primary' && 'text-white bg-[#0f2b92] hover:bg-[#ffc107]',
+        variant === 'primary' && 'text-white bg-[#0f2b92] hover:bg-[#1a3cbf]',
         variant === 'secondary' &&
           'text-[#00145d] bg-[#cfd4e5] hover:bg-[#c2cbe5]',
         className,

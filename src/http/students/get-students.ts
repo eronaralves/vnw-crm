@@ -117,6 +117,6 @@ export async function getStudents({
       ? error.detail
       : 'Error ao listar alunos, tente novamente.'
 
-    throw errorMessage
+    throw new Error(errorMessage)
   }
 }

@@ -42,6 +42,6 @@ export async function getTeams({ limit = 100, offset }: GetTeamsRequest) {
       ? error.detail
       : 'Error ao listar equipe, tente novamente.'
 
-    throw errorMessage
+    throw new Error(errorMessage)
   }
 }

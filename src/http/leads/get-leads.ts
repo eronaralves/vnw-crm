@@ -91,6 +91,6 @@ export async function getLeads({
       ? error.detail
       : 'Error ao listar leads, tente novamente.'
 
-    throw errorMessage
+    throw new Error(errorMessage)
   }
 }

@@ -12,7 +12,11 @@ import {
 } from '../ui/select'
 
 export const formReasonEvasionSchema = yup.object({
-  reason_give_up: yup.string().required('Selecione a razão.'),
+  reason_give_up: yup.string().when('$isEvaded', {
+    is: true,
+    then: (schema) => schema.required('Selecione a razão.'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 })
 
 export type FormReasonEvasionType = yup.InferType<

@@ -35,7 +35,7 @@ export type ProfileStudent = {
   indication: string | null
 
   interested_course: string | null
-  interested_modality: string | null
+  interested_modality?: string | null
   interested_time: string | null
   course_enrolled: string | null
 
@@ -147,15 +147,15 @@ export type ProfileStudent = {
     created_at: string
   }
 
-  student_responsible: {
-    id: string
-    fullname: string
-    relation: string
-    cpf: string
-    rg: string
-    emitter: string
-    phone: string
-    email: string
+  student_responsible?: {
+    id?: string
+    fullname?: string
+    relation?: string
+    cpf?: string
+    rg?: string
+    emitter?: string
+    phone?: string
+    email?: string
   }
 
   student_socioeconomic_data: {

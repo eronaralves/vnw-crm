@@ -20,6 +20,6 @@ export async function registerDocuments(formData: FormData) {
       ? error.detail
       : 'Erro ao cadastrar documentos, acesso o perfil do aluno para atualizar!'
 
-    throw errorMessage
+    throw new Error(errorMessage)
   }
 }

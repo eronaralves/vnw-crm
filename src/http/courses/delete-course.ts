@@ -12,6 +12,6 @@ export async function deleteCourse(courseId: string) {
       ? error.detail
       : 'Error ao deletar curso,tente novamente!'
 
-    throw errorMessage
+    throw new Error(errorMessage)
   }
 }

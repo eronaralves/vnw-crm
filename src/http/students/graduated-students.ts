@@ -20,6 +20,6 @@ export async function graduetedStudents({
       ? error.detail
       : 'Erro ao formar aluno(s), tente novamente!'
 
-    throw errorMessage
+    throw new Error(errorMessage)
   }
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
-import { useDropzone } from 'react-dropzone'
+import { useDropzone, type FileRejection } from 'react-dropzone'
 import * as yup from 'yup'
 
 import { useFormContext } from 'react-hook-form'
@@ -78,7 +78,11 @@ export function StepAnnexes({ studentId, isEditing = true }: StepAnnexesProps) {
           }
         }
 
-        setIsUploading(false)
+        setTimeout(() => {
+          setIsUploading(false)
+        }, 300)
+
+        // setIsUploading(false)
       } else {
         setFiles((prev) => [...prev, ...accepted])
       }
@@ -86,11 +90,75 @@ export function StepAnnexes({ studentId, isEditing = true }: StepAnnexesProps) {
     [studentId],
   )
 
+  const onDropRejected = useCallback((fileRejections: FileRejection[]) => {
+    const errorTooManyFiles = fileRejections.find(
+      (reject) => reject.errors[0].code === 'too-many-files',
+    )
+
+    if (errorTooManyFiles) {
+      toast.error(`Número máximo de arquivos excedido (5 arquivos).`, {
+        duration: 3000,
+        position: 'top-center',
+      })
+    }
+
+    const errorsFileTooLarge = fileRejections.filter(
+      (reject) => reject.errors[0].code === 'file-too-large',
+    )
+
+    errorsFileTooLarge.forEach((reject) => {
+      toast.error(
+        `O arquivo ${reject.file.name} ultrapassa o tamanho máximo permitido (4MB).`,
+        {
+          duration: 3000,
+          position: 'top-center',
+        },
+      )
+    })
+
+    // fileRejections.forEach(({ file, errors }) => {
+    //   console.log(errors.length, 'FFF')
+
+    //   errors.forEach((err) => {
+    //     if (err.code === 'file-too-large') {
+    //       return toast.error(
+    //         `O arquivo ${file.name} ultrapassa o tamanho máximo permitido (4MB).`,
+    //         {
+    //           duration: 3000,
+    //           position: 'top-center',
+    //         },
+    //       )
+    //     } else if (err.code === 'too-many-files') {
+    //       return toast.error(
+    //         `Número máximo de arquivos excedido (5 arquivos).`,
+    //         {
+    //           duration: 3000,
+    //           position: 'top-center',
+    //         },
+    //       )
+    //     } else {
+    //       return toast.error(
+    //         `Erro ao adicionar arquivo ${file.name}: ${err.message}`,
+    //         {
+    //           duration: 3000,
+    //           position: 'top-center',
+    //         },
+    //       )
+    //     }
+    //   })
+    // })
+
+    console.log(fileRejections)
+  }, [])
+
   const refInputProfileImage = useRef<HTMLInputElement | null>(null)
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: onDropFiles,
+    onDropRejected,
     multiple: true,
     disabled: !isEditing || isUploading,
+    maxFiles: 5,
+    maxSize: 4 * 1024 * 1024, // 4 MB
   })
 
   async function handleRemoveFile(fileIdOrName: string) {
@@ -243,7 +311,12 @@ export function StepAnnexes({ studentId, isEditing = true }: StepAnnexesProps) {
                       )
                     }
                     className="cursor-pointer"
-                    disabled={!isEditing}
+                    disabled={
+                      !isEditing ||
+                      removingFileIds.includes(
+                        file instanceof File ? file.name : file.id,
+                      )
+                    }
                   >
                     {removingFileIds.includes(
                       file instanceof File ? file.name : file.id,

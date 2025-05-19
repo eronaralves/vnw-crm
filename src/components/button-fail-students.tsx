@@ -76,7 +76,7 @@ export function ButtonFailStudents({
 
       <DialogContent>
         <div>
-          <DialogTitle>Confirmar reprovação</DialogTitle>
+          <DialogTitle>Deseja reprovar aluno?</DialogTitle>
           <DialogDescription className="mt-2">
             Após confirmar não poderá reverter isso.
           </DialogDescription>

@@ -102,7 +102,7 @@ export function ButtonEvadeStudents({
 
       <DialogContent>
         <div>
-          <DialogTitle>Confirmar evasão</DialogTitle>
+          <DialogTitle>Deseja evadir aluno?</DialogTitle>
 
           <div className="w-full max-w-80 flex flex-col gap-1 mt-4">
             <label className="text-sm font-normal">Motivo da Evasão</label>

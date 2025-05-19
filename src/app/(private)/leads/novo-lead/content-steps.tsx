@@ -37,6 +37,7 @@ import {
   StepEmpregability,
 } from '@/components/steps/step-employability'
 import { formAnnexesSchema, StepAnnexes } from '@/components/steps/step-annexes'
+import Link from 'next/link'
 
 enum STEPS {
   PERSONAL = 0,
@@ -292,11 +293,14 @@ export function ContentSteps() {
           {step === STEPS.ANNEXES && <StepAnnexes />}
 
           <div className="w-full flex justify-end gap-3">
-            <Button
-              type="button"
-              title="Voltar"
-              className="bg-[#5e81f418] hover:!bg-[#00000018] !text-[#0f2b92]"
-            />
+            <Link href="/leads">
+              <Button
+                type="button"
+                title="Voltar"
+                className="bg-[#5e81f418] hover:!bg-[#00000018] !text-[#0f2b92]"
+              />
+            </Link>
+
             <Button title="Salvar" />
           </div>
         </form>
