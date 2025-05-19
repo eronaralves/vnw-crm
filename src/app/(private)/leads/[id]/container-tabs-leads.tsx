@@ -225,6 +225,7 @@ export function ContainerTabsLeads({ lead }: ContentProfileProps) {
       studentId: lead.id,
       formData: leadDataToEdit,
     })
+
     setIsEditing(false)
   }
 

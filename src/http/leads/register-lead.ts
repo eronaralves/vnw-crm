@@ -3,7 +3,7 @@
 import { api } from '@/lib/axios'
 import { AppError } from '@/utils/app-error'
 
-interface RegisterStudentRequest {
+interface RegisterLeadRequest {
   formData: {
     age?: number | null
     birth_date?: string | null
@@ -98,30 +98,24 @@ interface RegisterStudentRequest {
     } | null
     under_age?: boolean | null
   }
-  moduleId: string
 }
 
-export async function registerStudent({
-  moduleId,
-  formData,
-}: RegisterStudentRequest) {
+export async function registerLead({ formData }: RegisterLeadRequest) {
   try {
-    const response = await api.post(
-      `students/import/single/${moduleId}/`,
-      formData,
-    )
+    const response = await api.post(`/students/`, formData)
 
-    const data = response.data.success
+    const leadId = response.data.id
 
     return {
-      studentId: data.id,
-      enrollmentId: data.enrollment_id,
+      leadId,
     }
   } catch (error) {
+    console.log(error, 'DATA')
+
     const isAppError = error instanceof AppError
     const errorMessage = isAppError
       ? error.detail
-      : 'Erro ao cadastrar aluno, tente novamente!'
+      : 'Erro ao cadastrar lead, tente novamente!'
 
     throw new Error(errorMessage)
   }

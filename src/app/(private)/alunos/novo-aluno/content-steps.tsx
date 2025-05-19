@@ -1,20 +1,23 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
-import { FormProvider, useForm } from 'react-hook-form'
+import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import type { AnyObjectSchema } from 'yup'
+import { FormProvider, useForm } from 'react-hook-form'
 
 import { toast } from 'sonner'
+import { UTCDate } from '@date-fns/utc'
 import { format } from 'date-fns'
 
-// Types
-import type { STATUS_STUDENT } from '@/types/status-student'
+// Utils
+import { dateDiff } from '@/utils/date-diff'
 
 // Http
 import { registerStudent } from '@/http/students/register-student'
-// import { registerDocuments } from '@/http/students/create-documents'
+import { registerDocuments } from '@/http/documents/register-documents'
 
 // Components
 import { Button } from '@/components/button'
@@ -39,7 +42,6 @@ import {
 } from '@/components/steps/step-employability'
 import { formAnnexesSchema, StepAnnexes } from '@/components/steps/step-annexes'
 import { formCourseSchema, StepCourse } from '@/components/steps/step-course'
-import Link from 'next/link'
 
 enum STEPS {
   PERSONAL = 0,
@@ -50,151 +52,20 @@ enum STEPS {
   COURSE = 5,
 }
 
-export type ProfileNewStudent = {
-  able?: boolean
-  age?: number
-  birth_date: string
-  fullname: string
-  gender?: string
+const fullSchema = formPersonalSchema
+  .concat(formSocioeconomicSchema)
+  .concat(formTechnologySchema)
+  .concat(formEmpregabilitySchema)
+  .concat(formAnnexesSchema)
+  .concat(formCourseSchema)
 
-  cpf: string
-  created_at?: string
-  documents: File[]
-
-  email: string
-  emergency_kinship?: string
-  emergency_name?: string
-  emergency_phone?: string
-
-  emitter?: string
-  father_name?: string
-  mother_name?: string
-
-  has_algorithm?: boolean
-  has_math?: boolean
-
-  hometown?: string
-  hometown_state?: string
-  indication?: string
-
-  interested_course?: string
-  interested_modality?: string
-  interested_time?: string
-  course_enrolled?: string
-
-  knowledge_languages?: string
-
-  marital_status?: string
-  modality?: string
-
-  phone: string
-  presencial_availability?: string
-
-  profile_picture?: string
-
-  religion?: string
-  rg?: string
-  sexuality?: string
-  skin_color?: string
-  social_name?: string
-
-  status?: STATUS_STUDENT
-
-  module_id: string
-
-  student_address: {
-    address: {
-      postal_code?: string
-      street?: string
-      number?: string
-      adjunct?: string
-      city?: string
-      district?: string
-      state?: string
-    }
-    community?: string
-    id?: string
-    notes?: string
-  }
-
-  student_tecnology: {
-    previous_experience?: boolean
-    have_computer?: boolean
-    have_internet?: boolean
-    computer_type?: string
-    internet_type?: string
-    internet_speed?: string
-    programming_languages?: string
-    has_programming_knowledge?: boolean
-  }
-
-  student_empregability: {
-    id?: string
-    work?: boolean
-    work_role?: string
-    work_type?: string
-    work_modality?: string
-    last_year_job?: string
-    last_work_role?: string
-    last_work_type?: string
-    last_work_modality?: string
-    years_worked?: string
-    study?: boolean
-    study_modality?: string
-    currently_studying?: string
-    other_language?: boolean
-    wich_language?: string
-    level_language?: string
-    last_grade?: string
-    motive_stop_study?: string
-    intend_study?: boolean
-    motive_intend_study?: string
-    interest_area?: string
-    enterprise_name?: string
-    partner_empress?: boolean
-    situation?: string
-    linkedin?: string
-    recruitment_channel?: string
-    last_enterprise_name?: string
-    start_date?: string
-    end_date?: string
-    created_at?: string
-  }
-
-  student_responsible: {
-    id?: string
-    fullname?: string
-    relation?: string
-    cpf?: string
-    rg?: string
-    emitter?: string
-    phone?: string
-    email?: string
-  }
-
-  student_socioeconomic_data: {
-    housemates?: string
-    home_type?: string
-    main_income?: string
-    live_with_pwd?: boolean
-    live_with_dwell_pwd?: boolean
-    pwd_description?: string
-    cid?: string
-    have_children?: boolean
-    home_condition?: string
-    live_in_community?: boolean
-    children?: string
-    family_income?: string
-    income_range?: string
-    chronic_diseases?: string
-    government_benefit?: string
-  }
-}
+type FormData = yup.InferType<typeof fullSchema>
 
 export function ContentSteps() {
-  const [step, setStep] = useState(STEPS.PERSONAL)
+  const [step, setStep] = useState(STEPS.ANNEXES)
+  const [isPending, setIsPending] = useState(false)
 
-  const schemaByStep: Record<STEPS, AnyObjectSchema> = {
+  const schemaByStep: Record<STEPS, yup.AnyObjectSchema> = {
     [STEPS.PERSONAL]: formPersonalSchema,
     [STEPS.SOCIO_ECONOMIC]: formSocioeconomicSchema,
     [STEPS.TECHNOLOGY]: formTechnologySchema,
@@ -207,70 +78,178 @@ export function ContentSteps() {
     resolver: yupResolver(schemaByStep[step]),
   })
 
-  async function onSubmit(data: Partial<ProfileNewStudent>) {
-    const student = data as ProfileNewStudent
+  const router = useRouter()
 
+  async function onSubmit(data: FormData) {
+    // check if it is the last step
     if (step !== STEPS.COURSE) {
       return setStep(step + 1)
     }
 
-    const studentData = {
-      ...student,
-      module_id: undefined,
-      documents: undefined,
-      phone: student.phone?.replace(/\D/g, ''),
-      birth_date: format(student.birth_date, 'yyyy-MM-dd'),
-      student_empregability: {
-        ...student.student_empregability,
-        start_date: format(
-          student?.student_empregability?.start_date || new Date(),
-          'yyyy-MM-dd',
-        ),
-        end_date: format(
-          student?.student_empregability?.end_date || new Date(),
-          'yyyy-MM-dd',
-        ),
-      },
-    }
+    try {
+      setIsPending(true)
 
-    delete studentData.documents
-    delete studentData.module_id
+      const age = dateDiff({
+        from: new UTCDate(data.birth_date),
+        to: new UTCDate(),
+      })
 
-    const responseRegister = await registerStudent({
-      moduleId: student.module_id,
-      formData: studentData,
-    })
+      const studentData = {
+        age,
+        phone: data.phone.replace(/[()\-\s]/g, ''),
+        birth_date: format(new UTCDate(data.birth_date), 'yyyy-MM-dd'),
+        cpf: data.cpf,
+        email: data.email,
+        emergency_kinship: data.emergency_kinship,
+        emergency_name: data.emergency_name,
+        emergency_phone: data.emergency_phone,
+        emitter: data.emitter,
+        father_name: data.father_name ?? '',
+        fullname: data.fullname,
+        gender: data.gender,
+        hometown: null,
+        hometown_state: null,
+        interested_modality: '',
+        marital_status: data.marital_status,
+        modality: '',
+        mother_name: data.mother_name ?? '',
+        religion: null,
+        rg: data.rg,
+        sexuality: data.sexuality,
+        skin_color: data.skin_color,
+        social_name: data.social_name,
+        student_address: {
+          ...data.student_address,
+          address: {
+            postal_code: data.student_address.address.postal_code ?? '',
+            street: data.student_address.address.street,
+            number: data.student_address.address.number,
+            adjunct: data.student_address.address.adjunct,
+            district: data.student_address.address.district,
+            city: data.student_address.address.city,
+            state: data.student_address.address.state,
+          },
+          community: data.student_address.community ?? '',
+          notes: data.student_address.notes ?? '',
+        },
+        student_responsible: {
+          cpf: data?.student_responsible?.cpf ?? null,
+          email: data?.student_responsible?.email ?? null,
+          emitter: data?.student_responsible?.emitter ?? null,
+          fullname: data?.student_responsible?.fullname ?? null,
+          phone:
+            data?.student_responsible?.phone?.replace(/[()\-\s]/g, '') ?? null,
+          relation: data?.student_responsible?.relation ?? null,
+          rg: data?.student_responsible?.rg ?? null,
+        },
+        student_empregability: {
+          ...data.student_empregability,
+          start_date: format(
+            data.student_empregability.start_date,
+            'yyyy-MM-dd',
+          ),
+          end_date: data.student_empregability.end_date
+            ? format(data.student_empregability.end_date, 'yyyy-MM-dd')
+            : null,
+          currently_studying: data.student_empregability.currently_studying,
+          enterprise_name: data.student_empregability.enterprise_name ?? '',
+          intend_study: data.student_empregability.intend_study ?? undefined,
+          last_grade: data.student_empregability.last_grade ?? '',
+          last_work_modality:
+            data.student_empregability.last_work_modality ?? null,
+          last_work_role: data.student_empregability.last_work_role,
+          last_year_job: null,
+          level_language: data.student_empregability.level_language,
+          linkedin: data.linkedin,
+          motive_intend_study:
+            data.student_empregability.motive_intend_study ?? '',
+          other_language: data.student_empregability.other_language,
+          partner_empress: data.student_empregability.partner_empress,
+          study: data.student_empregability.study,
+          study_modality: data.student_empregability.study_modality ?? null,
+          wich_language: data.student_empregability.wich_language,
+          work: data.student_empregability.work,
+          work_modality: data.student_empregability.work_modality,
+          work_role: data.student_empregability.work_role,
+          work_type: data.student_empregability.work_type,
+          years_worked: data.student_empregability.years_worked ?? null,
+        },
+        student_socioeconomic_data: {
+          ...data.student_socioeconomic_data,
+          family_income: '',
+          have_children: false,
+        },
+        student_tecnology: {
+          ...data.student_tecnology,
+          computer_type: data.student_tecnology.computer_type,
+          have_computer: data.student_tecnology.have_computer,
+          have_internet: data.student_tecnology.have_internet,
+          internet_speed: null,
+          internet_type: null,
+          previous_experience: false,
+          programming_languages:
+            data.student_tecnology.programming_languages ?? null,
+        },
+        under_age: age < 18,
+      }
+      // register student
+      const { studentId, enrollmentId } = await registerStudent({
+        moduleId: data.module_id,
+        formData: studentData,
+      })
 
-    if (responseRegister?.message) {
-      return toast.error(responseRegister.message, {
+      // upload annexes
+      const promisesDocuments = data.documents?.map((document) => {
+        const formData = new FormData()
+        formData.append('document', document as File)
+        formData.append('students', studentId)
+
+        return registerDocuments(formData)
+      })
+
+      if (promisesDocuments) {
+        const results = await Promise.allSettled(promisesDocuments)
+        const error = results?.filter(
+          (result) => result.status === 'rejected',
+        )[0]
+
+        if (error) {
+          toast.warning(
+            'Ocorreu error no uploads de algum documento, acesse o pefil do aluno para ver!',
+            {
+              duration: 3500,
+              position: 'top-center',
+              action: {
+                label: 'Ver perfil',
+                onClick: () => {
+                  router.push(`/alunos/${enrollmentId}/`)
+                },
+              },
+            },
+          )
+        }
+      }
+
+      toast.success('Aluno registrado com sucesso!', {
+        duration: 3500,
+        position: 'top-center',
+      })
+
+      methods.reset()
+      setStep(STEPS.PERSONAL)
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Erro interno, tente novamente mais tarde!'
+
+      toast.error(errorMessage, {
         duration: 3000,
         position: 'top-center',
       })
+    } finally {
+      setIsPending(false)
     }
-
-    // if (student.documents && student.documents?.length > 0) {
-    //   for (let i = 0; i < student?.documents?.length; i++) {
-    //     const formData = new FormData()
-    //     formData.append('document', student.documents[i])
-    //     formData.append('students', responseRegister.student.id)
-
-    //     const responseDocuments = await registerDocuments(formData)
-
-    //     if (responseDocuments?.message) {
-    //       toast.error(responseRegister.message, {
-    //         duration: 3000,
-    //         position: 'top-center',
-    //       })
-    //     }
-    //   }
-    // }
-
-    toast.success('Aluno cadastrado com sucesso!', {
-      duration: 3000,
-      position: 'top-center',
-    })
-    methods.reset()
-    setStep(STEPS.PERSONAL)
   }
 
   return (
@@ -305,11 +284,12 @@ export function ContentSteps() {
               <Button
                 type="button"
                 title="Voltar"
+                disabled={isPending}
                 className="bg-[#5e81f418] hover:!bg-[#00000018] !text-[#0f2b92]"
               />
             </Link>
 
-            <Button title="Salvar" />
+            <Button title="Salvar" isPending={isPending} />
           </div>
         </form>
       </div>

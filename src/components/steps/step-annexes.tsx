@@ -40,10 +40,10 @@ interface StepAnnexesProps {
 }
 
 export function StepAnnexes({ studentId, isEditing = true }: StepAnnexesProps) {
-  const { watch } = useFormContext<FormAnnexesType>()
+  const { watch, setValue } = useFormContext<FormAnnexesType>()
   const watchDocuments = watch('documents') as FileUpload[]
 
-  const [files, setFiles] = useState<FileUpload[]>(watchDocuments)
+  const [files, setFiles] = useState<FileUpload[]>(watchDocuments ?? [])
   const [profileImage, setProfileImage] = useState<File | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -51,6 +51,7 @@ export function StepAnnexes({ studentId, isEditing = true }: StepAnnexesProps) {
 
   const onDropFiles = useCallback(
     async (accepted: File[]) => {
+      // check if I am editing files of an existing user
       if (studentId) {
         setIsUploading(true)
         setUploadProgress(0)
@@ -84,10 +85,11 @@ export function StepAnnexes({ studentId, isEditing = true }: StepAnnexesProps) {
 
         // setIsUploading(false)
       } else {
+        setValue('documents', [...files, ...accepted])
         setFiles((prev) => [...prev, ...accepted])
       }
     },
-    [studentId],
+    [studentId, files, setValue],
   )
 
   const onDropRejected = useCallback((fileRejections: FileRejection[]) => {
@@ -115,40 +117,6 @@ export function StepAnnexes({ studentId, isEditing = true }: StepAnnexesProps) {
         },
       )
     })
-
-    // fileRejections.forEach(({ file, errors }) => {
-    //   console.log(errors.length, 'FFF')
-
-    //   errors.forEach((err) => {
-    //     if (err.code === 'file-too-large') {
-    //       return toast.error(
-    //         `O arquivo ${file.name} ultrapassa o tamanho máximo permitido (4MB).`,
-    //         {
-    //           duration: 3000,
-    //           position: 'top-center',
-    //         },
-    //       )
-    //     } else if (err.code === 'too-many-files') {
-    //       return toast.error(
-    //         `Número máximo de arquivos excedido (5 arquivos).`,
-    //         {
-    //           duration: 3000,
-    //           position: 'top-center',
-    //         },
-    //       )
-    //     } else {
-    //       return toast.error(
-    //         `Erro ao adicionar arquivo ${file.name}: ${err.message}`,
-    //         {
-    //           duration: 3000,
-    //           position: 'top-center',
-    //         },
-    //       )
-    //     }
-    //   })
-    // })
-
-    console.log(fileRejections)
   }, [])
 
   const refInputProfileImage = useRef<HTMLInputElement | null>(null)
@@ -166,11 +134,13 @@ export function StepAnnexes({ studentId, isEditing = true }: StepAnnexesProps) {
       f instanceof File ? f.name === fileIdOrName : f.id === fileIdOrName,
     )!
 
+    // checks if the selected file is a file coming from the api
     if (!(file instanceof File)) {
       setRemovingFileIds((prev) => [...prev, fileIdOrName])
 
       try {
         await deleteDocument({ fileId: file.id })
+
         setFiles((prev) =>
           prev.filter((f) =>
             f instanceof File ? f.name !== fileIdOrName : f.id !== fileIdOrName,
@@ -190,11 +160,12 @@ export function StepAnnexes({ studentId, isEditing = true }: StepAnnexesProps) {
         setRemovingFileIds((prev) => prev.filter((id) => id !== fileIdOrName))
       }
     } else {
-      setFiles((prev) =>
-        prev.filter((f) =>
-          f instanceof File ? f.name !== fileIdOrName : f.id !== fileIdOrName,
-        ),
+      const removeFile = files.filter((f) =>
+        f instanceof File ? f.name !== fileIdOrName : f.id !== fileIdOrName,
       )
+
+      setValue('documents', removeFile)
+      setFiles(removeFile)
     }
   }
 

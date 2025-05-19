@@ -20,7 +20,10 @@ import type { Course } from '@/http/courses/get-courses'
 import { getAllCourse } from '@/http/courses/get-all-courses'
 
 export const formCourseSchema = yup.object({
-  module_id: yup.string().min(1, 'Selecione um módulo.'),
+  module_id: yup
+    .string()
+    .min(1, 'Selecione um módulo.')
+    .required('Selecione um módulo'),
 })
 
 export type FormCourseType = yup.InferType<typeof formCourseSchema>

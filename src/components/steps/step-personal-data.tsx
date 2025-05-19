@@ -496,7 +496,7 @@ export function StepPersonalData({ isEditing = true }: StepPersonalDataProps) {
               render={({ field }) => (
                 <Select
                   onValueChange={field.onChange}
-                  value={String(field.value)}
+                  value={field.value ?? ''}
                 >
                   <SelectTrigger
                     variant="secondary"
@@ -594,7 +594,7 @@ export function StepPersonalData({ isEditing = true }: StepPersonalDataProps) {
               render={({ field }) => (
                 <Select
                   onValueChange={field.onChange}
-                  value={String(field.value)}
+                  value={field.value ?? ''}
                 >
                   <SelectTrigger
                     variant="secondary"

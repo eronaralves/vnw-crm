@@ -8,6 +8,8 @@ export function useFiltersStudents() {
   const work = searchParams.getAll('work') ?? []
   const search = searchParams.get('search')
   const state = searchParams.getAll('state')
+  const ageMin = searchParams.get('age_min') ?? ''
+  const ageMax = searchParams.get('age_max') ?? ''
   const group = searchParams.getAll('group')
   const study = searchParams.getAll('study') ?? []
   const gender = searchParams.getAll('gender')
@@ -23,6 +25,8 @@ export function useFiltersStudents() {
     city,
     work,
     search,
+    ageMin,
+    ageMax,
     state,
     group,
     study,
