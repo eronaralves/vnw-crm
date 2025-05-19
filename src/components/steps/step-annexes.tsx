@@ -31,7 +31,7 @@ type FileUpload =
 
 export const formAnnexesSchema = yup.object({
   documents: yup.array().of(yup.mixed<FileUpload>()),
-  profile_picture: yup.string(),
+  profile_picture: yup.string().nullable(),
 })
 
 export type FormAnnexesType = yup.InferType<typeof formAnnexesSchema>
@@ -187,8 +187,6 @@ export function StepAnnexes({ studentId, isEditing = true }: StepAnnexesProps) {
   function handleRemoveProfile() {
     setProfileImage(null)
   }
-
-  console.log(profileImage instanceof File)
 
   return (
     <div className="w-full h-full flex-1 flex flex-wrap sm:flex-nowrap gap-6 overflow-hidden">

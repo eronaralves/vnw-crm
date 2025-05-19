@@ -62,7 +62,7 @@ const fullSchema = formPersonalSchema
 type FormData = yup.InferType<typeof fullSchema>
 
 export function ContentSteps() {
-  const [step, setStep] = useState(STEPS.ANNEXES)
+  const [step, setStep] = useState(STEPS.PERSONAL)
   const [isPending, setIsPending] = useState(false)
 
   const schemaByStep: Record<STEPS, yup.AnyObjectSchema> = {

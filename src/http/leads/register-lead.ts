@@ -110,8 +110,6 @@ export async function registerLead({ formData }: RegisterLeadRequest) {
       leadId,
     }
   } catch (error) {
-    console.log(error, 'DATA')
-
     const isAppError = error instanceof AppError
     const errorMessage = isAppError
       ? error.detail
