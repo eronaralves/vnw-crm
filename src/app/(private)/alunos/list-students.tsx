@@ -727,7 +727,17 @@ export function ListStudent({ status }: ListStudentProps) {
                 </h3>
 
                 <div className="w-full flex flex-col items-start gap-3">
-                  {search && <span>Pesquisa: {search}</span>}
+                  {search && (
+                    <span>
+                      Pesquisa: <span className="font-semibold">{search}</span>
+                    </span>
+                  )}
+
+                  {status && (
+                    <span>
+                      Status: <span className="font-semibold">{status}</span>
+                    </span>
+                  )}
 
                   {filters.map((filter) => {
                     if (filtersSelectedInobject[filter.value]) {

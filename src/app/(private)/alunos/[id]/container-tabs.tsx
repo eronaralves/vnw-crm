@@ -13,7 +13,7 @@ import { toast } from 'sonner'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // Icons
-import { AlertCircle, Pencil, Share } from 'lucide-react'
+import { AlertCircle, Pencil } from 'lucide-react'
 
 // Utils
 import { dateDiff } from '@/utils/date-diff'
@@ -56,6 +56,7 @@ import {
   StepSocioeconomicData,
 } from '@/components/steps/step-socioeconomic-data'
 import { ButtonGraduatedStudents } from '@/components/button-graduated'
+import { ButtonTransferStudents } from '@/components/button-transfer-students'
 
 interface ContentProfileProps {
   student: ProfileStudent
@@ -283,7 +284,9 @@ export function ContainerTabs({ student }: ContentProfileProps) {
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
             <div>
               <h1 className="text-2xl font-bold">{student.fullname}</h1>
-              <p className="text-sm text-gray-500">{student.course.name}</p>
+              {student.status !== 'Transferido' && (
+                <p className="text-sm text-gray-500">{student.course.name}</p>
+              )}
             </div>
 
             <TagStatus status={student.status} />
@@ -329,12 +332,12 @@ export function ContainerTabs({ student }: ContentProfileProps) {
                   }}
                   onSuccess={() => router.refresh()}
                 />
-                <Button
-                  title="Transferir"
-                  className="border border-zinc-500 bg-transparent text-zinc-500 hover:bg-zinc-500 hover:text-white"
-                >
-                  <Share size={16} />
-                </Button>
+
+                <ButtonTransferStudents
+                  studentId={student.id}
+                  moduleId={student.course.moduleCurrent}
+                  onSuccess={() => router.refresh()}
+                />
               </>
             )}
           </div>

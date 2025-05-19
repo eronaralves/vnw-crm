@@ -540,7 +540,11 @@ export function ListLeads() {
                 </h3>
 
                 <div className="w-full flex flex-col items-start gap-3">
-                  {search && <span>Pesquisa: {search}</span>}
+                  {search && (
+                    <span>
+                      Pesquisa: <span className="font-semibold">{search}</span>
+                    </span>
+                  )}
 
                   {filters.map((filter) => {
                     if (filtersInobject[filter.value]) {

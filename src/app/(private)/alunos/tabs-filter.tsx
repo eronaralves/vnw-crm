@@ -1,6 +1,7 @@
 'use client'
 
 import { TabsList, TabsTrigger } from '@/components/ui/tabs'
+import type { STATUS_STUDENT } from '@/types/status-student'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { startTransition } from 'react'
 
@@ -9,7 +10,7 @@ export function TabsFilters() {
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams.toString())
 
-  function handleTabSelected(tab: string) {
+  function handleTabSelected(tab: STATUS_STUDENT) {
     params.set('status', tab)
     params.delete('page')
 
@@ -48,6 +49,14 @@ export function TabsFilters() {
         className="data-[state=active]:border-0 data-[state=active]:rounded-none data-[state=active]:text-[#173A92] data-[state=active]:border-[#7a82a7] p-4 text-sm"
       >
         Formados
+      </TabsTrigger>
+
+      <TabsTrigger
+        value="Transferido"
+        onClick={() => handleTabSelected('Transferido')}
+        className="data-[state=active]:border-0 data-[state=active]:rounded-none data-[state=active]:text-[#173A92] data-[state=active]:border-[#7a82a7] p-4 text-sm"
+      >
+        Transferidos
       </TabsTrigger>
     </TabsList>
   )
