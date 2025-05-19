@@ -50,7 +50,7 @@ export function ManuNavLinks() {
   ]
 
   return (
-    <nav className="flex-1 ">
+    <nav className="flex-1">
       {menuItems.map((item) => {
         const Icon = item.icon
         const isActive = pathname.includes(item.href)
@@ -59,11 +59,13 @@ export function ManuNavLinks() {
           <Link
             key={item.href}
             href={item.href}
-            className={`w-full text-[#173A92] flex items-center gap-8 p-4 duration-300 group ${isActive ? 'bg-[#F5F5FA]' : 'bg-white'} `}
+            className={`w-full text-[#173A92] flex items-center max-lg:justify-center gap-8 p-4 duration-300 group ${isActive ? 'bg-[#F5F5FA]' : 'bg-white'} `}
           >
-            <Icon size={22} color="#173A92" />
+            <span title={item.label}>
+              <Icon size={22} color="#173A92" />
+            </span>
             <span
-              className={`duration-300  ${isActive ? 'text-[#FF611E]' : '#173A92'} group-hover:text-[#FF611E]`}
+              className={`lg:flex hidden duration-300  ${isActive ? 'text-[#FF611E]' : '#173A92'} group-hover:text-[#FF611E]`}
             >
               {item.label}
             </span>
