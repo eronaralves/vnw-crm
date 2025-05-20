@@ -134,7 +134,7 @@ export function ButtonTransferStudents({
         <div>
           <DialogTitle>Deseja tranferir aluno?</DialogTitle>
 
-          <div className="flex gap-x-4 gap-y-6 mt-6">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-6 mt-6">
             <div className="w-full flex flex-col gap-1">
               <label className="text-sm font-medium">Curso ID:</label>
 
