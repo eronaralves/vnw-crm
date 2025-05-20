@@ -20,7 +20,7 @@ export function SideBar() {
       <div className="w-full h-full flex flex-col">
         <ManuNavLinks />
 
-        <div className="mt-auto">
+        <div className="mt-auto max-lg:mx-auto">
           <ButtonSignOutSidebar />
         </div>
       </div>
