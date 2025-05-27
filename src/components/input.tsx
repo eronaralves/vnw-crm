@@ -24,10 +24,10 @@ export function Input({
         `w-full flex items-center border relative
         border-[#0f2b92]
         focus-within:border-blue-900`,
-        error && 'border-red-500',
         variant === 'secondary' &&
-          'border-[#b1b3b5] focus-within:border-[#caccce]',
+          'border-[#E2E6F1] focus-within:border-[#7A82A3] rounded-sm',
         disabled && 'border-[#dddfe1]`',
+        error && 'border-[#D02A2A] focus-within:border-[#D02A2A]',
       )}
     >
       <input
@@ -36,7 +36,8 @@ export function Input({
           'focus:outline-[#5e75cb] disabled:text-[#8181a5] disabled:bg-[#e9ecef] disabled:border-[#dddfe1] disabled:placeholder:text-[#8181a5] w-full px-3 py-2 text-sm  text-gray-900 placeholder:text-gray-800',
           Icon && 'pr-10',
           variant === 'secondary' &&
-            'focus:outline-[#9c9d9e] placeholder:text-[#9c9d9e]',
+            'text-[#1F2127] focus:outline-[#9c9d9e] placeholder:text-[#7A82A3]',
+          error && 'focus:outline-[#D02A2A]',
           className,
         )}
         {...rest}

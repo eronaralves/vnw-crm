@@ -8,6 +8,7 @@ import {
   BookOpen,
   GraduationCap,
   HeartHandshake,
+  Mail,
   PlusCircle,
   UserCog,
   Users,
@@ -46,6 +47,11 @@ export function ManuNavLinks() {
       label: 'Administração',
       href: '/admins',
       icon: PlusCircle,
+    },
+    {
+      label: 'Envio de e-mail',
+      href: '/emails',
+      icon: Mail,
     },
   ]
 
