@@ -2,7 +2,6 @@ import { z } from 'zod'
 
 const envSchema = z.object({
   BASE_URL: z.string(),
-  NEXTAUTH_SECRET: z.string(),
 })
 
 const _env = envSchema.safeParse(process.env)
