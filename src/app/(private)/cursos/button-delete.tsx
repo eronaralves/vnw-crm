@@ -65,7 +65,7 @@ export function ButtonDelete({ courseId }: ButtonDeleteProps) {
           </DialogDescription>
 
           <div className="flex justify-end gap-2 mt-4">
-            <DialogClose>
+            <DialogClose asChild>
               <Button
                 title="Cancelar"
                 className="self-end bg-red-500 hover:bg-red-400"
