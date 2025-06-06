@@ -16,7 +16,8 @@ export type Journey = {
     feedback: {
       performance: PERFORMANCE
     }[]
-    github_username: string
+    github_username: string | null
+    github_repository: string | null
     grade: string
     status: string
   }
@@ -28,6 +29,7 @@ interface GetJourneyRequest {
   filters: {
     search?: string
     performance?: string[]
+    module_name?: string
   }
 }
 
@@ -37,7 +39,7 @@ export async function getJourney({
   filters,
 }: GetJourneyRequest) {
   try {
-    const response = await api.get('/enrollment/journey/', {
+    const response = await api.get('/students/journey/filter', {
       params: {
         limit,
         offset,
@@ -53,24 +55,27 @@ export async function getJourney({
     const journey: Journey[] = response.data.results.map((journey: any) => {
       return {
         errolmentId: journey.id,
-        id: journey.id_student.id,
-        fullname: journey.id_student.fullname,
-        email: journey.id_student.email,
-        phone: journey.id_student.phone,
+        id: journey.id_enrollment.id_student.id,
+        fullname: journey.id_enrollment.id_student.fullname,
+        email: journey.id_enrollment.id_student.email,
+        phone: journey.id_enrollment.id_student.phone,
         challenge: {
-          ...journey.activity_grade,
+          github_username: null, // journey.id_enrollment.github_username,
+          github_repository: null, // journey.id_enrollment.github_repository,
         },
-        frequency: journey.frequency,
+        frequency: journey.id_enrollment.frequency,
       } as Journey
     })
 
-    console.log(response.data.results[0])
+    console.log(data, 'data')
 
     return {
       journey,
       count: data.count,
     }
   } catch (error) {
+    console.log(error, 'error')
+
     const isAppError = error instanceof AppError
     const errorMessage = isAppError
       ? error.detail

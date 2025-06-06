@@ -5,11 +5,13 @@ import { toast } from 'sonner'
 
 import { useQuery } from '@tanstack/react-query'
 import { Copy, CopyCheck, Loader2 } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 // Hooks
 import { useFiltersJourney } from '@/hooks/useFiltersJourney'
 
 // Utils
+import { cn } from '@/lib/utils'
 import { formatPhone } from '@/utils/format-phone'
 
 // Http
@@ -31,8 +33,6 @@ import { SelectMultiple } from '@/components/select-multiple'
 import { TagPerformance } from '@/components/tag-performance'
 import { FormSearch } from '@/components/form-search'
 import { AlertError } from '@/components/alert-error'
-import { useRouter } from 'next/navigation'
-import { cn } from '@/lib/utils'
 import {
   Select,
   SelectContent,
@@ -43,11 +43,27 @@ import {
 
 export function ListJourney() {
   const [copy, setCopy] = useState<string | null>(null)
-  const [course, setCourse] = useState<string | null>(null)
-  const [module, setModule] = useState<string | null>(null)
 
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const course = searchParams.get('course')
+  const module = searchParams.get('module') ?? undefined
   const { page, search, performance } = useFiltersJourney()
+
+  function createQueryString(params: Record<string, string | null>) {
+    const newSearchParams = new URLSearchParams(searchParams.toString())
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === null) {
+        newSearchParams.delete(key)
+      } else {
+        newSearchParams.set(key, value)
+      }
+    })
+
+    return newSearchParams.toString()
+  }
 
   const {
     data: journeyData,
@@ -55,13 +71,14 @@ export function ListJourney() {
     isFetching,
     error,
   } = useQuery({
-    queryKey: ['get-journey', page, search, performance],
+    queryKey: ['get-journey', page, search, performance, module],
     queryFn: () =>
       getJourney({
         offset: (Number(page) - 1) * LIMIT_PER_PAGE,
         filters: {
           search,
           performance,
+          module_name: module,
         },
       }),
     refetchOnWindowFocus: true,
@@ -79,7 +96,7 @@ export function ListJourney() {
 
   const modules = useMemo(() => {
     return coursesData?.courses?.find((c) => c.id === course)?.course_modules
-  }, [course, coursesData])
+  }, [coursesData, course])
 
   async function handleCopy(copy: string) {
     try {
@@ -90,7 +107,7 @@ export function ListJourney() {
         setCopy(null)
       }, 1000)
     } catch (err) {
-      toast.warning(`Error ao copiar ${copy}, tente novamente!`, {
+      toast.warning(`Error ao copiar ${copy}, tente cle!`, {
         duration: 3000,
         position: 'top-center',
       })
@@ -106,10 +123,14 @@ export function ListJourney() {
               <label className="text-black font-bold">Curso</label>
 
               <Select
-                defaultValue="all"
+                value={courseLoading ? '' : (course ?? 'all')}
                 onValueChange={(value) => {
-                  setCourse(value === 'all' ? null : value)
-                  setModule(null)
+                  const newCourse = value === 'all' ? null : value
+                  const queryString = createQueryString({
+                    course: newCourse,
+                    module: null,
+                  })
+                  router.push(`?${queryString}`)
                 }}
               >
                 <SelectTrigger isLoading={courseLoading}>
@@ -133,7 +154,13 @@ export function ListJourney() {
               <Select
                 disabled={course === null}
                 value={module || ''}
-                onValueChange={(value) => setModule(value)}
+                onValueChange={(value) => {
+                  const queryString = createQueryString({
+                    course,
+                    module: value,
+                  })
+                  router.push(`?${queryString}`)
+                }}
               >
                 <SelectTrigger isLoading={courseLoading}>
                   <SelectValue placeholder="Selecione um módulo" />
@@ -141,7 +168,7 @@ export function ListJourney() {
 
                 <SelectContent>
                   {modules?.map((module) => (
-                    <SelectItem key={module.id} value={module.id}>
+                    <SelectItem key={module.id} value={module.name}>
                       {module.name}
                     </SelectItem>
                   ))}
@@ -273,7 +300,10 @@ export function ListJourney() {
                 </TableCell>
 
                 <TableCell className="p-5 whitespace-nowrap">
-                  <div className="flex gap-3">
+                  <div
+                    className="flex gap-3"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <span className="text-sm text-[#1c1d21] ">
                       {journey.email}
                     </span>
@@ -327,7 +357,7 @@ export function ListJourney() {
 
                 <TableCell className="p-5 whitespace-nowrap">
                   <span className="text-sm text-[#1c1d21] ">
-                    {journey.challenge.grade ?? 'Desafio não enviado'}
+                    {/* {journey.challenge.grade ?? 'Desafio não enviado'} */}
                   </span>
                 </TableCell>
 
@@ -366,6 +396,14 @@ export function ListJourney() {
                 </TableCell>
               </TableRow>
             ))}
+
+            {journeyData?.journey.length === 0 && !isLoading && (
+              <TableRow>
+                <TableCell colSpan={2} className="px-5 py-10 text-gray-500">
+                  <div>Nenhum aluno encontrado.</div>
+                </TableCell>
+              </TableRow>
+            )}
 
             {isLoading && (
               <TableRow>
