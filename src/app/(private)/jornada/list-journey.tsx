@@ -5,11 +5,13 @@ import { toast } from 'sonner'
 
 import { useQuery } from '@tanstack/react-query'
 import { Copy, CopyCheck, Loader2 } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 // Hooks
 import { useFiltersJourney } from '@/hooks/useFiltersJourney'
 
 // Utils
+import { cn } from '@/lib/utils'
 import { formatPhone } from '@/utils/format-phone'
 
 // Http
@@ -31,8 +33,6 @@ import { SelectMultiple } from '@/components/select-multiple'
 import { TagPerformance } from '@/components/tag-performance'
 import { FormSearch } from '@/components/form-search'
 import { AlertError } from '@/components/alert-error'
-import { useRouter } from 'next/navigation'
-import { cn } from '@/lib/utils'
 import {
   Select,
   SelectContent,
@@ -43,11 +43,27 @@ import {
 
 export function ListJourney() {
   const [copy, setCopy] = useState<string | null>(null)
-  const [course, setCourse] = useState<string | null>(null)
-  const [module, setModule] = useState<string | null>(null)
 
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const course = searchParams.get('course')
+  const module = searchParams.get('module')
   const { page, search, performance } = useFiltersJourney()
+
+  function createQueryString(params: Record<string, string | null>) {
+    const newSearchParams = new URLSearchParams(searchParams.toString())
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === null) {
+        newSearchParams.delete(key)
+      } else {
+        newSearchParams.set(key, value)
+      }
+    })
+
+    return newSearchParams.toString()
+  }
 
   const {
     data: journeyData,
@@ -107,9 +123,14 @@ export function ListJourney() {
 
               <Select
                 defaultValue="all"
+                value={course === null ? 'all' : course}
                 onValueChange={(value) => {
-                  setCourse(value === 'all' ? null : value)
-                  setModule(null)
+                  const newCourse = value === 'all' ? null : value
+                  const queryString = createQueryString({
+                    course: newCourse,
+                    module: null,
+                  })
+                  router.push(`?${queryString}`)
                 }}
               >
                 <SelectTrigger isLoading={courseLoading}>
@@ -133,7 +154,13 @@ export function ListJourney() {
               <Select
                 disabled={course === null}
                 value={module || ''}
-                onValueChange={(value) => setModule(value)}
+                onValueChange={(value) => {
+                  const queryString = createQueryString({
+                    course,
+                    module: value,
+                  })
+                  router.push(`?${queryString}`)
+                }}
               >
                 <SelectTrigger isLoading={courseLoading}>
                   <SelectValue placeholder="Selecione um módulo" />
