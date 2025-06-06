@@ -124,6 +124,22 @@ export function ButtonEvadeStudents({
                 <SelectItem value="Dificuldades técnicas">
                   Dificuldades técnicas
                 </SelectItem>
+                <SelectItem value="Dificuldade com o conteúdo">
+                  Dificuldade com o conteúdo
+                </SelectItem>
+                <SelectItem value="Problemas pessoais/familiares">
+                  Problemas pessoais/familiares
+                </SelectItem>
+                <SelectItem value="Não se identificou com o curso ou metodologia">
+                  Não se identificou com o curso ou metodologia
+                </SelectItem>
+                <SelectItem value="Saúde (física ou mental)">
+                  Saúde (física ou mental)
+                </SelectItem>
+                <SelectItem value="Conseguiu emprego ou outro curso">
+                  Conseguiu emprego ou outro curso
+                </SelectItem>
+                <SelectItem value="Outros">Outros</SelectItem>
               </SelectContent>
             </Select>
           </div>

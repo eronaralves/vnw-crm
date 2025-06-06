@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, Fragment, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -289,6 +289,7 @@ export function ListStudent({ status }: ListStudentProps) {
               <Button title="Importar">
                 <FileDown size={17} color="#fff" />
               </Button>
+
               <Link href="/alunos/novo-aluno">
                 <Button title="Adicionar" />
               </Link>
