@@ -59,11 +59,6 @@ export function Pagination({
   const totalPages = Math.ceil(totalCount / (perPage ?? LIMIT_PER_PAGE)) || 1
   const currentPage = Number(pageIndex) ?? 1
 
-  // useEffect(() => {
-  //   params.delete('page')
-  //   router.push(`?${params.toString()}`)
-  // }, [])
-
   function onPageChange(page: number) {
     params.set('page', page.toString())
     router.push(`?${params.toString()}`)

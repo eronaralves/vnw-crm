@@ -7,7 +7,11 @@ const filtersTableStudents = [
   },
   {
     name: 'Turma',
-    options: ['Manhã', 'Tarde', 'Noite'],
+    options: [
+      { value: 'Manhã', label: 'Manhã' },
+      { value: 'Tarde', label: 'Tarde' },
+      { value: 'Noite', label: 'Noite' },
+    ],
     value: 'group',
   },
   {
@@ -38,20 +42,26 @@ const filtersTableStudents = [
     name: 'Motivo de Evasão',
     value: 'reason_give_up',
     options: [
-      'Sem resposta',
-      'Conflito de horários',
-      'Trabalho',
-      'Dificuldades técnicas',
+      { value: 'Sem resposta', label: 'Sem resposta' },
+      { value: 'Conflito de horários', label: 'Conflito de horários' },
+      { value: 'Trabalho', label: 'Trabalho' },
+      { value: 'Dificuldades técnicas', label: 'Dificuldades técnicas' },
     ],
   },
   {
     name: 'Estuda',
-    options: ['Sim', 'Não'],
+    options: [
+      { value: 'Sim', label: 'Sim' },
+      { value: 'Não', label: 'Não' },
+    ],
     value: 'study',
   },
   {
     name: 'Empregado',
-    options: ['Sim', 'Não'],
+    options: [
+      { value: 'Sim', label: 'Sim' },
+      { value: 'Não', label: 'Não' },
+    ],
     value: 'work',
   },
   {
@@ -125,4 +135,13 @@ const filtersTableLeads = [
   },
 ]
 
-export { filtersTableStudents, filtersTableLeads }
+const filtersTableJourney = [
+  {
+    id: 'course_options',
+    name: 'Curso',
+    value: 'course_name',
+    options: [],
+  },
+]
+
+export { filtersTableStudents, filtersTableLeads, filtersTableJourney }

@@ -275,8 +275,6 @@ export function ContainerTabs({ student }: ContentProfileProps) {
     }
   }
 
-  console.log(methods.formState.errors)
-
   return (
     <FormProvider {...methods}>
       <form

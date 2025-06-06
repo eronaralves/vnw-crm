@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -18,6 +18,7 @@ import { useDebounce } from '@/hooks/useDebouce'
 import { useFiltersLeads } from '@/hooks/useFiltersLeads'
 
 // Utils
+import { cn } from '@/lib/utils'
 import { formatPhone } from '@/utils/format-phone'
 import { filtersTableLeads } from '@/utils/filters'
 import { parseSearchParamsToObject } from '@/utils/parse-search-params-to-object'
@@ -56,7 +57,8 @@ export function ListLeads() {
   const [exportedSpreadsheet, setExportedSpreadsheet] =
     useState<null | Spreadsheet>(null)
 
-  const [filters, setFilters] = useState(filtersTableLeads)
+  const [filtersInTable, setFiltersInTable] = useState(filtersTableLeads)
+
   const [ageMin, setAgeMin] = useState('')
   const [ageMax, setAgeMax] = useState('')
 
@@ -123,34 +125,35 @@ export function ListLeads() {
     refetchOnWindowFocus: true,
     staleTime: 1000 * 60 * 2,
     placeholderData: (data) => data,
-    retry: 3,
+    retry: 1,
     retryDelay: (attempt) => Math.min(attempt * 1000, 5000),
   })
 
-  useQuery({
+  const { data: filters, isLoading: loadingFilters } = useQuery({
     queryKey: ['get-options-filter-leads'],
-    queryFn: async () =>
-      await getOptionsFilters().then((res) => {
-        const optionsFilter = res.data
+    queryFn: getOptionsFilters,
+    select: (res) => {
+      const optionsFilter = res.data
 
-        const newFiltersOptions = filters.map((filter) => {
-          if (!filter.id) {
-            return filter
-          }
+      return filtersInTable.map((filter) => {
+        if (!filter.id) return filter
 
-          const options = optionsFilter[filter.id]
-          const clearOptions = options.filter((option: string) => option)
+        const options = optionsFilter[filter.id] || []
+        const clearOptions = options
+          .filter((option: string) => option)
+          .map((item: string) => {
+            return {
+              label: item,
+              value: item,
+            }
+          })
 
-          return {
-            ...filter,
-            options: clearOptions,
-          }
-        })
-
-        setFilters(newFiltersOptions)
-
-        return res
-      }),
+        return {
+          ...filter,
+          options: clearOptions,
+        }
+      })
+    },
   })
 
   async function handleExportStudent() {
@@ -182,6 +185,12 @@ export function ListLeads() {
       router.replace('leads')
     }
   }
+
+  useEffect(() => {
+    if (filters) {
+      setFiltersInTable(filters)
+    }
+  }, [filters])
 
   return (
     <div className="w-full h-full gap-10 flex flex-col">
@@ -252,7 +261,7 @@ export function ListLeads() {
                 </div>
               </TableHead>
 
-              {filters.map((filter) => (
+              {filtersInTable.map((filter) => (
                 <TableHead
                   key={filter.name}
                   className="px-5 pb-5 text-left whitespace-nowrap  min-w-[250px]"
@@ -262,7 +271,10 @@ export function ListLeads() {
                       {filter.name}
                     </label>
 
-                    <SelectMultiple filter={filter} />
+                    <SelectMultiple
+                      filter={filter}
+                      isLoading={loadingFilters}
+                    />
                   </div>
                 </TableHead>
               ))}
@@ -274,12 +286,11 @@ export function ListLeads() {
               dataLeads?.leads?.map((lead) => (
                 <TableRow
                   key={lead.id}
-                  className={`${isFetching ? 'opacity-40' : ''}`}
-                  onClick={(e) => {
-                    const target = e.target as HTMLElement
-
-                    if (target.closest('[data-ignore-row-click]')) return
-
+                  className={cn(
+                    'hover:bg-gray-200/50',
+                    isFetching && 'opacity-40',
+                  )}
+                  onClick={() => {
                     router.push(`/leads/${lead.id}`)
                   }}
                 >
@@ -447,7 +458,7 @@ export function ListLeads() {
                     </span>
                   )}
 
-                  {filters.map((filter) => {
+                  {filtersInTable.map((filter) => {
                     if (filtersInobject[filter.value]) {
                       return (
                         <span key={filter.name} className="text-start">
