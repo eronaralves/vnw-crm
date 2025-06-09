@@ -53,6 +53,7 @@ export async function getJourney({
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const journey: Journey[] = response.data.results.map((journey: any) => {
+      console.log(journey.id_enrollment, 'journey')
       return {
         errolmentId: journey.id,
         id: journey.id_enrollment.id_student.id,

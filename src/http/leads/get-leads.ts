@@ -62,7 +62,7 @@ type Lead = {
 
 export async function getLeads({
   offset = 0,
-  limit = 7,
+  limit = 9,
   filters,
 }: GetLeadsRequest) {
   try {

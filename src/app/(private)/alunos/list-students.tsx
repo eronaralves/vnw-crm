@@ -24,7 +24,14 @@ import { filtersTableStudents } from '@/utils/filters'
 import { parseSearchParamsToObject } from '@/utils/parse-search-params-to-object'
 
 // Icons
-import { CheckCircle, FileDown, FileUp, Loader2 } from 'lucide-react'
+import {
+  CheckCircle,
+  Copy,
+  CopyCheck,
+  FileDown,
+  FileUp,
+  Loader2,
+} from 'lucide-react'
 
 // Components
 import {
@@ -68,6 +75,7 @@ interface ListStudentProps {
 export function ListStudent({ status }: ListStudentProps) {
   const [filtersInTable, setFiltersInTable] = useState(filtersTableStudents)
 
+  const [copy, setCopy] = useState<string | null>(null)
   const [isExporting, setisExporting] = useState(false)
   const [exportedSpreadsheet, setExportedSpreadsheet] =
     useState<null | Spreadsheet>(null)
@@ -132,6 +140,7 @@ export function ListStudent({ status }: ListStudentProps) {
     queryFn: () =>
       getStudents({
         offset: (Number(page) - 1) * LIMIT_PER_PAGE,
+        limit: LIMIT_PER_PAGE,
         filters: {
           course_name: courseName,
           group,
@@ -274,6 +283,22 @@ export function ListStudent({ status }: ListStudentProps) {
     }
   }
 
+  async function handleCopy(copy: string) {
+    try {
+      await navigator.clipboard.writeText(copy)
+      setCopy(copy)
+
+      setTimeout(() => {
+        setCopy(null)
+      }, 1000)
+    } catch (err) {
+      toast.warning(`Error ao copiar ${copy}, tente cle!`, {
+        duration: 3000,
+        position: 'top-center',
+      })
+    }
+  }
+
   useEffect(() => {
     if (filters) {
       setFiltersInTable(filters)
@@ -281,7 +306,7 @@ export function ListStudent({ status }: ListStudentProps) {
   }, [filters])
 
   return (
-    <div className="flex-1 h-full flex flex-col gap-10">
+    <div className="flex-1 h-screen flex flex-col gap-6 pt-4 overflow-auto">
       <div className="flex flex-col gap-6">
         <div className="flex items-center gap-4 h-8">
           {status === 'Cursando' && (
@@ -332,11 +357,11 @@ export function ListStudent({ status }: ListStudentProps) {
         <AlertError errorMessage={error?.message} />
       </div>
 
-      <div className="w-full flex-1 h-full flex flex-col relative">
+      <div className="flex-1 overflow-hidden flex flex-col gap-2">
         <Table>
-          <TableHeader className=" bg-[#f5f5fa] ">
+          <TableHeader className="bg-[#f5f5fa] sticky top-0 z-40">
             <TableRow>
-              <TableHead className="w-[50px] px-5 text-left whitespace-nowrap z-50">
+              <TableHead className="px-5 pb-3 text-left whitespace-nowrap z-50">
                 <Checkbox
                   className="w-5 h-5"
                   checked={dataStudents?.students.every((student) =>
@@ -346,24 +371,22 @@ export function ListStudent({ status }: ListStudentProps) {
                 />
               </TableHead>
 
-              <TableHead className="min-w-[400px] px-5 pb-5 pl-[60px] text-left whitespace-nowrap overflow-visible">
-                <div className=" flex flex-col gap-2">
-                  <strong className="text-sm font-bold text-black ">
-                    Aluno
-                  </strong>
-                  <span className="text-[#80838e] font-normal m-0">ID</span>
-                </div>
+              <TableHead className="min-w-64 px-5 pb-3 text-left whitespace-nowrap overflow-visible">
+                <strong className="text-sm font-semibold text-black ">
+                  Aluno
+                </strong>
               </TableHead>
 
-              <TableHead className="min-w-[300px] px-5 pb-5 text-left whitespace-nowrap">
-                <div className="flex flex-col gap-2">
-                  <strong className="text-sm font-bold text-black">
-                    Contato
-                  </strong>
-                  <span className=" text-[#80838e] font-normal m-0 ">
-                    E-mail e Celular
-                  </span>
-                </div>
+              <TableHead className="min-w-52 px-5 pb-3 text-left whitespace-nowrap">
+                <strong className="text-sm font-semibold text-black">
+                  E-mail
+                </strong>
+              </TableHead>
+
+              <TableHead className="min-w-36 px-5 pb-3 text-left whitespace-nowrap">
+                <strong className="text-sm font-semibold text-black">
+                  Celular
+                </strong>
               </TableHead>
 
               <TableHead className="min-w-[130px] px-5 pb-5 h-full flex text-left whitespace-nowrap">
@@ -419,159 +442,217 @@ export function ListStudent({ status }: ListStudentProps) {
           </TableHeader>
 
           <TableBody>
-            {dataStudents?.students?.length !== 0
-              ? dataStudents?.students?.map((student) => (
-                  <TableRow
-                    key={student?.errolmentId}
-                    className={cn(
-                      'hover:bg-gray-200/50',
-                      isFetching && 'opacity-40',
-                    )}
-                    onClick={() => {
-                      router.push(`/alunos/${student.errolmentId}`)
-                    }}
-                  >
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <Checkbox
-                        className="w-5 h-5"
-                        onClick={(e) => e.stopPropagation()}
-                        checked={Boolean(
-                          selectedStudents.find(
-                            (studentSelect) =>
-                              studentSelect.id_student === student.id,
-                          ),
-                        )}
-                        onCheckedChange={() =>
-                          handleStudentSelection({
-                            id_module: student.course.moduleCurrent,
-                            id_student: student.id,
-                            enrollmentId: student.errolmentId,
-                          })
-                        }
-                      />
-                    </TableCell>
-
-                    <TableCell className="p-5 pl-[60px] whitespace-nowrap">
-                      <div className="flex flex-col gap-2">
-                        <strong className="text-sm font-bold text-[#1c1d21]">
-                          {student.fullname}
-                        </strong>
-                        <span className="text-xs text-[#1c1d21] ">
-                          ID {student.id}
-                        </span>
-                      </div>
-                    </TableCell>
-
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <div className="flex flex-col gap-2">
-                        <span className="text-xs text-[#1c1d21] ">
-                          {student.email}
-                        </span>
-                        <span className="text-xs text-[#1c1d21] ">
-                          {formatPhone(student?.phone)}
-                        </span>
-                      </div>
-                    </TableCell>
-
-                    <TableCell className="text-center p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {student.age}
-
-                        {/* {differenceInYears(
-                          new Date(),
-                          new UTCDate(student.birth_date),
-                        )} */}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {student.course.name}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {student.course.group}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {student.course.modality ?? 'Não informado'}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {student.course.programing_language ?? 'Não informado'}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {student.sexuality ?? 'Não informado'}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {student.gender ?? 'Não informado'}
-                      </span>
-                    </TableCell>
-
-                    {status === 'Evadiu' && (
-                      <TableCell className="p-5 whitespace-nowrap">
-                        <p className="w-[200px] truncate text-xs text-[#1c1d21] ">
-                          {student.reason_give_up ?? 'Não informado'}
-                        </p>
-                      </TableCell>
-                    )}
-
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {student.student_empregability?.study ? 'Sim' : 'Não'}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {student.student_empregability?.work ? 'Sim' : 'Não'}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {student.student_address?.community
-                          ? student.student_address?.community
-                          : 'Não informado'}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {student.student_address?.address?.city
-                          ? student.student_address?.address?.city
-                          : 'Não informado'}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="p-5 whitespace-nowrap">
-                      <span className="text-xs text-[#1c1d21] ">
-                        {student?.student_address?.address?.state
-                          ? student?.student_address?.address?.state
-                          : 'Não informado'}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                ))
-              : !isLoading && (
-                  <TableRow>
-                    <TableCell colSpan={2} className="px-5 py-10 text-gray-500">
-                      <div>Nenhum aluno encontrado.</div>
-                    </TableCell>
-                  </TableRow>
+            {dataStudents?.students.map((student) => (
+              <TableRow
+                tabIndex={0}
+                key={student.errolmentId}
+                className={cn(
+                  'hover:bg-gray-200/50',
+                  isFetching && 'opacity-40',
                 )}
+                onClick={(e) => {
+                  const targer = e.target as HTMLElement
+                  const tagName = targer.tagName.toLowerCase()
+                  if (tagName === 'button') {
+                    return
+                  }
+
+                  router.push(`/alunos/${student.errolmentId}`)
+                }}
+              >
+                <TableCell className="px-5 whitespace-nowrap">
+                  <Checkbox
+                    className="w-5 h-5"
+                    onClick={(e) => e.stopPropagation()}
+                    checked={Boolean(
+                      selectedStudents.find(
+                        (studentSelect) =>
+                          studentSelect.id_student === student.id,
+                      ),
+                    )}
+                    onCheckedChange={() =>
+                      handleStudentSelection({
+                        id_module: student.course.moduleCurrent,
+                        id_student: student.id,
+                        enrollmentId: student.errolmentId,
+                      })
+                    }
+                  />
+                </TableCell>
+
+                <TableCell className="max-w-80 p-5 whitespace-nowrap">
+                  <div className="flex gap-3">
+                    <span className="text-sm truncate capitalize">
+                      {student.fullname}
+                    </span>
+                    <button
+                      className="cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleCopy(student.fullname)
+                      }}
+                    >
+                      {copy === student.fullname ? (
+                        <CopyCheck
+                          size={16}
+                          className="text-green-600 transition-all duration-200"
+                        />
+                      ) : (
+                        <Copy size={16} />
+                      )}
+                    </button>
+                  </div>
+                </TableCell>
+
+                <TableCell className=" p-5 whitespace-nowrap">
+                  <div
+                    className="w-64 flex gap-3"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <span className="text-sm text-[#1c1d21] truncate">
+                      {student.email}
+                    </span>
+
+                    <button
+                      className="cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleCopy(student?.email)
+                      }}
+                    >
+                      {copy === student.email ? (
+                        <CopyCheck
+                          size={16}
+                          className="text-green-600 transition-all duration-200"
+                        />
+                      ) : (
+                        <Copy size={16} />
+                      )}
+                    </button>
+                  </div>
+                </TableCell>
+
+                <TableCell className="p-5 whitespace-nowrap">
+                  <div className="flex gap-3">
+                    <span className="text-sm text-[#1c1d21] ">
+                      {student.phone
+                        ? formatPhone(student.phone)
+                        : 'Não informado'}
+                    </span>
+
+                    <button
+                      className="cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleCopy(student?.phone)
+                      }}
+                    >
+                      {student?.phone &&
+                        (copy === student.phone ? (
+                          <CopyCheck
+                            size={16}
+                            className="text-green-600 transition-all duration-200"
+                          />
+                        ) : (
+                          <Copy size={16} />
+                        ))}
+                    </button>
+                  </div>
+                </TableCell>
+
+                <TableCell className="text-center p-5 whitespace-nowrap">
+                  <span className="text-sm text-[#1c1d21] ">{student.age}</span>
+                </TableCell>
+
+                <TableCell className="p-5 whitespace-nowrap">
+                  <span className="text-sm text-[#1c1d21] ">
+                    {student.course.name}
+                  </span>
+                </TableCell>
+
+                <TableCell className="p-5 whitespace-nowrap">
+                  <span className="text-sm text-[#1c1d21] ">
+                    {student.course.group}
+                  </span>
+                </TableCell>
+
+                <TableCell className="p-5 whitespace-nowrap">
+                  <span className="text-sm text-[#1c1d21] ">
+                    {student.course.modality ?? 'Não informado'}
+                  </span>
+                </TableCell>
+
+                <TableCell className="p-5 whitespace-nowrap">
+                  <span className="text-sm text-[#1c1d21] ">
+                    {student.course.programing_language ?? 'Não informado'}
+                  </span>
+                </TableCell>
+
+                <TableCell className="p-5 whitespace-nowrap">
+                  <span className="text-sm text-[#1c1d21] ">
+                    {student.sexuality ?? 'Não informado'}
+                  </span>
+                </TableCell>
+
+                <TableCell className="p-5 whitespace-nowrap">
+                  <span className="text-sm text-[#1c1d21] ">
+                    {student.gender ?? 'Não informado'}
+                  </span>
+                </TableCell>
+
+                {status === 'Evadiu' && (
+                  <TableCell className="p-5 whitespace-nowrap">
+                    <p className="w-[200px] truncate text-sm text-[#1c1d21] ">
+                      {student.reason_give_up ?? 'Não informado'}
+                    </p>
+                  </TableCell>
+                )}
+
+                <TableCell className="p-5 whitespace-nowrap">
+                  <span className="text-sm text-[#1c1d21] ">
+                    {student.student_empregability?.study ? 'Sim' : 'Não'}
+                  </span>
+                </TableCell>
+
+                <TableCell className="p-5 whitespace-nowrap">
+                  <span className="text-sm text-[#1c1d21] ">
+                    {student.student_empregability?.work ? 'Sim' : 'Não'}
+                  </span>
+                </TableCell>
+
+                <TableCell className="p-5 whitespace-nowrap">
+                  <span className="text-sm text-[#1c1d21] ">
+                    {student.student_address?.community
+                      ? student.student_address?.community
+                      : 'Não informado'}
+                  </span>
+                </TableCell>
+
+                <TableCell className="p-5 whitespace-nowrap">
+                  <span className="text-sm text-[#1c1d21] ">
+                    {student.student_address?.address?.city
+                      ? student.student_address?.address?.city
+                      : 'Não informado'}
+                  </span>
+                </TableCell>
+
+                <TableCell className="p-5 whitespace-nowrap">
+                  <span className="text-sm text-[#1c1d21] ">
+                    {student?.student_address?.address?.state
+                      ? student?.student_address?.address?.state
+                      : 'Não informado'}
+                  </span>
+                </TableCell>
+              </TableRow>
+            ))}
+
+            {dataStudents?.students.length === 0 && !isLoading && (
+              <TableRow>
+                <TableCell colSpan={2} className="px-5 py-10 text-gray-500">
+                  <div>Nenhum aluno encontrado.</div>
+                </TableCell>
+              </TableRow>
+            )}
 
             {isLoading && (
               <TableRow>
@@ -585,18 +666,15 @@ export function ListStudent({ status }: ListStudentProps) {
           </TableBody>
         </Table>
 
-        <div className="flex justify-center mt-auto ">
+        <div className="flex justify-center items-end">
           <Pagination
-            className="mt-4"
             pageIndex={Number(page)}
             totalCount={dataStudents?.count}
+            perPage={10}
             isLoading={isLoading}
           />
         </div>
-
-        <hr className="w-full min-h-[8px] mt-5 bg-gradient-primary" />
-
-        <div className="w-full max-w-[400px] flex items-center justify-between flex-wrap mt-7 px-4 py-2.5 gap-4 rounded-lg bg-[#5e81f419]">
+        <div className="w-full max-w-[400px] flex items-center justify-between flex-wrap mt-2 px-4 py-2.5 gap-4 rounded-lg bg-[#5e81f419]">
           <div className="flex flex-col gap-1">
             <span className="text-sm text-[#8181a5] ">Total de alunos</span>
             <strong className="text-xl text-[#1c1d21]">
