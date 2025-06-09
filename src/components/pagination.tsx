@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/pagination'
 import { Button } from '@/components/ui/button'
 
-export const LIMIT_PER_PAGE = 9
+export const LIMIT_PER_PAGE = 10
 
 interface PaginationProps {
   pageIndex: number
