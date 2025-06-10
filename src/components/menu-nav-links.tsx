@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 // Icons
 import {
   Eye,
+  Mail,
   Users,
   UserCog,
   BookOpen,
@@ -52,6 +53,11 @@ export function ManuNavLinks() {
       label: 'Administração',
       href: '/admins',
       icon: PlusCircle,
+    },
+    {
+      label: 'Envio de e-mail',
+      href: '/emails',
+      icon: Mail,
     },
   ]
 
