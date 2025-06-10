@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 
 // Icons
 import {
-  // Eye,
+  Eye,
   Mail,
   Users,
   UserCog,
@@ -34,11 +34,11 @@ export function ManuNavLinks() {
       href: '/cursos',
       icon: BookOpen,
     },
-    // {
-    //   label: 'Jornada',
-    //   href: '/jornada',
-    //   icon: Eye,
-    // },
+    {
+      label: 'Jornada',
+      href: '/jornada',
+      icon: Eye,
+    },
     {
       label: 'Equipe',
       href: '/equipe',
