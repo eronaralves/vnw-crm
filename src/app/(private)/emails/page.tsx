@@ -3,6 +3,7 @@ import { Send } from 'lucide-react'
 // Components
 import { Button } from '@/components/button'
 import { RowHistorical } from './row-historical'
+import Link from 'next/link'
 
 export type Email = {
   destinatarios: string[]
@@ -39,10 +40,11 @@ export default function HistoricalEmail() {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Histórico de E-mails
         </h1>
-
-        <Button title="Novo e-mail">
-          <Send size={16} className="mr-2" />
-        </Button>
+        <Link href="/envio-de-email">
+          <Button title="Novo e-mail">
+            <Send size={16} className="mr-2" />
+          </Button>
+        </Link>
       </div>
 
       <div className="flex flex-col divide-y divide-gray-200">

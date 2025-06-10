@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "PORT=3001 next dev",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -33,6 +33,7 @@
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.511.0",
     "next": "15.2.4",
+    "or": "^0.2.0",
     "postcss": "^8.5.3",
     "qs": "^6.14.0",
     "react": "^19.1.0",
