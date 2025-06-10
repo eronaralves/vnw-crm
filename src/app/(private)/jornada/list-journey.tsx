@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useQuery } from '@tanstack/react-query'
-import { Copy, CopyCheck, Loader2 } from 'lucide-react'
+import { Copy, CopyCheck, Github, Loader2 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 // Hooks
@@ -113,6 +113,8 @@ export function ListJourney() {
       })
     }
   }
+
+  console.log(journeyData)
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -357,7 +359,14 @@ export function ListJourney() {
 
                 <TableCell className="p-5 whitespace-nowrap">
                   <span className="text-sm text-[#1c1d21] ">
-                    {/* {journey.challenge.grade ?? 'Desafio não enviado'} */}
+                    <Github
+                      size={20}
+                      className={cn(
+                        journey.challenge.github_repository
+                          ? 'text-green-600'
+                          : 'text-gray-400 cursor-not-allowed',
+                      )}
+                    />
                   </span>
                 </TableCell>
 

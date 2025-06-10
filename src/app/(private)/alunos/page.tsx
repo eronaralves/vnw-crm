@@ -18,16 +18,17 @@ export default async function Students(props: { searchParams: SearchParams }) {
   return (
     <div className="flex-1 h-full flex flex-col p-4 overflow-auto">
       <Suspense>
-        <Tabs defaultValue={status} className="flex-1">
+        <Tabs
+          defaultValue={status}
+          className="h-screen flex flex-col overflow-hidden"
+        >
           <div className="w-full flex gap-3 flex-wrap items-center justify-between">
             <TabsFilters />
 
             <FormSearch />
           </div>
 
-          <div className="pt-4 flex-1 h-full flex flex-col gap-10 ">
-            <ListStudent status={status} />
-          </div>
+          <ListStudent status={status} />
         </Tabs>
       </Suspense>
     </div>
