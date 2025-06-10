@@ -74,7 +74,7 @@ export function ListAdmins() {
                 <TableHead className="px-5 pb-5 text-left whitespace-nowrap">
                   <div className="flex flex-col gap-2">
                     <strong className="text-sm font-bold text-black">
-                      Email
+                      E-mail
                     </strong>
                   </div>
                 </TableHead>

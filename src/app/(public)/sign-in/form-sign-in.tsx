@@ -66,7 +66,7 @@ export function FormSignIn() {
     >
       <div className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
-          <label className="text-md text-[#0f2b92]">Email</label>
+          <label className="text-md text-[#0f2b92]">E-mail</label>
           <Input
             type="email"
             placeholder="Digite o email"

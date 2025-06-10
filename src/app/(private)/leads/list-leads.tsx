@@ -218,7 +218,7 @@ export function ListLeads() {
               <TableHead className="min-w-[400px] px-5 pb-5 pl-[60px] text-left whitespace-nowrap overflow-visible">
                 <div className=" flex flex-col gap-2">
                   <strong className="text-sm font-bold text-black ">
-                    Aluno
+                    Nome
                   </strong>
                   <span className="text-[#80838e] font-normal m-0">ID</span>
                 </div>
