@@ -5,13 +5,14 @@ import { usePathname } from 'next/navigation'
 
 // Icons
 import {
+  // Eye,
+  Mail,
+  Users,
+  UserCog,
   BookOpen,
+  PlusCircle,
   GraduationCap,
   HeartHandshake,
-  Mail,
-  PlusCircle,
-  UserCog,
-  Users,
 } from 'lucide-react'
 
 export function ManuNavLinks() {
@@ -33,6 +34,11 @@ export function ManuNavLinks() {
       href: '/cursos',
       icon: BookOpen,
     },
+    // {
+    //   label: 'Jornada',
+    //   href: '/jornada',
+    //   icon: Eye,
+    // },
     {
       label: 'Equipe',
       href: '/equipe',

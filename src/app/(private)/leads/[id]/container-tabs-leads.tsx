@@ -238,6 +238,7 @@ export function ContainerTabsLeads({ lead }: ContentProfileProps) {
           (path) =>
             path.startsWith('fullname') ||
             path.startsWith('cpf') ||
+            path.startsWith('phone') ||
             path.startsWith('birth_date') ||
             path.startsWith('linkedin'),
         )

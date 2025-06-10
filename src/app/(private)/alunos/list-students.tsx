@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, Fragment } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -18,20 +18,13 @@ import { useDebounce } from '@/hooks/useDebouce'
 import { useFiltersStudents } from '@/hooks/useFiltersStudents'
 
 // Utils
+import { cn } from '@/lib/utils'
 import { formatPhone } from '@/utils/format-phone'
 import { filtersTableStudents } from '@/utils/filters'
 import { parseSearchParamsToObject } from '@/utils/parse-search-params-to-object'
 
 // Icons
-import {
-  Check,
-  CheckCircle,
-  ChevronDown,
-  FileDown,
-  FileUp,
-  Loader2,
-  Trash,
-} from 'lucide-react'
+import { CheckCircle, FileDown, FileUp, Loader2 } from 'lucide-react'
 
 // Components
 import {
@@ -42,13 +35,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  Listbox,
-  ListboxButton,
-  ListboxOption,
-  ListboxOptions,
-  Transition,
-} from '@headlessui/react'
+
 import { Button } from '@/components/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { LIMIT_PER_PAGE, Pagination } from '@/components/pagination'
@@ -62,6 +49,7 @@ import { ButtonFailStudents } from '@/components/button-fail-students'
 import { ButtonEvadeStudents } from '@/components/button-evade-students'
 import { AlertError } from '@/components/alert-error'
 import { ButtonGraduatedStudents } from '@/components/button-graduated'
+import { SelectMultiple } from '@/components/select-multiple'
 
 type Spreadsheet = {
   link: string
@@ -78,7 +66,8 @@ interface ListStudentProps {
 }
 
 export function ListStudent({ status }: ListStudentProps) {
-  const [allChecked, setAllChecked] = useState(false)
+  const [filtersInTable, setFiltersInTable] = useState(filtersTableStudents)
+
   const [isExporting, setisExporting] = useState(false)
   const [exportedSpreadsheet, setExportedSpreadsheet] =
     useState<null | Spreadsheet>(null)
@@ -86,7 +75,6 @@ export function ListStudent({ status }: ListStudentProps) {
     [],
   )
 
-  const [filters, setFilters] = useState(filtersTableStudents)
   const [ageMin, setAgeMin] = useState('')
   const [ageMax, setAgeMax] = useState('')
 
@@ -95,7 +83,6 @@ export function ListStudent({ status }: ListStudentProps) {
 
   const router = useRouter()
   const searchParams = useSearchParams()
-  const params = new URLSearchParams(searchParams.toString())
 
   const {
     page,
@@ -171,34 +158,35 @@ export function ListStudent({ status }: ListStudentProps) {
     refetchInterval: 1000 * 30, // 30s
     staleTime: 1000 * 30, // 30s
     placeholderData: (data) => data,
-    retry: 3,
+    retry: 1,
     retryDelay: (attempt) => Math.min(attempt * 1000, 5000),
   })
 
-  useQuery({
+  const { data: filters, isLoading: loadingFilters } = useQuery({
     queryKey: ['get-options-filter-students'],
-    queryFn: async () =>
-      await getOptionsFilters().then((res) => {
-        const optionsFilter = res.data
+    queryFn: getOptionsFilters,
+    select: (res) => {
+      const optionsFilter = res.data
 
-        const newFiltersOptions = filters.map((filter) => {
-          if (!filter.id) {
-            return filter
-          }
+      return filtersInTable.map((filter) => {
+        if (!filter.id) return filter
 
-          const options = optionsFilter[filter.id]
-          const clearOptions = options.filter((option: string) => option)
+        const options = optionsFilter[filter.id] || []
+        const clearOptions = options
+          .filter((option: string) => option)
+          .map((item: string) => {
+            return {
+              label: item,
+              value: item,
+            }
+          })
 
-          return {
-            ...filter,
-            options: clearOptions,
-          }
-        })
-
-        setFilters(newFiltersOptions)
-
-        return res
-      }),
+        return {
+          ...filter,
+          options: clearOptions,
+        }
+      })
+    },
   })
 
   function handleStudentSelection({
@@ -216,32 +204,43 @@ export function ListStudent({ status }: ListStudentProps) {
           (studentSelect) => studentSelect.id_student !== id_student,
         ),
       )
-      setAllChecked(false)
     } else {
       setSelectedStudents([
         ...selectedStudents,
         { id_student, id_module, enrollmentId },
       ])
-      if (selectedStudents.length + 1 === dataStudents?.students?.length) {
-        setAllChecked(true)
-      }
     }
   }
 
-  function handleMultiSelect(filterKey: string, selected: string[]) {
-    params.delete('page')
-    params.delete(filterKey)
+  function onAllCheckedChange(checked: boolean | string) {
+    if (checked) {
+      const newSelections =
+        dataStudents?.students.map((student) => ({
+          id_student: student.id,
+          id_module: student.course.moduleCurrent,
+          enrollmentId: student.errolmentId,
+        })) || []
 
-    selected.forEach((value) => {
-      params.append(filterKey, value)
-    })
+      const updatedSelected = [
+        ...selectedStudents.filter(
+          (studentSelected) =>
+            !dataStudents?.students.some(
+              (student) => student.id === studentSelected.id_student,
+            ),
+        ),
+        ...newSelections,
+      ]
 
-    router.push(`?${params.toString()}`)
-  }
-
-  function handleRemoveAllFilter(filterKey: string) {
-    params.delete(filterKey)
-    router.push(`?${params.toString()}`)
+      setSelectedStudents(updatedSelected)
+    } else {
+      const updatedSelected = selectedStudents.filter(
+        (studentSelected) =>
+          !dataStudents?.students.some(
+            (student) => student.id === studentSelected.id_student,
+          ),
+      )
+      setSelectedStudents(updatedSelected)
+    }
   }
 
   async function handleExportStudent() {
@@ -275,6 +274,12 @@ export function ListStudent({ status }: ListStudentProps) {
     }
   }
 
+  useEffect(() => {
+    if (filters) {
+      setFiltersInTable(filters)
+    }
+  }, [filters])
+
   return (
     <div className="flex-1 h-full flex flex-col gap-10">
       <div className="flex flex-col gap-6">
@@ -284,6 +289,7 @@ export function ListStudent({ status }: ListStudentProps) {
               <Button title="Importar">
                 <FileDown size={17} color="#fff" />
               </Button>
+
               <Link href="/alunos/novo-aluno">
                 <Button title="Adicionar" />
               </Link>
@@ -333,26 +339,10 @@ export function ListStudent({ status }: ListStudentProps) {
               <TableHead className="w-[50px] px-5 text-left whitespace-nowrap z-50">
                 <Checkbox
                   className="w-5 h-5"
-                  checked={allChecked}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setSelectedStudents(
-                        dataStudents?.students
-                          ? dataStudents?.students?.map((student) => {
-                              return {
-                                id_student: student.id,
-                                id_module: student.course.moduleCurrent,
-                                enrollmentId: student.errolmentId,
-                              }
-                            })
-                          : [],
-                      )
-                      setAllChecked(true)
-                    } else {
-                      setSelectedStudents([])
-                      setAllChecked(false)
-                    }
-                  }}
+                  checked={dataStudents?.students.every((student) =>
+                    selectedStudents.some((s) => s.id_student === student.id),
+                  )}
+                  onCheckedChange={(checked) => onAllCheckedChange(checked)}
                 />
               </TableHead>
 
@@ -402,7 +392,7 @@ export function ListStudent({ status }: ListStudentProps) {
                 </div>
               </TableHead>
 
-              {filters.map((filter) => {
+              {filtersInTable?.map((filter) => {
                 if (filter.value === 'reason_give_up' && status !== 'Evadiu') {
                   return null
                 }
@@ -416,80 +406,11 @@ export function ListStudent({ status }: ListStudentProps) {
                       <label className="text-black font-bold">
                         {filter.name}
                       </label>
-                      <Listbox
-                        value={searchParams.getAll(filter.value)}
-                        onChange={(value) =>
-                          handleMultiSelect(filter.value, value)
-                        }
-                        multiple
-                      >
-                        <div className="relative w-[180px] z-[999px]">
-                          <ListboxButton className="z-50 w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500">
-                            <span className="block truncate ">
-                              {params?.getAll(filter.value)?.length
-                                ? `${params?.getAll(filter.value)?.length} selecionado(s)`
-                                : 'Todos'}
-                            </span>
-                            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                              <ChevronDown className="h-4 w-4 text-gray-400" />
-                            </span>
-                          </ListboxButton>
 
-                          <Transition
-                            as={Fragment}
-                            leave="transition ease-in duration-100 overflow-auto bg-white"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                          >
-                            <ListboxOptions className="absolute mt-1 overflow-auto max-h-[300px] min-w-[150px] z-[999px] rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                              {filter?.options?.map((option, index) => (
-                                <ListboxOption
-                                  key={index}
-                                  value={option}
-                                  className={({ active }) =>
-                                    `relative z-[999px] cursor-default select-none py-2 pl-10 pr-4 ${
-                                      active
-                                        ? 'bg-blue-100 text-blue-900'
-                                        : 'text-gray-900'
-                                    }`
-                                  }
-                                >
-                                  {({ selected }) => (
-                                    <>
-                                      <span
-                                        className={`block truncate ${
-                                          selected
-                                            ? 'font-medium'
-                                            : 'font-normal'
-                                        }`}
-                                      >
-                                        {option}
-                                      </span>
-                                      {selected && (
-                                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
-                                          <Check className="w-4 h-4" />
-                                        </span>
-                                      )}
-                                    </>
-                                  )}
-                                </ListboxOption>
-                              ))}
-                            </ListboxOptions>
-                          </Transition>
-
-                          {params?.getAll(filter.value)?.length > 0 && (
-                            <button
-                              onClick={() =>
-                                handleRemoveAllFilter(filter.value)
-                              }
-                              className="absolute -right-7 top-2 cursor-pointer"
-                              title="Apagar filtros"
-                            >
-                              <Trash size={18} className="text-red-500" />
-                            </button>
-                          )}
-                        </div>
-                      </Listbox>
+                      <SelectMultiple
+                        filter={filter}
+                        isLoading={loadingFilters}
+                      />
                     </div>
                   </TableHead>
                 )
@@ -502,19 +423,18 @@ export function ListStudent({ status }: ListStudentProps) {
               ? dataStudents?.students?.map((student) => (
                   <TableRow
                     key={student?.errolmentId}
-                    className={`${isFetching ? 'opacity-40' : ''}`}
-                    onClick={(e) => {
-                      const target = e.target as HTMLElement
-
-                      if (target.closest('[data-ignore-row-click]')) return
-
+                    className={cn(
+                      'hover:bg-gray-200/50',
+                      isFetching && 'opacity-40',
+                    )}
+                    onClick={() => {
                       router.push(`/alunos/${student.errolmentId}`)
                     }}
                   >
                     <TableCell className="p-5 whitespace-nowrap">
                       <Checkbox
-                        data-ignore-row-click
                         className="w-5 h-5"
+                        onClick={(e) => e.stopPropagation()}
                         checked={Boolean(
                           selectedStudents.find(
                             (studentSelect) =>
@@ -739,7 +659,7 @@ export function ListStudent({ status }: ListStudentProps) {
                     </span>
                   )}
 
-                  {filters.map((filter) => {
+                  {filters?.map((filter) => {
                     if (filtersSelectedInobject[filter.value]) {
                       return (
                         <span key={filter.name}>

@@ -254,6 +254,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
           (path) =>
             path.startsWith('fullname') ||
             path.startsWith('cpf') ||
+            path.startsWith('phone') ||
             path.startsWith('birth_date') ||
             path.startsWith('linkedin'),
         )
@@ -297,6 +298,9 @@ export function ContainerTabs({ student }: ContentProfileProps) {
               type="button"
               title={isEditing ? 'Resetar' : 'Editar'}
               onClick={() => {
+                if (isEditing) {
+                  methods.reset()
+                }
                 setIsEditing(!isEditing)
               }}
               className="flex items-center gap-1"
@@ -356,6 +360,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
               >
                 Jornada do aluno
               </TabsTrigger>
+
               {student.status === 'Evadiu' && (
                 <TabsTrigger
                   value={TABS.REASON_EVASION}
@@ -364,6 +369,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
                   Motivo da Evasão
                 </TabsTrigger>
               )}
+
               <TabsTrigger
                 value={TABS.PERSONAL}
                 className="relative data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
@@ -376,6 +382,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
                   />
                 )}
               </TabsTrigger>
+
               <TabsTrigger
                 value={TABS.SOCIO_ECONOMIC}
                 className="relative data-[state=active]:bg-[#173A92] bg-[#a7b1d7] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
@@ -388,6 +395,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
                   />
                 )}
               </TabsTrigger>
+
               <TabsTrigger
                 value={TABS.TECHNOLOGY}
                 className="relative data-[state=active]:bg-[#173A92] bg-[#a7b1d7] min-w-[170px] max-w-max text-white h-12 px-8 rounded-b-none text-sm"
@@ -412,6 +420,7 @@ export function ContainerTabs({ student }: ContentProfileProps) {
                   />
                 )}
               </TabsTrigger>
+
               <TabsTrigger
                 value={TABS.ANNEXES}
                 className="relative data-[state=active]:bg-[#173A92] bg-[#a7b1d7] min-w-[170px] max-w-max text-white h-12 px-8 rounded-b-none text-sm"

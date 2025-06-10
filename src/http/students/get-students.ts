@@ -94,7 +94,7 @@ export async function getStudents({
     const data = response.data
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const students: Student[] = data.results.map((student: any) => {
+    const students: Student[] = data.results?.map((student: any) => {
       return {
         errolmentId: student.id,
         ...student?.id_student,
@@ -108,7 +108,7 @@ export async function getStudents({
     })
 
     return {
-      count: data.count,
+      count: data?.count,
       students,
     }
   } catch (error) {
