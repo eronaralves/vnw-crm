@@ -136,7 +136,7 @@ export function StepPersonalData({ isEditing = true }: StepPersonalDataProps) {
         </div>
 
         <div className="w-full max-w-64 flex flex-col gap-1">
-          <label className="text-sm font-normal">Email</label>
+          <label className="text-sm font-normal">E-mail</label>
           <Input
             variant="secondary"
             disabled={!isEditing}
@@ -341,7 +341,7 @@ export function StepPersonalData({ isEditing = true }: StepPersonalDataProps) {
 
               <div className="w-full max-w-80 flex flex-col gap-1">
                 <label className="text-sm font-normal">
-                  Email do responsável
+                  E-mail do responsável
                 </label>
                 <Input
                   variant="secondary"

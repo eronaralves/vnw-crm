@@ -36,7 +36,7 @@ export function FormSearch() {
       <input
         name="search"
         type="text"
-        placeholder="O que você procura?"
+        placeholder="Quem você procura?"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="w-full max-w-[425px] h-full px-4 py-2 text-sm font-medium rounded-md border border-gray-300 placeholder:text-black"
